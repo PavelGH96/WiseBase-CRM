@@ -582,9 +582,31 @@ body.t6 .tag-new{background:#eef2f7;color:#52606e}
 .tl-row > *:nth-child(8),.tl-thead > *:nth-child(8){width:var(--tw-8)}
 .tl-row > *:nth-child(9),.tl-thead > *:nth-child(9){width:var(--tw-9);overflow:visible;display:flex;justify-content:flex-end;gap:4px}
 .tl-thead > *{padding-top:8px;padding-bottom:8px}
+/* Мобильная раскладка таблицы задач (используется и на странице «Задачи», и в
+   табличном виде дашборда — обе используют одни и те же .tl-row/.tl-thead).
+   На узком экране 9 колонок в ряд физически не помещаются — вместо сжатия до
+   нечитаемых огрызков переверстываем строку в компактную «карточку»: тип и действия
+   в одну строку сверху, описание — крупно и на всю ширину под ними, а клиент/
+   приоритет/дата/время — мелкой строкой снизу. Шапка таблицы (.tl-thead) в таком
+   виде не нужна — над каждым полем и так есть смысловой контекст. */
 @media(max-width:600px){
-  .task-list.list-view{display:none}
+  .tl-thead{display:none}
+  .tl-row{display:flex;flex-wrap:wrap;align-items:center;gap:3px 8px;width:auto;padding:2px 0}
+  .tl-row > *{width:auto!important;flex:none;padding:2px 0!important;overflow:visible!important;text-overflow:clip!important;white-space:normal!important}
+  .tl-row > *:nth-child(1){order:1;padding-left:0!important}
+  .tl-row > *:nth-child(2){order:2}
+  .tl-row > *:nth-child(3){order:3}
+  .tl-row > *:nth-child(9){order:4;margin-left:auto;display:flex!important;justify-content:flex-end;gap:2px}
+  .tl-row > *:nth-child(4){order:5;flex:1 1 100%!important;font-size:14px;font-weight:500;color:var(--text)}
+  .tl-row > *:nth-child(5){order:6;font-size:12px;color:var(--t2)}
+  .tl-row > *:nth-child(6){order:7;font-size:12px}
+  .tl-row > *:nth-child(7){order:8;font-size:12px;color:var(--t2)}
+  .tl-row > *:nth-child(8){order:9;font-size:12px;color:var(--t2)}
+  .tl-row > *:nth-child(5):empty,.tl-row > *:nth-child(7):empty,.tl-row > *:nth-child(8):empty{display:none!important}
 }
+/* Было: на узком экране список задач ПОЛНОСТЬЮ прятался (см. ниже — теперь там
+   настоящая мобильная раскладка .tl-row/.tl-thead), из-за чего страница «Задачи»
+   в табличном виде выглядела пустой — контент не пропадал, просто был скрыт CSS. */
 
 .badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:500;white-space:nowrap}
 .badge-call{background:var(--blue-bg);color:var(--blue)}
