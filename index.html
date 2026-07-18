@@ -1151,6 +1151,59 @@ kbd{display:inline-flex;align-items:center;justify-content:center;min-width:26px
 .mob-search-bar .gsearch-wrap{max-width:100%}
 .mob-search-bar .gsearch{font-size:16px}
 
+/* === МОБИЛЬНЫЕ УЛУЧШЕНИЯ (v16) === */
+/* 4. Меню «Ещё» нижней навигации */
+.mob-more-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:198}
+.mob-more-menu{display:none;position:fixed;left:10px;right:10px;bottom:calc(74px + env(safe-area-inset-bottom,0));background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,.28);z-index:199;padding:8px;flex-direction:column}
+body.mob-more-open .mob-more-menu{display:flex}
+body.mob-more-open .mob-more-backdrop{display:block}
+.mob-more-item{display:flex;align-items:center;gap:10px;min-height:48px;padding:10px 14px;border:none;background:transparent;color:var(--text);font-size:15px;font-weight:500;font-family:var(--font);border-radius:10px;text-align:left;cursor:pointer}
+.mob-more-item:active{background:var(--bg)}
+.mob-more-item.active{color:var(--accent);font-weight:650}
+/* 6. Индикатор pull-to-refresh */
+#ptr-ind{position:fixed;top:calc(8px + env(safe-area-inset-top,0));left:50%;transform:translateX(-50%) translateY(-64px);background:var(--card);border:1px solid var(--border);border-radius:20px;box-shadow:0 6px 20px rgba(0,0,0,.18);padding:8px 16px;font-size:13px;font-weight:500;color:var(--t2);z-index:300;transition:transform .2s;pointer-events:none;white-space:nowrap}
+#ptr-ind.show{transform:translateX(-50%) translateY(0)}
+
+@media(max-width:600px){
+  /* 1. Задачи: таблица → карточки */
+  .tl-thead{display:none!important}
+  .task-list.list-view{border:none;background:transparent;overflow:visible;gap:8px}
+  .task-list.list-view .task-row{border:1px solid var(--border)!important;border-radius:var(--radius)!important;background:var(--card)}
+  .task-list.list-view .task-row.overdue{border-left:3px solid var(--red)!important}
+  .task-list.list-view .task-row.prio-h{border-left:3px solid var(--amber)!important}
+  .task-list.list-view .tl-row{flex-wrap:wrap;gap:6px 10px;padding:11px 12px;align-items:center}
+  .task-list.list-view .tl-row>div{padding:0!important;width:auto!important}
+  .task-list.list-view .tl-row>div:nth-child(4){flex:1 1 100%;order:8;white-space:normal;font-size:14.5px;line-height:1.35}
+  .task-list.list-view .tl-row>div:nth-child(5){order:9;font-size:12.5px;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+  .task-list.list-view .tl-row>div:nth-child(6){order:2}
+  .task-list.list-view .tl-row>div:nth-child(7){order:3;margin-left:auto}
+  .task-list.list-view .tl-row>div:nth-child(8){order:4}
+  .task-list.list-view .tl-row>div:nth-child(9){order:10;margin-left:auto;display:flex;gap:4px}
+  /* 1. Клиенты: строка списка → карточка */
+  .cl-thead{display:none!important}
+  .cl-row{flex-wrap:wrap;width:100%!important;min-width:0!important;gap:4px 8px;padding:10px 12px}
+  .cl-row>*{width:auto!important;padding:2px 0!important;white-space:normal!important;flex-shrink:1!important}
+  .cl-row>*:first-child{padding-left:0!important}
+  .cl-row>*:nth-child(3){flex:1 1 auto;min-width:0}
+  /* 3. Зоны нажатия ≥44px */
+  .btn-icon{width:40px;height:40px;min-width:40px}
+  .btn.btn-sm{min-height:40px}
+  .pin-btn{width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center}
+  .task-row input[type="checkbox"],.cl-row input[type="checkbox"]{width:20px;height:20px}
+  /* 5. Воронка: карусель со snap */
+  .dash-kanban{flex-direction:row!important;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;gap:10px}
+  .dash-kanban-col{flex:0 0 86vw;min-width:86vw;max-width:86vw;scroll-snap-align:center}
+  /* 7. Сворачиваемый поиск */
+  #mob-search-bar{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-bottom:10px}
+  #mob-search-bar .gsearch-wrap{display:none}
+  #mob-search-bar.open .gsearch-wrap{display:block;flex:1}
+  .mob-search-toggle{display:flex;align-items:center;justify-content:center;width:42px;height:42px;border-radius:12px;border:1px solid var(--border);background:var(--card);color:var(--t2);font-size:19px;cursor:pointer;flex-shrink:0;font-family:var(--font)}
+  #mob-search-bar.open .mob-search-toggle{color:var(--accent);border-color:var(--accent)}
+  /* 8. Кнопки модалок во всю ширину, липкие к низу */
+  .mfoot{position:sticky;bottom:-1px;background:var(--card);padding:12px 0 2px;margin-top:14px;gap:10px;z-index:2}
+  .mfoot .btn{flex:1 1 0;justify-content:center;min-height:46px;font-size:15px}
+}
+
 @media(max-width:600px){
   .shell{padding:calc(12px + env(safe-area-inset-top,0)) 12px 90px;flex-direction:column}
   .rail{display:none}
@@ -1566,7 +1619,7 @@ button,a,select,label{touch-action:manipulation}
         <div style="border-top:1px solid var(--border);margin:2px 0 8px"></div>
         <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:flex-start;margin-bottom:6px" onclick="openChangePassword()">🔑 Сменить пароль</button>
         <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:flex-start" onclick="confirmLogout()">🚪 Выйти</button>
-        <div style="font-size:10px;color:var(--t2);text-align:center;padding:8px 4px 2px;border-top:1px solid var(--border);margin-top:6px;letter-spacing:.02em;opacity:.7">Версия: 17.07.2026 — ver 3</div>
+        <div style="font-size:10px;color:var(--t2);text-align:center;padding:8px 4px 2px;border-top:1px solid var(--border);margin-top:6px;letter-spacing:.02em;opacity:.7">Версия: 18.07.2026 — ver 4</div>
       </div>
     </div>
   </div>
@@ -1644,7 +1697,8 @@ button,a,select,label{touch-action:manipulation}
 </div>
 
 <!-- Поиск на мобильных (≤600px) — на десктопе скрыт, вместо него используется .nav-row -->
-<div class="mob-search-bar">
+<div class="mob-search-bar" id="mob-search-bar">
+  <button class="mob-search-toggle" onclick="toggleMobSearch()" aria-label="Открыть поиск">⌕</button>
   <div class="gsearch-wrap">
     <span class="gsearch-icon">⌕</span>
     <input class="gsearch" type="text" placeholder="Поиск везде..." oninput="globalSearch(this.value,'gsearch-mobile')" onfocus="gsFocus('gsearch-mobile')" id="gsearch-mobile" aria-label="Поиск везде">
@@ -2270,11 +2324,15 @@ button,a,select,label{touch-action:manipulation}
     <button class="mob-nav-btn" id="mob-btn-clients" onclick="showPage('clients')"><div class="icon">👥</div><span>Клиенты</span></button>
     <button class="mob-nav-btn" id="mob-btn-tasks" onclick="showPage('tasks')"><div class="icon" id="mob-tasks-icon">📋<span class="mob-badge" id="mob-tasks-badge" style="display:none">0</span></div><span>Задачи</span></button>
     <button class="mob-nav-btn" id="mob-btn-offers" onclick="showPage('offers')"><div class="icon">🎯</div><span>Предложения</span></button>
-    <button class="mob-nav-btn" id="mob-btn-trips" onclick="showPage('trips')"><div class="icon">🧳</div><span>Карта</span></button>
-    <button class="mob-nav-btn" id="mob-btn-analytics" onclick="showPage('analytics')"><div class="icon">📈</div><span>Аналитика</span></button>
-    <button class="mob-nav-btn" id="mob-btn-stats" onclick="showPage('stats')"><div class="icon">📊</div><span>Статистика</span></button>
-    <button class="mob-nav-btn" id="mob-btn-links" onclick="showPage('links')"><div class="icon">🔗</div><span>Ссылки</span></button>
+    <button class="mob-nav-btn" id="mob-btn-more" onclick="toggleMobMore()" aria-label="Ещё разделы"><div class="icon">⋯</div><span>Ещё</span></button>
   </div>
+</div>
+<div class="mob-more-backdrop" id="mob-more-backdrop" onclick="closeMobMore()"></div>
+<div class="mob-more-menu" id="mob-more-menu" role="menu">
+  <button class="mob-more-item" id="mob-btn-trips" onclick="closeMobMore();showPage('trips')">🧳 Карта поездок</button>
+  <button class="mob-more-item" id="mob-btn-analytics" onclick="closeMobMore();showPage('analytics')">📈 Аналитика</button>
+  <button class="mob-more-item" id="mob-btn-stats" onclick="closeMobMore();showPage('stats')">📊 Статистика</button>
+  <button class="mob-more-item" id="mob-btn-links" onclick="closeMobMore();showPage('links')">🔗 Ссылки/Контакты</button>
 </div>
 <button class="fab" onclick="openAddTask()" aria-label="Добавить задачу">＋</button>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -2832,6 +2890,14 @@ const R=n=>{
   const s=Math.abs(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g,'\u00A0');
   return (num<0?'-':'')+s+' ₽';
 };
+// 9. Компактный формат для мобильного: 1,2 млн ₽ / 340 тыс ₽
+const RC=n=>{
+  const v=Math.round(Number(n||0)),a=Math.abs(v),sg=v<0?'-':'';
+  if(a>=1e6)return sg+(Math.round(a/1e5)/10).toString().replace('.',',')+' млн ₽';
+  if(a>=1e4)return sg+Math.round(a/1e3)+' тыс ₽';
+  return R(v);
+};
+const RM=n=>(typeof matchMedia!=='undefined'&&matchMedia('(max-width:600px)').matches)?RC(n):R(n);
 const FD=s=>{if(!s)return'';const[y,m,d]=s.split('-');return`${d}.${m}.${y}`;};
 // Русское склонение числительных: pluralRu(2,'клиент','клиента','клиентов') -> 'клиента'
 function pluralRu(n,one,few,many){
@@ -2847,7 +2913,7 @@ const GC=id=>S.clients.find(c=>c.id===id)||{name:'—',company:'',tags:[]};
 // Без этого имя/заметка/текст задачи и т.п. могли содержать <img onerror=...> или <script> и выполниться в CRM.
 const esc=s=>String(s??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 
-function toast(m){const el=document.getElementById('toast');el.textContent=m;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2400);}
+function toast(m){haptic(8);const el=document.getElementById('toast');el.textContent=m;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2400);}
 // Нормализация телефона к международному формату из одних цифр: "+7 900 123-45-67" -> "79001234567".
 // Ведущую 8 (по привычке) заменяем на 7 — российский код страны.
 // Нормализация телефона к международному формату из одних цифр для ссылок (Telegram и т.п.).
@@ -3677,8 +3743,11 @@ function showPage(p){
   if(idx>=0){const activeBtn=document.querySelectorAll('.nav-btn')[idx];activeBtn.classList.add('active');activeBtn.setAttribute('aria-current','page');}
   // Мобильная навигация
   document.querySelectorAll('.mob-nav-btn').forEach(b=>{b.classList.remove('active');b.removeAttribute('aria-current');});
+  document.querySelectorAll('.mob-more-item').forEach(b=>{b.classList.remove('active');b.removeAttribute('aria-current');});
   const mb=document.getElementById('mob-btn-'+p);
   if(mb){mb.classList.add('active');mb.setAttribute('aria-current','page');}
+  const mMore=document.getElementById('mob-btn-more');
+  if(mMore)mMore.classList.toggle('active',['trips','analytics','stats','links'].includes(p));
   // Боковой рельс
   document.querySelectorAll('.rail-item').forEach(b=>{b.classList.remove('active');b.removeAttribute('aria-current');});
   const rb=document.getElementById('rail-btn-'+p);
@@ -4038,7 +4107,7 @@ function mkNoStepWidget(noStep){
       <span class="ddw-ic">🎯</span>
       <div class="ddw-body">
         <div class="ddw-title">${noStep.length} ${pluralRu(noStep.length,'клиент','клиента','клиентов')} в воронке без следующего шага</div>
-        <div class="ddw-sub">Ни задачи, ни визита, ни даты контакта · потенциал ${R(pot)}</div>
+        <div class="ddw-sub">Ни задачи, ни визита, ни даты контакта · потенциал ${RM(pot)}</div>
       </div>
       <span class="ddw-cta">Разобрать <span aria-hidden="true">→</span></span>
     </div>`;
@@ -4668,7 +4737,7 @@ function renderClients(){
             </div>
           </div>
           <div>${mkStatusBadge(c)}</div>
-          <div style="font-size:12px;font-weight:500">${c.potential?R(c.potential):'—'}</div>
+          <div style="font-size:12px;font-weight:500">${c.potential?RM(c.potential):'—'}</div>
           <div style="font-size:12px;color:var(--t2)">${getChannels(c).length?getChannels(c).map(ch=>`<span style="display:inline-block;padding:1px 7px;border-radius:20px;font-size:11px;font-weight:500;background:var(--blue-bg);color:var(--blue);margin:1px 2px 1px 0">${ch}</span>`).join(''):'<span style="color:var(--t3)">—</span>'}</div>
           <div style="font-size:12px;color:var(--t2)">${getFormats(c).length?getFormats(c).join(', '):'<span style="color:var(--t3)">—</span>'}</div>
           <div>${tasks?`<span class="badge badge-task">${tasks}</span>`:'<span style="color:var(--t3)">—</span>'}</div>
@@ -4698,7 +4767,7 @@ function renderClients(){
           ${mkGeoLinks(c)}
         </div>
         <div class="cc-tags" style="margin-bottom:6px;align-items:center">
-          ${c.potential?`<span class="cc-potential">${R(c.potential)}</span>`:''}
+          ${c.potential?`<span class="cc-potential">${RM(c.potential)}</span>`:''}
           ${ncBadge}
           ${tasks?`<span class="badge badge-task">${tasks} задач</span>`:''}
           ${offersCount?`<span class="badge badge-deal">${offersCount} ${pluralRu(offersCount,'предложение','предложения','предложений')}</span>`:''}
@@ -4769,7 +4838,7 @@ function renderClientDetailHTML(c){
     <div class="info-g">
       <div class="info-it"><span>ИНН</span><strong>${esc(c.inn)||'—'}</strong></div>
       ${c.nextContact?`<div class="info-it"><span>Следующий контакт</span><strong style="color:${c.nextContact<TODAY?'var(--red)':c.nextContact===TODAY?'var(--amber)':'var(--text)'}">${FD(c.nextContact)}</strong></div>`:''}
-      ${c.potential?`<div class="info-it"><span>Потенциал</span><strong>${R(c.potential)}</strong></div>`:''}
+      ${c.potential?`<div class="info-it"><span>Потенциал</span><strong>${RM(c.potential)}</strong></div>`:''}
       <div class="info-it"><span>Без контакта</span><strong style="color:${days!==null&&days>=30?'var(--red)':'var(--text)'}">${days!==null?days+'д':'—'}</strong></div>
       ${getChannels(c).length?`<div class="info-it"><span>Канал продаж</span><strong style="display:flex;gap:4px;flex-wrap:wrap">${getChannels(c).map(ch=>`<span style="padding:2px 8px;border-radius:20px;font-size:12px;font-weight:500;background:var(--blue-bg);color:var(--blue)">${ch}</span>`).join('')}</strong></div>`:''}
       ${getFormats(c).length?`<div class="info-it"><span>Формат клиента</span><strong style="display:flex;gap:4px;flex-wrap:wrap">${getFormats(c).map(f=>`<span style="padding:2px 8px;border-radius:20px;font-size:12px;font-weight:500;background:var(--blue-bg);color:var(--blue)">${f}</span>`).join('')}</strong></div>`:''}
@@ -6441,7 +6510,7 @@ function renderStuck(){
       <span class="stuck-meta">${esc(statusLabel(c.status))}${c.region?' · '+esc(c.region):''} · ${R(Number(c.potential||0))}</span>
       <span class="stuck-days">${d} ${pluralRu(d,'день','дня','дней')}</span>
     </div>`).join('')
-    +`<div class="an-hint" style="margin-top:12px">Застряло: ${rows.length} ${pluralRu(rows.length,'клиент','клиента','клиентов')} на ${R(pot)}${rows.length>12?' · показаны первые 12':''}</div>`;
+    +`<div class="an-hint" style="margin-top:12px">Застряло: ${rows.length} ${pluralRu(rows.length,'клиент','клиента','клиентов')} на ${RM(pot)}${rows.length>12?' · показаны первые 12':''}</div>`;
 }
 function openClientFromAnalytics(id){ showPage('clients'); setTimeout(()=>openHist(id), 60); }
 
@@ -6484,7 +6553,7 @@ function renderCooling(){
       <span class="stuck-days ${cls}">${d} ${pluralRu(d,'день','дня','дней')}</span>
     </div>`;
   }).join('')
-  +`<div class="an-hint" style="margin-top:12px">Молчат ${coolMin}+ дней: ${rows.length} ${pluralRu(rows.length,'клиент','клиента','клиентов')} на ${R(pot)}${rows.length>12?' · показаны первые 12':''}${unknown?` · ещё у ${unknown} нет данных о касаниях`:''}</div>`;
+  +`<div class="an-hint" style="margin-top:12px">Молчат ${coolMin}+ дней: ${rows.length} ${pluralRu(rows.length,'клиент','клиента','клиентов')} на ${RM(pot)}${rows.length>12?' · показаны первые 12':''}${unknown?` · ещё у ${unknown} нет данных о касаниях`:''}</div>`;
 }
 function setFunnelMode(m){ funnelMode=m; document.querySelectorAll('#funnel-mode button').forEach((b,i)=>b.classList.toggle('active',(i===0)===(m==='count'))); renderFunnel(); }
 function setRegSort(s){ regSort=s; const order=['clients','penetration','potential']; document.querySelectorAll('#reg-sort button').forEach((b,i)=>b.classList.toggle('active',order[i]===s)); renderRegions(); }
@@ -8393,6 +8462,97 @@ async function initApp() {
     if(dl)dl.style.display='none';
   }
 }
+
+// === МОБИЛЬНЫЕ УЛУЧШЕНИЯ (v16) ===
+// 10. Хаптик-отклик (Android; iOS Safari игнорирует вызов без ошибки)
+function haptic(ms){try{if(navigator.vibrate)navigator.vibrate(ms||10);}catch(e){}}
+
+// 4. Меню «Ещё» в нижней навигации
+function toggleMobMore(){document.body.classList.toggle('mob-more-open');}
+function closeMobMore(){document.body.classList.remove('mob-more-open');}
+
+// 7. Сворачиваемый мобильный поиск
+function toggleMobSearch(){
+  const bar=document.getElementById('mob-search-bar');
+  if(!bar)return;
+  bar.classList.toggle('open');
+  const inp=document.getElementById('gsearch-mobile');
+  if(bar.classList.contains('open')){if(inp)setTimeout(()=>inp.focus(),60);}
+  else if(inp){inp.value='';const r=document.getElementById('gsr-mobile');if(r){r.innerHTML='';r.classList.remove('show');}}
+}
+
+// 2. Свайпы по задачам: вправо — выполнить, влево — удалить (только сенсорные экраны)
+(function(){
+  if(!matchMedia('(pointer:coarse)').matches)return;
+  let row=null,sx=0,sy=0,dx=0,act=false;
+  document.addEventListener('touchstart',e=>{
+    row=e.target.closest('.task-row');
+    if(!row)return;
+    if(e.target.closest('button,input,select,textarea,a')){row=null;return;}
+    sx=e.touches[0].clientX;sy=e.touches[0].clientY;dx=0;act=false;
+  },{passive:true});
+  document.addEventListener('touchmove',e=>{
+    if(!row)return;
+    dx=e.touches[0].clientX-sx;
+    const dy=e.touches[0].clientY-sy;
+    if(!act){
+      if(Math.abs(dy)>16&&Math.abs(dy)>Math.abs(dx)){row=null;return;}
+      if(Math.abs(dx)>20)act=true;
+    }
+    if(act){
+      row.style.transition='none';
+      row.style.transform='translateX('+Math.max(-90,Math.min(90,dx))+'px)';
+      row.style.background=dx>40?'var(--green-bg)':dx<-40?'var(--red-bg)':'';
+    }
+  },{passive:true});
+  document.addEventListener('touchend',()=>{
+    if(!row)return;
+    const r=row,id=Number(r.dataset.taskId||r.dataset.tid),fin=act?dx:0;
+    r.style.transition='transform .18s,background .18s';
+    r.style.transform='';r.style.background='';
+    row=null;act=false;
+    if(!id)return;
+    if(fin>=80){haptic(15);if(typeof toggleDoneDb==='function')toggleDoneDb(id);}
+    else if(fin<=-80){haptic(15);if(typeof askDelTaskDb==='function')askDelTaskDb(id);}
+  },{passive:true});
+})();
+
+// 6. Pull-to-refresh: потянуть страницу вниз с самого верха — обновление данных
+(function(){
+  if(!matchMedia('(pointer:coarse)').matches)return;
+  const ind=document.createElement('div');
+  ind.id='ptr-ind';ind.textContent='↓ Потяните для обновления';
+  document.body.appendChild(ind);
+  let sy=0,pull=0,armed=false,busy=false;
+  document.addEventListener('touchstart',e=>{
+    if(busy){armed=false;return;}
+    if(e.target.closest('[class*="modal"],.mob-more-menu,.task-row,.dash-kanban')){armed=false;return;}
+    armed=window.scrollY<=0;
+    sy=e.touches[0].clientY;pull=0;
+  },{passive:true});
+  document.addEventListener('touchmove',e=>{
+    if(!armed||busy)return;
+    pull=e.touches[0].clientY-sy;
+    if(pull>24&&window.scrollY<=0){
+      ind.classList.add('show');
+      ind.textContent=pull>90?'↻ Отпустите для обновления':'↓ Потяните для обновления';
+    } else ind.classList.remove('show');
+  },{passive:true});
+  document.addEventListener('touchend',async()=>{
+    if(!armed||busy)return;
+    const go=pull>90&&window.scrollY<=0;
+    armed=false;
+    if(!go){ind.classList.remove('show');return;}
+    busy=true;haptic(12);
+    ind.textContent='↻ Обновляю…';
+    try{
+      if(typeof syncFromSupabase==='function')await syncFromSupabase();
+      if(typeof renderAll==='function')renderAll();
+      toast('Данные обновлены');
+    }catch(e){toast('Не удалось обновить');}
+    ind.classList.remove('show');busy=false;
+  },{passive:true});
+})();
 
 // --- ЗАПУСК ---
 (async () => {
