@@ -580,10 +580,6 @@ body.t6 .tag-new{background:#eef2f7;color:#52606e}
 .tl-row > *:nth-child(8),.tl-thead > *:nth-child(8){width:var(--tw-8)}
 .tl-row > *:nth-child(9),.tl-thead > *:nth-child(9){width:var(--tw-9);overflow:visible;display:flex;justify-content:flex-end;gap:4px}
 .tl-thead > *{padding-top:8px;padding-bottom:8px}
-@media(max-width:600px){
-  .task-list.list-view{display:none}
-}
-
 .badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:500;white-space:nowrap}
 .badge-call{background:var(--blue-bg);color:var(--blue)}
 .badge-meet{background:var(--amber-bg);color:var(--amber)}
@@ -1167,18 +1163,20 @@ body.mob-more-open .mob-more-backdrop{display:block}
 @media(max-width:600px){
   /* 1. Задачи: таблица → карточки */
   .tl-thead{display:none!important}
-  .task-list.list-view{border:none;background:transparent;overflow:visible;gap:8px}
+  .task-list.list-view{display:flex;flex-direction:column;border:none;background:transparent;overflow:visible;gap:8px}
+  .vt-menu{left:0;right:auto;max-width:calc(100vw - 32px)}
   .task-list.list-view .task-row{border:1px solid var(--border)!important;border-radius:var(--radius)!important;background:var(--card)}
   .task-list.list-view .task-row.overdue{border-left:3px solid var(--red)!important}
   .task-list.list-view .task-row.prio-h{border-left:3px solid var(--amber)!important}
-  .task-list.list-view .tl-row{flex-wrap:wrap;gap:6px 10px;padding:11px 12px;align-items:center}
-  .task-list.list-view .tl-row>div{padding:0!important;width:auto!important}
-  .task-list.list-view .tl-row>div:nth-child(4){flex:1 1 100%;order:8;white-space:normal;font-size:14.5px;line-height:1.35}
-  .task-list.list-view .tl-row>div:nth-child(5){order:9;font-size:12.5px;max-width:100%;overflow:hidden;text-overflow:ellipsis}
-  .task-list.list-view .tl-row>div:nth-child(6){order:2}
-  .task-list.list-view .tl-row>div:nth-child(7){order:3;margin-left:auto}
-  .task-list.list-view .tl-row>div:nth-child(8){order:4}
-  .task-list.list-view .tl-row>div:nth-child(9){order:10;margin-left:auto;display:flex;gap:4px}
+  .task-list.list-view .tl-row{padding:11px 12px}
+  .task-list.list-view .tl-row,.funnel-wrap .tl-row{flex-wrap:wrap;gap:6px 10px;align-items:center}
+  .task-list.list-view .tl-row>div,.funnel-wrap .tl-row>div{padding:0!important;width:auto!important}
+  .task-list.list-view .tl-row>div:nth-child(4),.funnel-wrap .tl-row>div:nth-child(4){flex:1 1 100%;order:8;white-space:normal;font-size:14.5px;line-height:1.35}
+  .task-list.list-view .tl-row>div:nth-child(5),.funnel-wrap .tl-row>div:nth-child(5){order:9;font-size:12.5px;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+  .task-list.list-view .tl-row>div:nth-child(6),.funnel-wrap .tl-row>div:nth-child(6){order:2}
+  .task-list.list-view .tl-row>div:nth-child(7),.funnel-wrap .tl-row>div:nth-child(7){order:3;margin-left:auto}
+  .task-list.list-view .tl-row>div:nth-child(8),.funnel-wrap .tl-row>div:nth-child(8){order:4}
+  .task-list.list-view .tl-row>div:nth-child(9),.funnel-wrap .tl-row>div:nth-child(9){order:10;margin-left:auto;display:flex;gap:4px}
   /* 1. Клиенты: строка списка → карточка */
   .cl-thead{display:none!important}
   .cl-row{flex-wrap:wrap;width:100%!important;min-width:0!important;gap:4px 8px;padding:10px 12px}
@@ -1619,7 +1617,7 @@ button,a,select,label{touch-action:manipulation}
         <div style="border-top:1px solid var(--border);margin:2px 0 8px"></div>
         <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:flex-start;margin-bottom:6px" onclick="openChangePassword()">🔑 Сменить пароль</button>
         <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:flex-start" onclick="confirmLogout()">🚪 Выйти</button>
-        <div style="font-size:10px;color:var(--t2);text-align:center;padding:8px 4px 2px;border-top:1px solid var(--border);margin-top:6px;letter-spacing:.02em;opacity:.7">Версия: 18.07.2026 — ver 4</div>
+        <div style="font-size:10px;color:var(--t2);text-align:center;padding:8px 4px 2px;border-top:1px solid var(--border);margin-top:6px;letter-spacing:.02em;opacity:.7">Версия: 18.07.2026 — ver 5</div>
       </div>
     </div>
   </div>
