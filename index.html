@@ -1147,6 +1147,26 @@ kbd{display:inline-flex;align-items:center;justify-content:center;min-width:26px
 .mob-search-bar .gsearch-wrap{max-width:100%}
 .mob-search-bar .gsearch{font-size:16px}
 
+/* === МОБИЛЬНЫЕ УЛУЧШЕНИЯ (v17) === */
+.mob-page-title{display:none;align-items:center;gap:8px;font-size:17px;font-weight:700;letter-spacing:-.01em;min-width:0;flex:1}
+.mob-page-title span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.offline-badge.ok{background:var(--green-bg);color:var(--green)}
+.offline-chip{font-size:11px;padding:4px 9px;border-radius:12px;font-weight:600;white-space:nowrap;flex-shrink:0;cursor:pointer}
+.offline-chip.off{background:var(--red-bg);color:var(--red)}
+.offline-chip.pending{background:var(--amber-bg);color:var(--amber)}
+.offline-chip.ok{background:var(--green-bg);color:var(--green)}
+.mob-nav-btn .icon svg{width:23px;height:23px;display:block}
+.mob-nav-btn .icon{padding:3px 12px;border-radius:12px;transition:background .15s}
+.mob-nav-btn.active .icon{background:color-mix(in srgb,var(--accent) 13%,transparent)}
+.fab-menu{display:none;position:fixed;right:14px;bottom:calc(140px + env(safe-area-inset-bottom,0));background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,.28);z-index:199;padding:8px;flex-direction:column;min-width:235px}
+body.fab-open .fab-menu{display:flex}
+body.fab-open #fab-backdrop{display:block}
+body.fab-open .fab{transform:rotate(45deg)}
+.fab-rec{margin-left:auto;font-size:10.5px;font-weight:700;color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,transparent);padding:2px 8px;border-radius:10px}
+.form-sec-lbl{font-size:11.5px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin:18px 0 10px;padding-top:14px;border-top:1px solid var(--border)}
+.form-sec-lbl.first{margin-top:0;padding-top:0;border-top:none}
+.mob-cta-bar{display:none}
+
 /* === МОБИЛЬНЫЕ УЛУЧШЕНИЯ (v16) === */
 /* 4. Меню «Ещё» нижней навигации */
 .mob-more-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:198}
@@ -1271,6 +1291,40 @@ body.mob-more-open .mob-more-backdrop{display:block}
   body{overscroll-behavior-y:none}
 }
 @keyframes mobSheetIn{from{transform:translateY(48px);opacity:.4}to{transform:none;opacity:1}}
+/* === v17: мобильные переопределения === */
+@media(max-width:600px){
+  /* 1. Зоны нажатия ≥44px */
+  .hdr-right .btn{padding:6px 10px;font-size:12px;min-height:44px}
+  .hdr-right .btn-icon{min-width:44px;min-height:44px}
+  .hdr-right .theme-btn,#notif-bell-btn,#user-menu-btn{min-height:44px;min-width:44px}
+  .btn-icon{width:44px;height:44px;min-width:44px}
+  .btn.btn-sm{min-height:44px}
+  .vt-btn{min-height:44px}
+  .pin-btn{width:44px;height:44px}
+  .mob-search-toggle{width:44px;height:44px}
+  .ch-btn{min-height:40px}
+  .task-done-ck{width:24px;height:24px}
+  .cb-wrap input,.cl-row input[type="checkbox"]{width:22px;height:22px}
+  /* 2. Шапка: название раздела вместо логотипа, второстепенное — в «Ещё» */
+  .logo.wb-logo{display:none!important}
+  .mob-page-title{display:flex}
+  .hdr-right>div:first-child{display:none}
+  #nav-layout-btn,.hk-tip{display:none!important}
+  /* 7. Дашборд «в поле»: сначала требующее действий, метрики — горизонтальная лента */
+  #page-dashboard.active{display:flex;flex-direction:column}
+  #page-dashboard #dash-due{order:1}
+  #page-dashboard .metrics{order:2;display:flex;overflow-x:auto;gap:8px;margin-bottom:12px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;padding-bottom:2px}
+  #page-dashboard .metrics .metric{flex:0 0 40vw;scroll-snap-align:start}
+  #page-dashboard .metrics .dash-due-widget{flex:0 0 86vw;grid-column:auto!important;margin:0!important;scroll-snap-align:start}
+  #page-dashboard .toolbar{order:3}
+  #page-dashboard .page-scroll{order:4}
+  /* 9. CTA-панель в карточке клиента */
+  .mob-cta-bar{display:flex;gap:8px;position:sticky;bottom:calc(78px + env(safe-area-inset-bottom,0));z-index:5;background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.16);padding:8px;margin:12px 0 4px}
+  .mcta{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:54px;border:none;background:var(--bg);border-radius:10px;font-size:11.5px;font-weight:600;color:var(--text);text-decoration:none;font-family:var(--font);cursor:pointer;padding:6px 2px}
+  .mcta span{font-size:19px;line-height:1}
+  /* 10. Индикатор синхронизации — у названия раздела, а не в шапке */
+  #offline-badge{display:none!important}
+}
 html{-webkit-text-size-adjust:100%}
 button,a,select,label{touch-action:manipulation}
 *{-webkit-tap-highlight-color:rgba(0,0,0,0)}
@@ -1562,6 +1616,7 @@ button,a,select,label{touch-action:manipulation}
     </svg>
     <span class="wb-word">Wise<em>Base</em></span>
   </div>
+  <div class="mob-page-title" id="mob-page-title"><span id="mob-page-title-text">Главная</span><span class="offline-chip" id="offline-chip" style="display:none" onclick="flushQueue()"></span></div>
   <div class="today-lbl" id="today-lbl"></div>
   <div class="hdr-right">
     <div style="display:flex;gap:2px">
@@ -1617,7 +1672,7 @@ button,a,select,label{touch-action:manipulation}
         <div style="border-top:1px solid var(--border);margin:2px 0 8px"></div>
         <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:flex-start;margin-bottom:6px" onclick="openChangePassword()">🔑 Сменить пароль</button>
         <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:flex-start" onclick="confirmLogout()">🚪 Выйти</button>
-        <div style="font-size:10px;color:var(--t2);text-align:center;padding:8px 4px 2px;border-top:1px solid var(--border);margin-top:6px;letter-spacing:.02em;opacity:.7">Версия: 18.07.2026 — ver 5</div>
+        <div style="font-size:10px;color:var(--t2);text-align:center;padding:8px 4px 2px;border-top:1px solid var(--border);margin-top:6px;letter-spacing:.02em;opacity:.7">Версия: 18.07.2026 — ver 6</div>
       </div>
     </div>
   </div>
@@ -2074,19 +2129,33 @@ button,a,select,label{touch-action:manipulation}
 <div class="overlay" id="m-task" onkeydown="taskModalKeydown(event)" role="dialog" aria-modal="true" aria-labelledby="m-task-title"><div class="modal"><h3 id="m-task-title">Новая задача</h3><div class="fg-row"><div class="fg"><label for="t-type">Тип</label><select id="t-type"><option value="call">Звонок</option><option value="meet">Встреча</option><option value="task">Задача</option></select></div><div class="fg"><label for="t-prio">Приоритет</label><select id="t-prio"><option value="mid">Средний</option><option value="high">Высокий</option><option value="low">Низкий</option></select></div></div><div class="fg"><label for="t-text">Описание *</label><input type="text" id="t-text" placeholder="Что нужно сделать?"></div><div class="fg"><label for="t-client">Клиент</label><select id="t-client"><option value="0">— без клиента —</option></select></div><div class="fg"><label class="lbl-check"><input type="checkbox" id="t-shared" class="w-auto"> 👥 Общая задача — видна и редактируется всеми пользователями</label></div><div class="fg-row"><div class="fg"><label for="t-date">Дата</label><input type="date" id="t-date"><label class="lbl-check-inline"><input type="checkbox" id="t-nodate" onchange="toggleNoDate()" class="w-auto"> Без даты</label></div><div class="fg"><label for="t-time">Время</label><input type="time" id="t-time" step="600"></div></div><div class="fg"><label for="t-repeat">Повтор</label><select id="t-repeat"><option value="">Без повтора</option><option value="daily">Каждый день</option><option value="weekly">Каждую неделю</option><option value="biweekly">Каждые 2 недели</option><option value="monthly">Каждый месяц</option></select></div><div class="fg"><label for="t-note">Заметка</label><textarea id="t-note" placeholder="Детали..."></textarea></div><div class="mfoot"><button class="btn btn-ghost" onclick="closeModal('m-task')">Отмена</button><button class="btn btn-primary" id="m-task-save-btn" onclick="saveTaskToDb()">Сохранить</button></div></div></div>
 
 <div class="overlay" id="m-client" onkeydown="clientModalKeydown(event)" role="dialog" aria-modal="true" aria-labelledby="m-client-title"><div class="modal"><h3 id="m-client-title">Новый клиент</h3>
-<div class="fg-row"><div class="fg"><label for="c-company">Компания *</label><input type="text" id="c-company" placeholder="ООО Ромашка"></div><div class="fg"><label for="c-sign">Вывеска</label><input type="text" id="c-sign" placeholder="Название на вывеске"></div></div>
+<div class="form-sec-lbl first">Основное</div>
+<div class="fg-row"><div class="fg"><label for="c-company">Компания *</label><input type="text" id="c-company" autocomplete="organization" placeholder="ООО Ромашка"></div><div class="fg"><label for="c-sign">Вывеска</label><input type="text" id="c-sign" placeholder="Название на вывеске"></div></div>
 <div class="fg" id="c-owner-wrap" style="display:none">
   <label for="c-owner">Ответственный</label>
   <select id="c-owner"></select>
   <div class="field-hint">При смене клиент сразу переходит в зону видимости нового ответственного</div>
 </div>
-<div class="collapsible-section">
-<div class="collapsible-toggle" id="client-extra-toggle" onclick="toggleClientExtra()">
-  <span>Дополнительные поля</span>
-  <span class="coll-arrow">▼</span>
+<div class="fg"><label for="c-status">Статус клиента</label><select id="c-status" onchange="onClientStatusChange()" style="font-size:13px;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius-s);background:var(--card);color:var(--text);width:100%;outline:none"><option value="unknown">⚪ Неизвестный</option><option value="potential">🔵 Потенциальный</option><option value="negotiation">🟡 Переговоры</option><option value="active">🟢 Действующий</option><option value="inactive">🔴 Не работаем</option></select></div>
+<div class="fg" id="c-notworking-wrap" style="display:none">
+  <label id="lbl-c-notworking">Причина «Не работаем»</label>
+  <div id="c-notworking" role="group" aria-labelledby="lbl-c-notworking" style="display:flex;flex-direction:column;gap:4px;margin-top:4px"></div>
+  <input type="text" id="c-notworking-other" placeholder="Свой вариант..." style="margin-top:6px;display:none">
 </div>
-<div class="collapsible-body" id="client-extra-body" style="display:none">
-<div class="fg-row"><div class="fg"><label for="c-inn">ИНН</label><input type="text" id="c-inn" placeholder="Введите ИНН" inputmode="numeric" maxlength="12" oninput="this.value=this.value.replace(/\D/g,'').slice(0,12)"><div class="field-hint">10 цифр — для ЮЛ, 12 цифр — для ИП или ФЛ</div></div><div class="fg"><label for="c-potential">Потенциал (₽)</label><input type="text" inputmode="numeric" id="c-potential" placeholder="100 000" oninput="formatAmountInput(this)"></div></div>
+<div class="form-sec-lbl">Контакты</div>
+<div class="fg" style="margin-bottom:6px">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+    <label style="margin-bottom:0" id="lbl-contacts-list">Контактные лица</label>
+    <button type="button" class="btn btn-ghost btn-sm" onclick="addContactRow()" style="padding:4px 10px;font-size:12px">+ Добавить</button>
+  </div>
+  <div id="contacts-list" role="group" aria-labelledby="lbl-contacts-list"></div>
+</div>
+<div class="fg"><label for="c-nextcontact">📅 Следующий контакт</label><input type="date" id="c-nextcontact"></div>
+<div class="form-sec-lbl">Адрес</div>
+<div class="fg-row"><div class="fg"><label for="c-region">Регион</label><select id="c-region" onchange="onRegionChange()"><option value="">— не указан —</option></select></div><div class="fg"><label for="c-city">Город</label><input type="text" id="c-city" list="c-city-list" placeholder="Начните вводить название" autocomplete="off"><datalist id="c-city-list"></datalist></div></div>
+<div class="fg"><label for="c-address">Адрес</label><input type="text" id="c-address" autocomplete="street-address" placeholder="ул. Ленина, 1, офис 101"></div>
+<div class="form-sec-lbl">Продажи</div>
+<div class="fg-row"><div class="fg"><label for="c-potential">Потенциал (₽)</label><input type="text" inputmode="decimal" id="c-potential" placeholder="100 000" oninput="formatAmountInput(this)"></div><div class="fg"><label for="c-category">Категория объекта</label><select id="c-category"><option value="">— не указана —</option></select></div></div>
 <div class="fg-row">
   <div class="fg"><label id="lbl-channel-btns">Канал продаж</label>
     <div id="c-channel-btns" role="group" aria-labelledby="lbl-channel-btns" class="chip-row">
@@ -2103,30 +2172,6 @@ button,a,select,label{touch-action:manipulation}
     </div>
   </div>
 </div>
-<div class="fg-row"><div class="fg"><label for="c-region">Регион</label><select id="c-region" onchange="onRegionChange()"><option value="">— не указан —</option></select></div><div class="fg"><label for="c-city">Город</label><input type="text" id="c-city" list="c-city-list" placeholder="Начните вводить название" autocomplete="off"><datalist id="c-city-list"></datalist></div></div>
-<div class="fg"><label for="c-address">Адрес</label><input type="text" id="c-address" placeholder="ул. Ленина, 1, офис 101"></div>
-</div>
-</div>
-<div class="fg"><label for="c-nextcontact">📅 Следующий контакт</label><input type="date" id="c-nextcontact"></div>
-
-<div class="fg" style="margin-bottom:6px">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-    <label style="margin-bottom:0" id="lbl-contacts-list">Контактные лица</label>
-    <button type="button" class="btn btn-ghost btn-sm" onclick="addContactRow()" style="padding:4px 10px;font-size:12px">+ Добавить</button>
-  </div>
-  <div id="contacts-list" role="group" aria-labelledby="lbl-contacts-list"></div>
-</div>
-
-<div class="fg"><label for="c-status">Статус клиента</label><select id="c-status" onchange="onClientStatusChange()" style="font-size:13px;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius-s);background:var(--card);color:var(--text);width:100%;outline:none"><option value="unknown">⚪ Неизвестный</option><option value="potential">🔵 Потенциальный</option><option value="negotiation">🟡 Переговоры</option><option value="active">🟢 Действующий</option><option value="inactive">🔴 Не работаем</option></select></div>
-<div class="fg" id="c-notworking-wrap" style="display:none">
-  <label id="lbl-c-notworking">Причина «Не работаем»</label>
-  <div id="c-notworking" role="group" aria-labelledby="lbl-c-notworking" style="display:flex;flex-direction:column;gap:4px;margin-top:4px"></div>
-  <input type="text" id="c-notworking-other" placeholder="Свой вариант..." style="margin-top:6px;display:none">
-</div>
-<div class="fg-row">
-  <div class="fg"><label for="c-category">Категория объекта</label><select id="c-category"><option value="">— не указана —</option></select></div>
-  <div class="fg"><label for="c-revisit">Повторить визит</label><select id="c-revisit"><option value="">— не задано —</option><option value="3m">через 3 месяца</option><option value="6m">через 6 месяцев</option><option value="12m">через 12 месяцев</option><option value="never">никогда</option></select></div>
-</div>
 <!-- Геосервисы: появляются только у клиентов канала ФМА — там важны рейтинг и отзывы.
      Точек может быть несколько (сеть по городам), поэтому список динамический —
      поле «Город» показывается само, как только точек становится больше одной. -->
@@ -2136,11 +2181,19 @@ button,a,select,label{touch-action:manipulation}
   <div id="c-geo-list" role="group" aria-labelledby="lbl-c-geo"></div>
   <button type="button" class="ct-add-phone" onclick="addGeoGroup()">+ добавить точку</button>
 </div>
+<div class="collapsible-section">
+<div class="collapsible-toggle" id="client-extra-toggle" onclick="toggleClientExtra()">
+  <span>Добавить подробности</span>
+  <span class="coll-arrow">▼</span>
+</div>
+<div class="collapsible-body" id="client-extra-body" style="display:none">
+<div class="fg-row"><div class="fg"><label for="c-inn">ИНН</label><input type="text" id="c-inn" placeholder="Введите ИНН" inputmode="numeric" maxlength="12" oninput="this.value=this.value.replace(/\D/g,'').slice(0,12)"><div class="field-hint">10 цифр — для ЮЛ, 12 цифр — для ИП или ФЛ</div></div><div class="fg"><label for="c-revisit">Повторить визит</label><select id="c-revisit"><option value="">— не задано —</option><option value="3m">через 3 месяца</option><option value="6m">через 6 месяцев</option><option value="12m">через 12 месяцев</option><option value="never">никогда</option></select></div></div>
 <div class="fg"><label id="lbl-tag-selector">Теги</label><div class="chip-row" id="tag-selector" role="group" aria-labelledby="lbl-tag-selector"><label class="lbl-check-sm"><input type="checkbox" value="vip"> ⭐ VIP</label><label class="lbl-check-sm"><input type="checkbox" value="warm" style="accent-color:var(--amber)"> 🌤 Тёплый</label><label class="lbl-check-sm"><input type="checkbox" value="cold" style="accent-color:var(--blue)"> ❄️ Холодный</label><label class="lbl-check-sm"><input type="checkbox" value="new"> 🆕 Новый</label></div></div>
 <div class="fg"><label for="c-note">Заметка</label><textarea id="c-note" placeholder="Источник лида..."></textarea></div>
-<div class="mfoot"><button class="btn btn-ghost" onclick="closeModal('m-client')">Отмена</button><button class="btn btn-primary" onclick="saveClientToDb()">Добавить</button></div></div></div>
-
-<div class="overlay" id="m-offer" onkeydown="offerModalKeydown(event)" role="dialog" aria-modal="true" aria-labelledby="m-offer-title"><div class="modal"><h3 id="m-offer-title">Новое предложение</h3><div class="fg"><label for="o-text">Предложение *</label><textarea id="o-text" placeholder="Например: закупка партии товара X на склад"></textarea></div><div class="fg"><label for="o-client">Клиент</label><select id="o-client"></select></div><div class="fg-row"><div class="fg"><label for="o-amount">Сумма (₽)</label><input type="text" inputmode="numeric" id="o-amount" placeholder="100 000" oninput="formatAmountInput(this)"></div><div class="fg"><label for="o-status">Статус</label><select id="o-status"><option value="proposed">Предложено</option><option value="agreed">Согласовано</option><option value="declined">Отклонено</option></select></div></div><div class="fg-row"><div class="fg"><label id="lbl-o-channel-btns">Канал продаж *</label><div id="o-channel-btns" role="group" aria-labelledby="lbl-o-channel-btns" class="chip-row"><button type="button" class="ch-btn" data-ch="ФМА" aria-pressed="false" onclick="toggleChannel(this)">ФМА</button><button type="button" class="ch-btn" data-ch="Beyosa" aria-pressed="false" onclick="toggleChannel(this)">Beyosa</button><button type="button" class="ch-btn" data-ch="Комплектация" aria-pressed="false" onclick="toggleChannel(this)">Комплектация</button></div></div><div class="fg"><label for="o-date">Дата</label><input type="date" id="o-date"></div></div><div class="mfoot"><button class="btn btn-ghost" onclick="closeModal('m-offer')">Отмена</button><button class="btn btn-primary" id="m-offer-save-btn" onclick="saveOfferToDb()">Добавить</button></div></div></div>
+</div>
+</div>
+<div class="mfoot"><button class="btn btn-ghost" onclick="cancelClientModal()">Отмена</button><button class="btn btn-primary" onclick="saveClientToDb()">Добавить</button></div></div></div>
+<div class="overlay" id="m-offer" onkeydown="offerModalKeydown(event)" role="dialog" aria-modal="true" aria-labelledby="m-offer-title"><div class="modal"><h3 id="m-offer-title">Новое предложение</h3><div class="fg"><label for="o-text">Предложение *</label><textarea id="o-text" placeholder="Например: закупка партии товара X на склад"></textarea></div><div class="fg"><label for="o-client">Клиент</label><select id="o-client"></select></div><div class="fg-row"><div class="fg"><label for="o-amount">Сумма (₽)</label><input type="text" inputmode="decimal" id="o-amount" placeholder="100 000" oninput="formatAmountInput(this)"></div><div class="fg"><label for="o-status">Статус</label><select id="o-status"><option value="proposed">Предложено</option><option value="agreed">Согласовано</option><option value="declined">Отклонено</option></select></div></div><div class="fg-row"><div class="fg"><label id="lbl-o-channel-btns">Канал продаж *</label><div id="o-channel-btns" role="group" aria-labelledby="lbl-o-channel-btns" class="chip-row"><button type="button" class="ch-btn" data-ch="ФМА" aria-pressed="false" onclick="toggleChannel(this)">ФМА</button><button type="button" class="ch-btn" data-ch="Beyosa" aria-pressed="false" onclick="toggleChannel(this)">Beyosa</button><button type="button" class="ch-btn" data-ch="Комплектация" aria-pressed="false" onclick="toggleChannel(this)">Комплектация</button></div></div><div class="fg"><label for="o-date">Дата</label><input type="date" id="o-date"></div></div><div class="mfoot"><button class="btn btn-ghost" onclick="closeModal('m-offer')">Отмена</button><button class="btn btn-primary" id="m-offer-save-btn" onclick="saveOfferToDb()">Добавить</button></div></div></div>
 
 <div class="overlay" id="m-history" role="dialog" aria-modal="true" aria-labelledby="m-hist-title"><div class="modal"><h3 id="m-hist-title">История</h3><div class="fg"><label for="h-text">Новая запись</label><textarea id="h-text" placeholder="Итог..."></textarea></div><div class="mfoot"><button class="btn btn-ghost" onclick="closeModal('m-history')">Закрыть</button><button class="btn btn-primary" onclick="saveHistDb()">Добавить</button></div><div id="hist-list" style="margin-top:14px;border-top:1px solid var(--border);padding-top:12px"></div></div></div>
 
@@ -2318,11 +2371,11 @@ button,a,select,label{touch-action:manipulation}
 <!-- MOBILE NAV -->
 <div class="mob-nav">
   <div class="mob-nav-inner">
-    <button class="mob-nav-btn active" id="mob-btn-dashboard" onclick="showPage('dashboard')" aria-current="page"><div class="icon">🏠</div><span>Дашборд</span></button>
-    <button class="mob-nav-btn" id="mob-btn-clients" onclick="showPage('clients')"><div class="icon">👥</div><span>Клиенты</span></button>
-    <button class="mob-nav-btn" id="mob-btn-tasks" onclick="showPage('tasks')"><div class="icon" id="mob-tasks-icon">📋<span class="mob-badge" id="mob-tasks-badge" style="display:none">0</span></div><span>Задачи</span></button>
-    <button class="mob-nav-btn" id="mob-btn-offers" onclick="showPage('offers')"><div class="icon">🎯</div><span>Предложения</span></button>
-    <button class="mob-nav-btn" id="mob-btn-more" onclick="toggleMobMore()" aria-label="Ещё разделы"><div class="icon">⋯</div><span>Ещё</span></button>
+    <button class="mob-nav-btn active" id="mob-btn-dashboard" onclick="showPage('dashboard')" aria-current="page"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg></div><span>Главная</span></button>
+    <button class="mob-nav-btn" id="mob-btn-clients" onclick="showPage('clients')"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M2.8 20c.6-3.3 3.1-5 6.2-5s5.6 1.7 6.2 5"/><circle cx="17" cy="9" r="2.6"/><path d="M16.4 15.2c2.5.3 4.3 1.9 4.8 4.3"/></svg></div><span>Клиенты</span></button>
+    <button class="mob-nav-btn" id="mob-btn-tasks" onclick="showPage('tasks')"><div class="icon" id="mob-tasks-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8.5 12.2l2.4 2.4 4.8-5"/></svg><span class="mob-badge" id="mob-tasks-badge" style="display:none">0</span></div><span>Задачи</span></button>
+    <button class="mob-nav-btn" id="mob-btn-offers" onclick="showPage('offers')"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="8" width="18" height="12" rx="3"/><path d="M9 8V6.5A2.5 2.5 0 0 1 11.5 4h1A2.5 2.5 0 0 1 15 6.5V8"/><path d="M3 13h18"/></svg></div><span>Сделки</span></button>
+    <button class="mob-nav-btn" id="mob-btn-more" onclick="toggleMobMore()" aria-label="Ещё разделы"><div class="icon"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg></div><span>Ещё</span></button>
   </div>
 </div>
 <div class="mob-more-backdrop" id="mob-more-backdrop" onclick="closeMobMore()"></div>
@@ -2331,8 +2384,19 @@ button,a,select,label{touch-action:manipulation}
   <button class="mob-more-item" id="mob-btn-analytics" onclick="closeMobMore();showPage('analytics')">📈 Аналитика</button>
   <button class="mob-more-item" id="mob-btn-stats" onclick="closeMobMore();showPage('stats')">📊 Статистика</button>
   <button class="mob-more-item" id="mob-btn-links" onclick="closeMobMore();showPage('links')">🔗 Ссылки/Контакты</button>
+  <button class="mob-more-item" id="mob-btn-calendar" onclick="closeMobMore();showPage('calendar')">📅 Календарь</button>
+  <div style="height:1px;background:var(--border);margin:4px 8px" aria-hidden="true"></div>
+  <button class="mob-more-item" onclick="closeMobMore();undo()">↺ Отменить действие</button>
+  <button class="mob-more-item" onclick="closeMobMore();redo()">↻ Повторить действие</button>
 </div>
-<button class="fab" onclick="openAddTask()" aria-label="Добавить задачу">＋</button>
+<button class="fab" onclick="toggleFabMenu()" aria-label="Создать">＋</button>
+<div class="mob-more-backdrop" id="fab-backdrop" onclick="closeFabMenu()"></div>
+<div class="fab-menu" id="fab-menu" role="menu">
+  <button class="mob-more-item" id="fab-add-client" onclick="closeFabMenu();openAddClient()">👤 Новый клиент</button>
+  <button class="mob-more-item" id="fab-add-task" onclick="closeFabMenu();openAddTask()">✅ Новая задача</button>
+  <button class="mob-more-item" id="fab-add-offer" onclick="closeFabMenu();openAddOffer()">💼 Новая сделка</button>
+  <button class="mob-more-item" id="fab-add-visit" onclick="fabVisitResult()">📝 Итог визита</button>
+</div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
@@ -2595,10 +2659,10 @@ function addContactRow(data){
   const extraHtml=extra.map(ph=>mkExtraPhoneRow(ph)).join('');
   const html=`<div class="contact-row" id="${id}">
     <button type="button" class="contact-del" onclick="removeContactRow('${id}')" title="Удалить контакт" aria-label="Удалить контакт">✕</button>
-    <div class="cr-full"><label for="${id}-name">Имя контакта *</label><input type="text" id="${id}-name" class="ct-name" placeholder="Иван Иванов" value="${esc(n)}"></div>
+    <div class="cr-full"><label for="${id}-name">Имя контакта *</label><input type="text" id="${id}-name" class="ct-name" autocomplete="name" placeholder="Иван Иванов" value="${esc(n)}"></div>
     <div><label for="${id}-pos">Должность</label><select id="${id}-pos" class="ct-pos"><option value="">— не указана —</option>${opts}</select></div>
-    <div><label for="${id}-phone">Телефон</label><input type="tel" id="${id}-phone" class="ct-phone" placeholder="+7 " value="${esc(p)}" oninput="formatPhoneInput(this)"></div>
-    <div class="cr-full"><label for="${id}-email">Email</label><input type="email" id="${id}-email" class="ct-email" placeholder="ivan@mail.ru" value="${esc(e)}"></div>
+    <div><label for="${id}-phone">Телефон</label><input type="tel" id="${id}-phone" class="ct-phone" autocomplete="tel" placeholder="+7 " value="${esc(p)}" oninput="formatPhoneInput(this)"></div>
+    <div class="cr-full"><label for="${id}-email">Email</label><input type="email" id="${id}-email" class="ct-email" inputmode="email" autocomplete="email" placeholder="ivan@mail.ru" value="${esc(e)}"></div>
     <div class="cr-full ct-extra-wrap">
       <div class="ct-extra-list">${extraHtml}</div>
       <button type="button" class="ct-add-phone" onclick="addExtraPhone('${id}')">+ ещё номер</button>
@@ -2817,6 +2881,13 @@ function openClientExtra(){
   const toggle=document.getElementById('client-extra-toggle');
   body.style.display='flex';
   toggle.classList.add('open');
+}
+function closeClientExtra(){
+  const body=document.getElementById('client-extra-body');
+  const toggle=document.getElementById('client-extra-toggle');
+  if(!body||!toggle)return;
+  body.style.display='none';
+  toggle.classList.remove('open');
 }
 function closeClientExtra(){
   const body=document.getElementById('client-extra-body');
@@ -3742,6 +3813,8 @@ function showPage(p){
   // Мобильная навигация
   document.querySelectorAll('.mob-nav-btn').forEach(b=>{b.classList.remove('active');b.removeAttribute('aria-current');});
   document.querySelectorAll('.mob-more-item').forEach(b=>{b.classList.remove('active');b.removeAttribute('aria-current');});
+  const _mpt=document.getElementById('mob-page-title-text');
+  if(_mpt)_mpt.textContent=({dashboard:'Главная',clients:'Клиенты',tasks:'Задачи',offers:'Сделки',trips:'Карта поездок',calendar:'Календарь',analytics:'Аналитика',stats:'Статистика',links:'Ссылки и контакты'})[p]||'WiseBase';
   const mb=document.getElementById('mob-btn-'+p);
   if(mb){mb.classList.add('active');mb.setAttribute('aria-current','page');}
   const mMore=document.getElementById('mob-btn-more');
@@ -3763,7 +3836,7 @@ function showPage(p){
   else if(p==='stats')renderStats();
   else if(p==='links')renderLinksPage();
   // FAB — только на Дашборде и в Задачах
-  (function(){const fab=document.querySelector('.fab');if(fab)fab.style.display=(p==='dashboard'||p==='tasks')?'flex':'none';})();
+  (function(){const fab=document.querySelector('.fab');if(fab)fab.style.display=(matchMedia('(max-width:600px)').matches||p==='dashboard'||p==='tasks')?'flex':'none';if(typeof closeFabMenu==='function')closeFabMenu();})();
   // Каскад списков при входе убран по просьбе — раздел появляется как раньше (fadeIn всей страницы).
   // Рост полос графиков при попадании в зону видимости оставлен.
   if(pageChanged&&!lbReduced()){
@@ -4286,7 +4359,7 @@ function renderTaskPage(){
   el.className='task-list'+(taskView==='list'?' list-view':'');
   // Запоминаем полный (не обрезанный пагинацией) список — нужен для «Выделить всё».
   lastRenderedTaskIds=list.map(t=>t.id);
-  if(!list.length){ el.innerHTML=`<div class="empty-state"><div class="es-ic">✅</div><div class="es-t">Нет задач</div><div class="es-s">По текущим фильтрам ничего не найдено — создайте задачу или сбросьте фильтры</div><button class="btn btn-primary" onclick="openAddTask()">+ Задача</button></div>`; updTSelBar(); return; }
+  if(!list.length){ el.innerHTML=`<div class="empty-state"><div class="es-ic">✅</div><div class="es-t">Нет задач</div><div class="es-s">По текущим фильтрам ничего не найдено — создайте задачу или сбросьте фильтры</div><button class="btn btn-primary" onclick="openAddTask()">+ Создать первую задачу</button></div>`; updTSelBar(); return; }
   const {items:pageTasks,rest:tasksRest}=pageSlice('tasks',list);
   if(taskView==='list'){
     el.innerHTML=mkTaskThead()+pageTasks.map(t=>mkTaskRow(t,true)).join('')+mkShowMore('tasks',tasksRest);
@@ -4798,6 +4871,16 @@ function setListSort(col){
   else{listSortCol=col;listSortDir=1;}
   renderClients();
 }
+function mkMobCta(c){
+  const ph=(c.contacts&&c.contacts.length&&(c.contacts.find(ct=>ct.phone)||{}).phone)||c.phone||'';
+  const addr=[c.region,c.city,c.address].filter(Boolean).join(', ');
+  return `<div class="mob-cta-bar">
+    ${ph?`<a class="mcta" href="#" data-phone="${esc(ph)}" onclick="openPhoneMenu(event,this)"><span>📞</span>Позвонить</a>`:''}
+    ${addr?`<a class="mcta" href="#" data-addr="${esc(addr)}" onclick="openNavMenu(event,this)"><span>🧭</span>Маршрут</a>`:''}
+    <button class="mcta" onclick="openAddTask(${c.id})"><span>＋</span>Задача</button>
+    <button class="mcta" onclick="openHist(${c.id})"><span>📝</span>Итог</button>
+  </div>`;
+}
 function renderClientDetailHTML(c){
   const tasks=S.tasks.filter(t=>t.clientId===c.id&&!t.done);
   const offers=S.offers.filter(o=>o.clientId===c.id);
@@ -4833,6 +4916,7 @@ function renderClientDetailHTML(c){
         <button class="btn btn-danger btn-sm" onclick="askDelClientDb(${c.id})">Удалить</button>
       </div>
     </div>
+    ${mkMobCta(c)}
     <div class="info-g">
       <div class="info-it"><span>ИНН</span><strong>${esc(c.inn)||'—'}</strong></div>
       ${c.nextContact?`<div class="info-it"><span>Следующий контакт</span><strong style="color:${c.nextContact<TODAY?'var(--red)':c.nextContact===TODAY?'var(--amber)':'var(--text)'}">${FD(c.nextContact)}</strong></div>`:''}
@@ -4994,7 +5078,7 @@ function emailSelectedClients(){
 }
 
 // === CRUD CLIENTS ===
-function openAddClient(){ editClientId=null; ['c-company','c-sign','c-city','c-address','c-note','c-inn','c-nextcontact'].forEach(id=>document.getElementById(id).value=''); renderRegionOptions(); setRegionValue(''); document.getElementById('c-potential').value=''; document.getElementById('c-status').value='unknown'; renderNotWorkingOptions(); renderObjectCategoryOptions(); setNotWorkingReasons([]); onClientStatusChange(); document.getElementById('c-category').value=''; document.getElementById('c-revisit').value=''; setChannelBtns([]); setFormatBtns([]); resetGeoGroups(null); updGeoVisible(); document.querySelectorAll('#tag-selector input').forEach(cb=>cb.checked=false); openClientExtra(); document.querySelector('#m-client h3').textContent='Новый клиент'; document.querySelector('#m-client .btn-primary').textContent='Добавить'; resetContacts(null); document.getElementById('c-owner-wrap').style.display='none'; document.getElementById('m-client').classList.add('open'); }
+function openAddClient(){ editClientId=null; ['c-company','c-sign','c-city','c-address','c-note','c-inn','c-nextcontact'].forEach(id=>document.getElementById(id).value=''); renderRegionOptions(); setRegionValue(''); document.getElementById('c-potential').value=''; document.getElementById('c-status').value='unknown'; renderNotWorkingOptions(); renderObjectCategoryOptions(); setNotWorkingReasons([]); onClientStatusChange(); document.getElementById('c-category').value=''; document.getElementById('c-revisit').value=''; setChannelBtns([]); setFormatBtns([]); resetGeoGroups(null); updGeoVisible(); document.querySelectorAll('#tag-selector input').forEach(cb=>cb.checked=false); (matchMedia('(max-width:600px)').matches?closeClientExtra():openClientExtra()); document.querySelector('#m-client h3').textContent='Новый клиент'; document.querySelector('#m-client .btn-primary').textContent='Добавить'; resetContacts(null); document.getElementById('c-owner-wrap').style.display='none'; document.getElementById('m-client').classList.add('open'); }
 // УЛУЧШЕНИЕ: Enter в модалке клиента работает так же, как клик по кнопке
 // «Сохранить»/«Добавить» — в полях компании, ИНН, региона, полях контактного
 // лица (имя/телефон/email) и т.д. В заметке (textarea) Enter, как обычно,
@@ -7256,26 +7340,32 @@ async function flushQueue(){
     }
   } finally {
     flushing=false;
-    updateOfflineIndicator();
+    updateOfflineIndicator(!offlineQueue.length);
     // После разгрузки очереди подтягиваем свежие данные.
     if(!offlineQueue.length && isOnline() && currentUser){ try{ await syncFromSupabase(); renderAll&&renderAll(); }catch(e){} }
   }
 }
 
-function updateOfflineIndicator(){
-  const el=document.getElementById('offline-badge');
-  if(!el)return;
+function updateOfflineIndicator(showOk){
+  const full=document.getElementById('offline-badge');
+  const chip=document.getElementById('offline-chip');
   const n=offlineQueue.length;
+  const set=(el,txt,cls,tip)=>{if(!el)return;el.style.display='';el.textContent=txt;el.className=cls;el.title=tip||'';};
+  const hide=el=>{if(el)el.style.display='none';};
   if(!isOnline()){
-    el.style.display='';
-    el.textContent=n?`📴 Оффлайн · ${n} в очереди`:'📴 Оффлайн';
-    el.className='offline-badge off';
+    set(full,n?`📴 Офлайн · ${n} — сохранено на устройстве`:'📴 Офлайн — изменения сохраняются на устройстве','offline-badge off');
+    set(chip,n?`📴 ${n}`:'📴 офлайн','offline-chip off',n?`Офлайн: ${n} ${pluralRu(n,'изменение','изменения','изменений')} сохранено на устройстве — отправятся при появлении сети`:'Офлайн — изменения сохраняются на устройстве');
   }else if(n){
-    el.style.display='';
-    el.textContent=flushing?`⏳ Отправка… (${n})`:`⏳ ${n} ${pluralRu(n,'изменение','изменения','изменений')} ждут отправки`;
-    el.className='offline-badge pending';
+    const t=flushing?`⏳ Отправка… (${n})`:`⏳ ${n} ${pluralRu(n,'изменение ждёт','изменения ждут','изменений ждут')} синхронизации`;
+    set(full,t,'offline-badge pending');
+    set(chip,`⏳ ${n}`,'offline-chip pending',t+'. Нажмите, чтобы отправить сейчас');
+  }else if(showOk===true){
+    set(full,'✓ Синхронизировано','offline-badge ok');
+    set(chip,'✓','offline-chip ok','Все изменения синхронизированы');
+    clearTimeout(window._syncOkT);
+    window._syncOkT=setTimeout(()=>{hide(full);hide(chip);},2500);
   }else{
-    el.style.display='none';
+    hide(full);hide(chip);
   }
 }
 
@@ -8542,14 +8632,103 @@ function toggleMobSearch(){
     armed=false;
     if(!go){ind.classList.remove('show');return;}
     busy=true;haptic(12);
-    ind.textContent='↻ Обновляю…';
+    ind.textContent='⇅ Синхронизация…';
     try{
       if(typeof syncFromSupabase==='function')await syncFromSupabase();
       if(typeof renderAll==='function')renderAll();
-      toast('Данные обновлены');
+      toast('Синхронизировано');
     }catch(e){toast('Не удалось обновить');}
     ind.classList.remove('show');busy=false;
   },{passive:true});
+})();
+
+// === МОБИЛЬНЫЕ УЛУЧШЕНИЯ (v17): JS ===
+// 4. FAB — меню быстрого создания (первый пункт — рекомендуемый для текущего раздела)
+function toggleFabMenu(){
+  const open=!document.body.classList.contains('fab-open');
+  document.body.classList.toggle('fab-open',open);
+  if(!open)return;
+  haptic(8);
+  document.querySelectorAll('#fab-menu .fab-rec').forEach(x=>x.remove());
+  const map={clients:'fab-add-client',offers:'fab-add-offer',tasks:'fab-add-task',dashboard:'fab-add-task'};
+  const id=map[currentPageId()];
+  const b=id?document.getElementById(id):null;
+  if(b){b.insertAdjacentHTML('beforeend','<span class="fab-rec">рекомендуем</span>');b.parentElement.prepend(b);}
+}
+function closeFabMenu(){document.body.classList.remove('fab-open');}
+function fabVisitResult(){
+  closeFabMenu();
+  showPage('clients');
+  const bar=document.getElementById('mob-search-bar');
+  if(bar&&!bar.classList.contains('open'))toggleMobSearch();
+  toast('Найдите клиента и нажмите «Итог» в его карточке');
+}
+// Доп. Защита несохранённой формы клиента
+function cancelClientModal(){
+  const dirty=editClientId===null&&(['c-company','c-sign','c-note','c-inn','c-address','c-city'].some(id=>{const el=document.getElementById(id);return el&&el.value.trim();})||[...document.querySelectorAll('#contacts-list input')].some(i=>{const v=(i.value||'').trim();return v&&v!=='+7';}));
+  if(dirty){confirm2('Закрыть форму?','Введённые данные не будут сохранены.',()=>closeModal('m-client'),'Закрыть');return;}
+  closeModal('m-client');
+}
+// 8. Свайпы по клиентам: вправо — позвонить/написать, влево — новая задача
+(function(){
+  if(!matchMedia('(pointer:coarse)').matches)return;
+  let card=null,sx=0,sy=0,dx=0,act=false;
+  document.addEventListener('touchstart',e=>{
+    card=e.target.closest('.client-card');
+    if(!card||!card.dataset.clientId){card=null;return;}
+    if(e.target.closest('button,input,select,textarea,a')){card=null;return;}
+    sx=e.touches[0].clientX;sy=e.touches[0].clientY;dx=0;act=false;
+  },{passive:true});
+  document.addEventListener('touchmove',e=>{
+    if(!card)return;
+    dx=e.touches[0].clientX-sx;
+    const dy=e.touches[0].clientY-sy;
+    if(!act){
+      if(Math.abs(dy)>16&&Math.abs(dy)>Math.abs(dx)){card=null;return;}
+      if(Math.abs(dx)>20)act=true;
+    }
+    if(act){
+      card.style.transition='none';
+      card.style.transform='translateX('+Math.max(-90,Math.min(90,dx))+'px)';
+      card.style.background=dx>40?'var(--green-bg)':dx<-40?'var(--blue-bg)':'';
+    }
+  },{passive:true});
+  document.addEventListener('touchend',()=>{
+    if(!card)return;
+    const el=card,id=Number(el.dataset.clientId),fin=act?dx:0;
+    el.style.transition='transform .18s,background .18s';
+    el.style.transform='';el.style.background='';
+    card=null;act=false;
+    if(!id)return;
+    if(fin>=80){haptic(15);swipeCallClient(id);}
+    else if(fin<=-80){haptic(15);openAddTask(id);}
+  },{passive:true});
+})();
+function swipeCallClient(id){
+  const c=GC(id); if(!c)return;
+  const ph=(c.contacts&&c.contacts.length&&(c.contacts.find(ct=>ct.phone)||{}).phone)||c.phone||'';
+  if(!ph){toast('У клиента нет телефона');return;}
+  const a=document.createElement('a');
+  a.href='#';a.dataset.phone=ph;a.style.position='fixed';a.style.left='50%';a.style.top='55%';
+  document.body.appendChild(a);
+  openPhoneMenu({preventDefault(){},stopPropagation(){}},a);
+  setTimeout(()=>a.remove(),0);
+}
+// 8. Удержание задачи — множественный выбор
+(function(){
+  if(!matchMedia('(pointer:coarse)').matches)return;
+  let t=null;
+  document.addEventListener('touchstart',e=>{
+    const row=e.target.closest('.task-row');
+    clearTimeout(t);
+    if(!row)return;
+    if(e.target.closest('button,input,select,textarea,a'))return;
+    const cb=row.querySelector('.cb-wrap input');
+    if(!cb)return;
+    t=setTimeout(()=>{haptic(20);cb.click();},550);
+  },{passive:true});
+  document.addEventListener('touchmove',()=>clearTimeout(t),{passive:true});
+  document.addEventListener('touchend',()=>clearTimeout(t),{passive:true});
 })();
 
 // --- ЗАПУСК ---
