@@ -268,15 +268,15 @@ body{font-family:var(--font);font-size:14px;line-height:1.5;background:var(--bg)
    уезжают вместе со страницей, вместо того чтобы оставаться на месте. Тот же принцип,
    что и на мобильных (там это всегда так, из-за прячущейся адресной строки браузера),
    просто теперь доступен как выбор и на десктопе. */
-@media(min-width:601px){
-  html.scroll-whole-page{height:auto}
-  html.scroll-whole-page body{height:auto;overflow:visible}
-  html.scroll-whole-page .shell{height:auto;overflow:visible}
-  html.scroll-whole-page .shell-main{overflow:visible}
-  html.scroll-whole-page .content{overflow:visible}
-  html.scroll-whole-page .page{overflow:visible}
-  html.scroll-whole-page .page-scroll{overflow-y:visible}
-}
+/* v19: раньше это действовало только на экранах шире 600px — на телефоне выбор
+   в настройках ничего не менял. Теперь режим работает на любой ширине. */
+html.scroll-whole-page{height:auto!important}
+html.scroll-whole-page body{height:auto!important;overflow-y:visible!important;overflow-x:hidden!important}
+html.scroll-whole-page .shell{height:auto!important;overflow:visible!important}
+html.scroll-whole-page .shell-main{overflow:visible!important}
+html.scroll-whole-page .content{overflow:visible!important}
+html.scroll-whole-page .page{overflow:visible!important}
+html.scroll-whole-page .page-scroll{overflow-y:visible!important;max-height:none!important}
 a{color:inherit;text-decoration:none}
 button{font-family:var(--font);cursor:pointer}
 select,input,textarea{font-family:var(--font)}
@@ -1158,6 +1158,8 @@ kbd{display:inline-flex;align-items:center;justify-content:center;min-width:26px
 .mob-nav-btn .icon svg{width:23px;height:23px;display:block}
 .mob-nav-btn .icon{padding:3px 12px;border-radius:12px;transition:background .15s}
 .mob-nav-btn.active .icon{background:color-mix(in srgb,var(--accent) 13%,transparent)}
+#cfilters-btn{display:none}
+.fab-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:198}
 .fab-menu{display:none;position:fixed;right:14px;bottom:calc(140px + env(safe-area-inset-bottom,0));background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,.28);z-index:199;padding:8px;flex-direction:column;min-width:235px}
 body.fab-open .fab-menu{display:flex}
 body.fab-open #fab-backdrop{display:block}
@@ -1313,9 +1315,13 @@ body.mob-more-open .mob-more-backdrop{display:block}
   /* 7. Дашборд «в поле»: сначала требующее действий, метрики — горизонтальная лента */
   #page-dashboard.active{display:flex;flex-direction:column}
   #page-dashboard #dash-due{order:1}
-  #page-dashboard .metrics{order:2;display:flex;overflow-x:auto;gap:8px;margin-bottom:12px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;padding-bottom:2px}
-  #page-dashboard .metrics .metric{flex:0 0 40vw;scroll-snap-align:start}
-  #page-dashboard .metrics .dash-due-widget{flex:0 0 86vw;grid-column:auto!important;margin:0!important;scroll-snap-align:start}
+  #page-dashboard .metrics{order:2;display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+  #page-dashboard .metrics .metric{flex:0 1 auto;display:flex;align-items:center;gap:8px;padding:7px 12px;box-shadow:none}
+  #page-dashboard .metrics .metric .metric-lbl{margin-bottom:0;font-size:10.5px;letter-spacing:.04em}
+  #page-dashboard .metrics .metric .metric-val{font-size:17px}
+  #page-dashboard .metrics .dash-due-widget{flex:1 1 100%;grid-column:auto!important;margin:0!important;padding:9px 12px}
+  #page-dashboard .metrics .dash-due-widget .ddw-sub{display:none}
+  #page-dashboard .metrics .dash-due-widget .ddw-title{font-size:12.5px}
   #page-dashboard .toolbar{order:3}
   #page-dashboard .page-scroll{order:4}
   /* 9. CTA-панель в карточке клиента */
@@ -1324,6 +1330,36 @@ body.mob-more-open .mob-more-backdrop{display:block}
   .mcta span{font-size:19px;line-height:1}
   /* 10. Индикатор синхронизации — у названия раздела, а не в шапке */
   #offline-badge{display:none!important}
+  /* v18-1. Запрет горизонтального смещения экрана и модалок */
+  html,body{overflow-x:hidden;max-width:100vw}
+  .overlay{overflow-x:hidden;touch-action:pan-y}
+  .modal{overflow-x:hidden;touch-action:pan-y;max-width:100vw}
+  .modal .fg-row{flex-wrap:wrap}
+  /* v18-4. Контакты на вкладке «Ссылки/Контакты»: таблица → карточки */
+  #lk-staff{display:block}
+  #lk-staff thead{display:none}
+  #lk-staff tbody{display:flex;flex-direction:column;gap:10px}
+  #lk-staff tr{display:grid;grid-template-columns:1fr 1fr;gap:8px;border:1px solid var(--border);border-radius:12px;padding:12px;padding-right:44px;background:var(--card);position:relative}
+  #lk-staff td{display:block;border-bottom:none;padding:0}
+  #lk-staff td[data-l="ФИО"],#lk-staff td[data-l="Почта"],#lk-staff td[data-l="Функционал"],#lk-staff td[colspan]{grid-column:1/-1}
+  #lk-staff td::before{content:attr(data-l);display:block;font-size:10px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;margin:0 0 3px 2px}
+  #lk-staff td:not([data-l])::before{display:none}
+  #lk-staff td.lk-x{position:absolute;top:8px;right:8px;width:auto;padding:0}
+  #lk-staff .lk-del{width:36px;height:36px}
+  #lk-staff .lk-cell{background:var(--bg);border:1px solid var(--border);font-size:14px;padding:9px 10px;min-height:41px}
+  #lk-staff .lk-duties{max-height:none}
+  /* v19-2/3. Меню «Вид» теперь справа — открываем его влево, чтобы не резалось краем */
+  #tvt-menu,#trvt-menu,#vt-menu{left:auto;right:0}
+  #page-tasks #tsearch{max-width:none;flex:1 1 auto;min-width:0}
+  /* v19-4. Клиенты: компактная шапка — фильтры спрятаны за кнопкой */
+  #page-clients .toolbar #cfilters-btn{display:inline-flex}
+  #page-clients:not(.cfilters-open) .toolbar .sel-in{display:none!important}
+  #page-clients:not(.cfilters-open) #tag-filters{display:none!important}
+  #page-clients:not(.cfilters-open) .toolbar button[onclick="exportSelectedClients()"],#page-clients:not(.cfilters-open) .toolbar button[onclick="emailSelectedClients()"]{display:none!important}
+  #page-clients.cfilters-open #cfilters-btn{border-color:var(--accent);color:var(--accent)}
+  .seg-chips{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;max-width:100%;padding-bottom:2px}
+  .seg-chips::-webkit-scrollbar{display:none}
+  .seg-chips>*{flex:0 0 auto}
 }
 html{-webkit-text-size-adjust:100%}
 button,a,select,label{touch-action:manipulation}
@@ -1810,6 +1846,7 @@ button,a,select,label{touch-action:manipulation}
         <option value="__none__">⚠️ Без ответственного</option>
       </select>
       <div class="tag-filter-row" id="tag-filters" style="flex:1;margin-bottom:0"></div>
+      <button class="btn btn-ghost btn-sm" id="cfilters-btn" onclick="toggleClientFilters()">⚙︎ Фильтры</button>
       <button class="btn btn-ghost btn-sm" onclick="openAddClient()">+ Клиент</button>
       <button class="btn btn-ghost btn-sm" onclick="exportSelectedClients()">📤 Экспорт</button>
       <button class="btn btn-ghost btn-sm" onclick="emailSelectedClients()">✉️ Email</button>
@@ -1861,6 +1898,9 @@ button,a,select,label{touch-action:manipulation}
       </select>
       <button class="btn btn-ghost btn-sm" onclick="openAddTask()">+ Задача</button>
       <button class="btn btn-ghost btn-sm" onclick="exportSelectedTasks()">📤 Экспорт выбранных</button>
+    </div>
+    <div class="toolbar" style="margin-top:-6px">
+      <input class="search-in" type="text" placeholder="Поиск по задачам..." id="tsearch" oninput="renderTaskPage()" style="max-width:340px">
       <div style="position:relative">
         <button class="vt-btn" id="tvt-btn" onclick="toggleViewMenu('tvt-menu')" title="Вид отображения">
           <span id="tvt-icon">☰</span> Вид
@@ -1870,9 +1910,6 @@ button,a,select,label{touch-action:manipulation}
           <div class="vt-opt active" id="tvt-opt-list" onclick="setTaskView('list')">☰ &nbsp;Список</div>
         </div>
       </div>
-    </div>
-    <div class="toolbar" style="margin-top:-6px">
-      <input class="search-in" type="text" placeholder="Поиск по задачам..." id="tsearch" oninput="renderTaskPage()" style="max-width:340px">
     </div>
     <div id="tsel-bar" class="sel-bar">
       <span id="tsel-cnt"></span>
@@ -1919,10 +1956,6 @@ button,a,select,label{touch-action:manipulation}
     <div class="toolbar" style="flex-wrap:wrap;gap:8px">
       <span class="tlbl">Карта региона</span>
       <button class="btn btn-primary btn-sm" onclick="openTripPlanner()">🧳 Запланировать командировку</button>
-      <select class="sel-in" id="trip-region" onchange="onTripRegionChange()" style="font-size:13px"><option value="">Все регионы</option></select>
-      <select class="sel-in" id="trip-city" onchange="renderTrips()" style="font-size:13px"><option value="">Все города</option></select>
-      <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;color:var(--t2)"><input type="checkbox" id="trip-hide-inactive" onchange="renderTrips()" checked> Скрыть «Не работаем»</label>
-      <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;color:var(--t2)"><input type="checkbox" id="trip-due-only" onchange="renderTrips()"> Только «пора посетить»</label>
       <div style="position:relative;margin-left:auto">
         <button class="vt-btn" id="trvt-btn" onclick="toggleViewMenu('trvt-menu')" title="Вид отображения">
           <span id="trvt-icon">☰</span> Вид
@@ -1932,6 +1965,10 @@ button,a,select,label{touch-action:manipulation}
           <div class="vt-opt active" id="trvt-opt-list" onclick="setTripView('list')">☰ &nbsp;Список</div>
         </div>
       </div>
+      <select class="sel-in" id="trip-region" onchange="onTripRegionChange()" style="font-size:13px"><option value="">Все регионы</option></select>
+      <select class="sel-in" id="trip-city" onchange="renderTrips()" style="font-size:13px"><option value="">Все города</option></select>
+      <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;color:var(--t2)"><input type="checkbox" id="trip-hide-inactive" onchange="renderTrips()" checked> Скрыть «Не работаем»</label>
+      <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;color:var(--t2)"><input type="checkbox" id="trip-due-only" onchange="renderTrips()"> Только «пора посетить»</label>
     </div>
     <div class="page-scroll"><div id="planned-trips" style="margin-bottom:8px"></div><div id="trips-wrap" style="display:flex;flex-direction:column;gap:16px;padding-bottom:20px"></div></div>
   </div>
@@ -2390,7 +2427,7 @@ button,a,select,label{touch-action:manipulation}
   <button class="mob-more-item" onclick="closeMobMore();redo()">↻ Повторить действие</button>
 </div>
 <button class="fab" onclick="toggleFabMenu()" aria-label="Создать">＋</button>
-<div class="mob-more-backdrop" id="fab-backdrop" onclick="closeFabMenu()"></div>
+<div class="fab-backdrop" id="fab-backdrop" onclick="closeFabMenu()"></div>
 <div class="fab-menu" id="fab-menu" role="menu">
   <button class="mob-more-item" id="fab-add-client" onclick="closeFabMenu();openAddClient()">👤 Новый клиент</button>
   <button class="mob-more-item" id="fab-add-task" onclick="closeFabMenu();openAddTask()">✅ Новая задача</button>
@@ -2610,7 +2647,7 @@ const TODAY=today();
 // новой присланной версии). Показывается в Профиле, чтобы можно было сверить «то, что
 // открыто на телефоне» с «тем, что прислали только что» — без гадания, обновился
 // ли сайт после деплоя на хостинг.
-const APP_BUILD='19.07.2026 · ver 5';
+const APP_BUILD='19.07.2026 · ver 7';
 // Преобразует Date обратно в строку 'YYYY-MM-DD' по ЛОКАЛЬНЫМ компонентам (не UTC) — пара к today().
 function dateToLocalStr(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 // Парсит строку 'YYYY-MM-DD' как ЛОКАЛЬНУЮ дату (полночь по местному времени), а не UTC.
@@ -6420,11 +6457,11 @@ function renderContactsTable(){
     return;
   }
   b.innerHTML=rows.map(c=>`<tr>
-    <td><input class="lk-cell" value="${lkEsc(c.fullName)}" placeholder="Иванов Иван" oninput="editStaff(${c.id},'fullName',this.value)" onblur="flushEdit()"></td>
-    <td><input class="lk-cell" list="staff-cats" value="${lkEsc(c.category)}" placeholder="Логистика" oninput="editStaff(${c.id},'category',this.value)" onblur="flushEdit()"></td>
-    <td><input class="lk-cell" type="email" value="${lkEsc(c.email)}" placeholder="mail@company.ru" oninput="editStaff(${c.id},'email',this.value)" onblur="flushEdit()"></td>
-    <td><input class="lk-cell" value="${lkEsc(c.phone)}" placeholder="+7 900 000-00-00" oninput="editStaff(${c.id},'phone',this.value)" onblur="flushEdit()"></td>
-    <td><textarea class="lk-cell lk-duties" rows="1" placeholder="С чем обращаться" oninput="editStaff(${c.id},'duties',this.value);lkAutosize(this)" onblur="flushEdit()">${lkEsc(c.duties)}</textarea></td>
+    <td data-l="ФИО"><input class="lk-cell" value="${lkEsc(c.fullName)}" placeholder="Иванов Иван" oninput="editStaff(${c.id},'fullName',this.value)" onblur="flushEdit()"></td>
+    <td data-l="Категория"><input class="lk-cell" list="staff-cats" value="${lkEsc(c.category)}" placeholder="Логистика" oninput="editStaff(${c.id},'category',this.value)" onblur="flushEdit()"></td>
+    <td data-l="Почта"><input class="lk-cell" type="email" inputmode="email" autocomplete="off" value="${lkEsc(c.email)}" placeholder="mail@company.ru" oninput="editStaff(${c.id},'email',this.value)" onblur="flushEdit()"></td>
+    <td data-l="Телефон"><input class="lk-cell" type="tel" inputmode="tel" autocomplete="off" value="${lkEsc(c.phone)}" placeholder="+7 900 000-00-00" oninput="editStaff(${c.id},'phone',this.value)" onblur="flushEdit()"></td>
+    <td data-l="Функционал"><textarea class="lk-cell lk-duties" rows="1" placeholder="С чем обращаться" oninput="editStaff(${c.id},'duties',this.value);lkAutosize(this)" onblur="flushEdit()">${lkEsc(c.duties)}</textarea></td>
     <td class="lk-x"><button class="lk-del" onclick="delStaff(${c.id})" title="Удалить" aria-label="Удалить контакт">✕</button></td>
   </tr>`).join('')+dl;
   b.querySelectorAll('.lk-duties').forEach(lkAutosize);
@@ -8736,6 +8773,28 @@ function swipeCallClient(id){
   },{passive:true});
   document.addEventListener('touchmove',()=>clearTimeout(t),{passive:true});
   document.addEventListener('touchend',()=>clearTimeout(t),{passive:true});
+})();
+
+// === v19: кнопка «Фильтры» на вкладке клиентов (мобильный) ===
+function toggleClientFilters(){const p=document.getElementById('page-clients');if(!p)return;p.classList.toggle('cfilters-open');}
+// === v19: свайп влево/вправо по нижней навигации — переход между разделами ===
+(function(){
+  const nav=document.querySelector('.mob-nav'); if(!nav)return;
+  let sx=0,sy=0,on=false;
+  nav.addEventListener('touchstart',e=>{const t=e.touches[0];sx=t.clientX;sy=t.clientY;on=true;},{passive:true});
+  nav.addEventListener('touchend',e=>{
+    if(!on)return; on=false;
+    const t=e.changedTouches[0],dx=t.clientX-sx,dy=t.clientY-sy;
+    if(Math.abs(dx)<60||Math.abs(dy)>50)return; // короткие/вертикальные касания — не свайп
+    const order=['dashboard','clients','tasks','offers'];
+    const i=order.indexOf(currentPageId());
+    let next;
+    if(i<0){ next='dashboard'; }
+    else{ const ni=i+(dx<0?1:-1); if(ni<0||ni>=order.length)return; next=order[ni]; }
+    if(typeof closeMobMore==='function')closeMobMore();
+    showPage(next);
+    if(typeof haptic==='function')haptic(12);
+  },{passive:true});
 })();
 
 // --- ЗАПУСК ---
