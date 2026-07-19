@@ -25,6 +25,18 @@ var l=document.createElement("link");l.rel="manifest";l.href=URL.createObjectURL
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:wght@500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+// ОФЛАЙН-СТРАХОВКА: если XLSX не загрузился с CDN (нет сети), подставляем заглушку
+// с понятным сообщением вместо молчаливого падения при экспорте/импорте Excel.
+window.addEventListener('load', function(){
+  if (typeof XLSX === 'undefined') {
+    window.XLSX = new Proxy({}, { get: function(){
+      if (typeof toast === 'function') toast('Экспорт/импорт Excel недоступен без интернета');
+      throw new Error('XLSX недоступен офлайн');
+    }});
+  }
+});
+</script>
 <style>
 /* ===== ТЕМЫ ===== */
 :root {
@@ -970,7 +982,7 @@ body.col-resizing *{cursor:col-resize!important}
 .kb-focus{outline:none!important;position:relative;z-index:3;
   box-shadow:inset 0 0 0 2px var(--accent), inset 0 0 0 5px color-mix(in srgb,var(--accent) 14%,transparent) !important;
   animation:kbPop .22s cubic-bezier(.22,1,.36,1)}
-/* На кнопках со СПЛОШНОЙ заливкой акцентным цветом обычная рамка того же акцентного
+/* На кнопках со СПЛОШНОЙ заливкой акцентным цветом обычная рамка того же а��центного
    цвета попросту сливается с фоном и не видна. Используем --accent-fg — тот самый
    цвет, который тема уже применяет для текста/иконок поверх --accent, то есть
    гарантированно контрастный к нему в любой теме (в «WiseBase Dark», например, акцент
@@ -2518,7 +2530,7 @@ const RU_CITIES=[
   {name:'Мурманск',region:'Мурманская область'},{name:'Кострома',region:'Костромская область'},
   {name:'Новороссийск',region:'Краснодарский край'},{name:'Химки',region:'Московская область'},
   {name:'Тамбов',region:'Тамбовская область'},{name:'Нальчик',region:'Кабардино-Балкарская Республика'},
-  {name:'Таганрог',region:'Ростовская область'},{name:'Нижнекамск',region:'Республика Татарстан'},
+  {name:'Таганрог',region:'Ростовская обла��ть'},{name:'Нижнекамск',region:'Республика Татарстан'},
   {name:'Благовещенск',region:'Амурская область'},{name:'Люберцы',region:'Московская область'},
   {name:'Петрозаводск',region:'Республика Карелия'},{name:'Комсомольск-на-Амуре',region:'Хабаровский край'},
   {name:'Королёв',region:'Московская область'},{name:'Энгельс',region:'Саратовская область'},
@@ -2632,7 +2644,7 @@ const RU_CITIES=[
   {name:'Янаул',region:'Республика Башкортостан'},
 ];
 // Иконка кнопки «Изменить» — линейная SVG (квадрат с уголком и карандаш), currentColor
-// подхватывает цвет текста кнопки, поэтому смотрится в одном стиле с символом ⧉ у «Дублировать».
+// подхватывает цвет текста кнопки, поэтому смотрится в одно�� стиле с символом ⧉ у «Дублировать».
 const ICON_EDIT='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;vertical-align:-0.15em;flex:none"><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.4 2.6a2.1 2.1 0 1 1 3 3L11 15l-4 1 1-4Z"/></svg>';
 
 // ВАЖНО: используем локальные компоненты даты (getFullYear/getMonth/getDate), а не toISOString(),
@@ -3010,7 +3022,7 @@ const RC=n=>{
 };
 const RM=n=>(typeof matchMedia!=='undefined'&&matchMedia('(max-width:600px)').matches)?RC(n):R(n);
 const FD=s=>{if(!s)return'';const[y,m,d]=s.split('-');return`${d}.${m}.${y}`;};
-// Русское склонение числительных: pluralRu(2,'клиент','клиента','клиентов') -> 'клиента'
+// Русское склонение числительных: pluralRu(2,'клиент','кл��ента','клиентов') -> 'клиента'
 function pluralRu(n,one,few,many){
   const mod10=n%10, mod100=n%100;
   if(mod10===1&&mod100!==11)return one;
@@ -3442,7 +3454,7 @@ const NAV_ORDER=['dashboard','clients','tasks','offers','trips','calendar','anal
       что кликабельно или является полем ввода.
 
    2) Навигация и контент — РАЗНЫЕ ЗОНЫ. Раньше поиск ближайшего элемента шёл по всему
-      экрану, поэтому «вверх» из календаря могло утащить в боковой рельс (в «Ссылки/
+      экрану, поэтому «вверх» из календаря могло утащи��ь в боковой рельс (в «Ссылки/
       Контакты»), ведь он геометрически рядом. Теперь стрелки ходят внутри своей зоны,
       а переход между зонами — по явным правилам. */
 
@@ -3693,7 +3705,7 @@ function kbHandleArrow(e){
         if(hi.length){ kbFocus(hi[hi.length-1]); return; }
       }
     }
-    // Уход с вкладок «внутрь» страницы — всегда в её первый элемент.
+    // Уход с вкладок «внутрь» страницы — всегда в её первы�� элемент.
     const intoContent = isRail(cur) ? 'ArrowRight' : (isTopNav(cur) ? 'ArrowDown' : 'ArrowUp');
     if(key === intoContent && focusFirstContent()) return;
   }
@@ -6014,7 +6026,7 @@ function printTrip(){
   </style></head><body>
   <div class="btnbar noprint"><button onclick="window.print()">🖨 Печать</button><button onclick="window.close()">Закрыть</button></div>
   <h1>${esc(t.title||'Маршрут')}</h1>
-  <div class="sub">Дата поездки: ${t.date?FD(t.date):'—'} · Точек: ${stops.length} · Посещено: ${done}</div>
+  <div class="sub">��ата поездки: ${t.date?FD(t.date):'—'} · Точек: ${stops.length} · Посещено: ${done}</div>
   ${t.note?`<div class="note">${esc(t.note)}</div>`:''}
   <table><thead><tr><th>№</th><th>✓</th><th>Объект</th><th>Телефон</th><th>Итог визита</th></tr></thead>
   <tbody>${rowsHtml||'<tr><td colspan="5" style="text-align:center;color:#888">В маршруте нет точек</td></tr>'}</tbody></table>
@@ -6661,7 +6673,7 @@ function renderCooling(){
     <span><i style="background:var(--red)"></i>90+ — ${b4}</span>
   </div>`;
   if(!known.length){
-    el.innerHTML='<div class="an-empty">Нет данных о касаниях: заполните дату контакта или добавьте записи в ленту клиента.</div>';
+    el.innerHTML='<div class="an-empty">Нет данных о касаниях: заполните дату контакта и��и добавьте записи в ленту клиента.</div>';
     return;
   }
   if(!rows.length){
@@ -7247,7 +7259,62 @@ function localInit(){
 
 const SUPABASE_URL = 'https://umgvbcmxbevbmyzhdsmr.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_SAVkgoyBl3yTAJMEuvgKCQ_FGKnqbu3';
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+// ОФЛАЙН-УСТОЙЧИВОСТЬ: если supabase.js не загрузился с CDN (открыли без сети),
+// приложение не должно умирать на этой строке. Создаём настоящий клиент, если
+// библиотека есть; иначе — заглушку, которая отвечает «сетевой ошибкой» (такие
+// операции уходят в офлайн-очередь), и догружаем библиотеку при появлении сети.
+let SB_STUB = (typeof supabase === 'undefined');
+function makeSbStub(){
+  const netErr = { name: 'TypeError', message: 'Failed to fetch (offline)' };
+  const mkChain = () => {
+    const fn = function(){};
+    const p = new Proxy(fn, {
+      get(_, k){
+        if (k === 'then') return (resolve) => { resolve({ data: null, error: netErr }); };
+        return () => p;
+      },
+      apply(){ return p; },
+    });
+    return p;
+  };
+  return {
+    from(){ return mkChain(); },
+    channel(){ return mkChain(); },
+    removeChannel(){},
+    auth: {
+      async getSession(){ return { data: { session: null }, error: null }; },
+      async signInWithPassword(){ return { error: netErr }; },
+      async resetPasswordForEmail(){ return { error: netErr }; },
+      async updateUser(){ return { error: netErr }; },
+      async signOut(){ return { error: null }; },
+      onAuthStateChange(){ return { data: { subscription: { unsubscribe(){} } } }; },
+    },
+  };
+}
+let sb = SB_STUB ? makeSbStub() : supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+// Появилась сеть, а настоящей библиотеки нет — тихо догружаем её и переключаемся
+// в онлайн-режим без перезагрузки (очередь изменений отправится автоматически).
+let _sbRecovering = false;
+function tryRecoverSupabase(){
+  if (!SB_STUB || _sbRecovering || navigator.onLine === false) return;
+  _sbRecovering = true;
+  const s = document.createElement('script');
+  s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js';
+  s.onload = () => {
+    _sbRecovering = false;
+    if (typeof supabase === 'undefined') return;
+    sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    SB_STUB = false;
+    toast('Соединение восстановлено — синхронизирую…');
+    bootApp().then(() => { flushQueue(); }).catch(() => {});
+  };
+  s.onerror = () => { _sbRecovering = false; };
+  document.head.appendChild(s);
+}
+if (SB_STUB) {
+  window.addEventListener('online', () => setTimeout(tryRecoverSupabase, 1000));
+  setInterval(tryRecoverSupabase, 30000);
+}
 
 // ============================================================
 // ОФФЛАЙН-ОЧЕРЕДЬ
@@ -7432,7 +7499,7 @@ async function loginUser() {
   btn.textContent = 'Вход...'; btn.disabled = true;
   const { error } = await sb.auth.signInWithPassword({ email, password });
   btn.textContent = 'Войти'; btn.disabled = false;
-  if (error) errEl.textContent = 'Неверный email или пароль';
+  if (error) errEl.textContent = isNetworkError(error) ? 'Нет соединения с интернетом — попробуйте позже' : 'Неверный email или пароль';
 }
 
 async function forgotPassword() {
@@ -7676,9 +7743,47 @@ window.addEventListener('resize',()=>{
 });
 
 async function loadProfile() {
-  const { data } = await sb.from('profiles').select('*').eq('id', currentUser.id).single();
-  currentProfile = data;
+  try {
+    const { data } = await sb.from('profiles').select('*').eq('id', currentUser.id).single();
+    if (data) { currentProfile = data; return; }
+  } catch(e) {}
+  // Сеть недоступна или запрос упал — используем профиль из локального кэша.
+  if (!currentProfile) {
+    try {
+      const a = JSON.parse(localStorage.getItem(AUTHK) || 'null');
+      if (a && a.user && a.user.id === currentUser.id) currentProfile = a.profile || null;
+    } catch(e) {}
+  }
 }
+
+// === ОФЛАЙН-ВХОД ===
+// После успешного входа кэшируем пользователя/профиль/коллег в localStorage,
+// чтобы при следующем открытии без сети работать с локальными данными
+// (просмотр и редактирование; правки уходят в офлайн-очередь).
+const AUTHK = 'crm_cached_auth_v1';
+function cacheAuth() {
+  try {
+    if (!currentUser) return;
+    localStorage.setItem(AUTHK, JSON.stringify({
+      user: { id: currentUser.id, email: currentUser.email },
+      profile: currentProfile,
+      profiles: allProfiles,
+      delegated: [...delegatedFrom],
+    }));
+  } catch(e) {}
+}
+function loadCachedAuth() {
+  try {
+    const a = JSON.parse(localStorage.getItem(AUTHK) || 'null');
+    if (!a || !a.user) return false;
+    currentUser = a.user;
+    currentProfile = a.profile || null;
+    if (Array.isArray(a.profiles)) allProfiles = a.profiles;
+    delegatedFrom = new Set(a.delegated || []);
+    return true;
+  } catch(e) { return false; }
+}
+function clearCachedAuth() { try { localStorage.removeItem(AUTHK); } catch(e) {} }
 
 function isAdmin() { return currentProfile && ['admin','administrator'].includes(currentProfile.role); }
 function isAdministrator() { return currentProfile && currentProfile.role === 'administrator'; }
@@ -7724,7 +7829,7 @@ function canEditTask(t){ return isAdmin()||t?.owner_id===currentUser?.id||delega
 
 // Список всех пользователей — нужен, чтобы показать/выбрать «Ответственного» на карточке
 // клиента. Загружаем только для admin/manager: обычному user он не нужен (у него все клиенты
-// и так свои), а RLS в базе всё равно не даст ему прочитать чужие профили за пределами организации.
+// и так свои), а RLS в базе всё равно не даст ему прочита��ь чужие профили за пределами организации.
 let allProfiles=[];
 async function loadAllProfiles(){
   if(!isAdmin()&&!isManagerRole())return;
@@ -7812,7 +7917,19 @@ function offerToDbFields(o) {
 }
 
 // --- SYNC: подтягиваем актуальные данные из Supabase в локальное состояние S ---
+// Поднять локальную копию данных (сохраняется при каждой правке через save()).
+// Вызывается, когда сети нет: показываем и редактируем то, что уже на устройстве.
+let _offlineLoaded = false;
+function offlineLoadLocal() {
+  if (_offlineLoaded) return;
+  _offlineLoaded = true;
+  try { if (localStorage.getItem(SK)) load(); } catch(e) {}
+  if (!Array.isArray(S.links)) S.links = [];
+  if (!Array.isArray(S.staff)) S.staff = [];
+}
 async function syncFromSupabase() {
+  // ОФЛАЙН: без сети не трогаем серверную синхронизацию — работаем с локальной копией.
+  if (SB_STUB || !isOnline()) { offlineLoadLocal(); return; }
   // ОПТИМИЗАЦИЯ (лёгкая синхронизация): не тянем текст всей истории при старте.
   // Даты нужны для расчётов «дней без контакта», а текст — только у статусных
   // записей («🔄 Статус: …»), по которым считаются daysInStatus/isStuck.
@@ -7828,10 +7945,12 @@ async function syncFromSupabase() {
   (hsRes.data || []).forEach(h => { statusText[h.id] = h.text; });
   const histMap = {};
   (hRes.data || []).forEach(h => { (histMap[h.client_id] ||= []).push({ id: h.id, date: h.date, text: statusText[h.id] }); });
-  S.clients = (cRes.data || []).map(r => dbToClient(r, histMap[r.id] || []));
-  migrateClientStatuses();
-  S.tasks   = (tRes.data || []).map(dbToTask);
-  S.offers  = (oRes.data || []).map(dbToOffer);
+  // Если запросы упали по сети (связь пропала прямо на старте) — не затираем
+  // локальные данные пустотой, а поднимаем локальную копию.
+  if ((cRes.error && isNetworkError(cRes.error)) || (tRes.error && isNetworkError(tRes.error))) { offlineLoadLocal(); return; }
+  if (!cRes.error) { S.clients = (cRes.data || []).map(r => dbToClient(r, histMap[r.id] || [])); migrateClientStatuses(); }
+  if (!tRes.error) S.tasks = (tRes.data || []).map(dbToTask);
+  if (!oRes.error) S.offers = (oRes.data || []).map(dbToOffer);
   // Поездки грузим отдельно и мягко: если таблицы trips ещё нет в базе, не роняем всю синхронизацию.
   try {
     const trRes = await sb.from('trips').select('*').is('deleted_at', null).order('id');
@@ -7840,6 +7959,8 @@ async function syncFromSupabase() {
   // Ссылки и внутренние контакты — мягко: если таблиц ещё нет, остальное не ломаем.
   await loadLinksData();
   ci = S.clients.length % COLS.length;
+  // Свежая копия с сервера — сразу сохраняем локально для офлайн-режима.
+  try { save(); } catch(e) {}
 }
 // Ленивая догрузка полной истории одного клиента (с текстом записей).
 // Вызывается при открытии карточки клиента или окна «История».
@@ -8406,7 +8527,7 @@ async function delHistEntryDb(histId,localIdx){
 function renderHistList(){
   const c=S.clients.find(x=>x.id===histClientId);
   const el=document.getElementById('hist-list');
-  if(!c||!c.history?.length){el.innerHTML='<div class="empty" style="padding:16px">Нет записей</div>';return;}
+  if(!c||!c.history?.length){el.innerHTML='<div class="empty" style="padding:16px">��ет записей</div>';return;}
   const items=[...c.history].reverse();
   el.innerHTML=items.map((h,i)=>{
     const localIdx=c.history.length-1-i;
@@ -8560,7 +8681,7 @@ async function initApp() {
     _lastSnapshot=JSON.stringify(S);
     updateUndoRedoButtons();
     localInit();
-    initRealtime();
+    if (!SB_STUB && isOnline()) { try { initRealtime(); } catch(e) {} }
     const sortOwnerOpt=document.getElementById('sort-owner-opt');
     if(sortOwnerOpt)sortOwnerOpt.style.display=(isAdmin()||isManagerRole())?'':'none';
     const ownerFilterSel=document.getElementById('owner-filter');
@@ -8798,17 +8919,32 @@ function toggleClientFilters(){const p=document.getElementById('page-clients');i
 })();
 
 // --- ЗАПУСК ---
-(async () => {
-  const { data: { session } } = await sb.auth.getSession();
+async function bootApp() {
+  let session = null;
+  try { const r = await sb.auth.getSession(); session = (r && r.data && r.data.session) || null; } catch(e) {}
   if (session) {
     currentUser = session.user;
     await loadProfile();
     hideLoginScreen();
     await initApp();
     appInitialized = true;
+    cacheAuth();
+  } else if ((SB_STUB || !isOnline()) && loadCachedAuth()) {
+    // Сети нет, но на этом устройстве уже входили — офлайн-режим:
+    // просмотр и редактирование локальных данных, правки уйдут в очередь.
+    hideLoginScreen();
+    await initApp();
+    appInitialized = true;
+    toast('📴 Офлайн-режим: показаны данные, сохранённые на этом устройстве');
   } else {
     showLoginScreen();
+    if (SB_STUB || !isOnline()) {
+      const errEl = document.getElementById('login-error');
+      if (errEl) errEl.textContent = 'Нет соединения с интернетом. Для первого входа на этом устройстве нужна сеть.';
+    }
   }
+  if (SB_STUB || window._authListenerSet) return;
+  window._authListenerSet = true;
   sb.auth.onAuthStateChange(async (event, session) => {
     if (event === 'SIGNED_IN') {
       // SIGNED_IN присылается не только при настоящем входе, но и когда Supabase
@@ -8822,21 +8958,25 @@ function toggleClientFilters(){const p=document.getElementById('page-clients');i
       hideLoginScreen();
       await initApp();
       appInitialized = true;
+      cacheAuth();
     } else if (event === 'PASSWORD_RECOVERY') {
       currentUser = session.user;
       await loadProfile();
       hideLoginScreen();
       await initApp();
       appInitialized = true;
+      cacheAuth();
       openChangePassword();
       toast('Задайте новый пароль');
     } else if (event === 'SIGNED_OUT') {
       currentUser = null; currentProfile = null;
       appInitialized = false;
+      clearCachedAuth();
       showLoginScreen();
     }
   });
-})();
+}
+bootApp();
 
 // ============================================================
 // КОНЕЦ SUPABASE ИНТЕГРАЦИИ
