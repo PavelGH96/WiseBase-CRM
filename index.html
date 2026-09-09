@@ -537,7 +537,7 @@ body.t6 .tag-new{background:#eef2f7;color:#52606e}
 .dash-kanban-col.collapsed .dash-kanban-col-head{margin-bottom:0}
 .dash-kanban-cards.drag-over{background:color-mix(in srgb,var(--blue) 8%,transparent);border-radius:var(--radius);outline:2px dashed var(--blue);outline-offset:-2px}
 .dash-kanban-col.drop-ready .dash-kanban-col-head{opacity:.6}
-/* Drag-and-drop в списочном виде дашборда (перетаскивание строк между разделами) */
+/* Drag-and-drop в списочном виде дашборда (перетаскива��ие строк между разделами) */
 .task-row.dash-row-draggable{cursor:grab}
 .task-row.dash-row-draggable.dragging{opacity:.35;cursor:grabbing}
 .fs-body.drag-over{background:color-mix(in srgb,var(--blue) 8%,transparent);outline:2px dashed var(--blue);outline-offset:-2px}
@@ -718,7 +718,7 @@ body.col-resizing *{cursor:col-resize!important}
 .cal-day .day-dot{ width:6px; height:6px; border-radius:50%; background:var(--green); margin-top:3px; }
 .cal-day .day-events{ font-size:10px; color:var(--t2); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; }
 
-/* Остальные ст��ли (модалки, статистика, воронка и т.д.) — оставлены без изменений */
+/* Остальные ст��ли (модалки, стат��стика, воронка и т.д.) — оставлены без изменений */
 .funnel-wrap{display:flex;flex-direction:column;gap:8px;flex:1;overflow-y:auto;padding-bottom:4px}
 .fs-wrap{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--sh-s);flex-shrink:0}
 .fs-hd{display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;transition:background .18s}
@@ -970,7 +970,7 @@ body.col-resizing *{cursor:col-resize!important}
    границы элемента вообще, поэтому не обрежется нигде: ни в панели, ни в
    прокручиваемой колонке, ни у края экрана.
    !important — потому что у активной вкладки есть своё правило box-shadow с более
-   высокой специфичностью (а в темах «Стиль Т» и «��тСтиль» — ещё выш��), и рамка ему
+   высокой специфичностью (а в темах «Стиль Т» и «��тСтиль» — ещё в��ш����), и рамка ему
    проигрывала. Радиус НЕ переопределяем: inset-тень сама повторяет форму элемента,
    будь то «пилюля» или карточка. */
 .kb-editing{box-shadow:inset 0 0 0 2px var(--green), 0 0 0 3px color-mix(in srgb,var(--green) 25%,transparent) !important}
@@ -1932,7 +1932,7 @@ button,a,select,label{touch-action:manipulation}
 
   <!-- FUNNEL -->
   <div id="page-offers" class="page">
-    <!-- Строка 1: фильтры + кнопки действий -->
+    <!-- Строка 1: фильтры + кно��ки действий -->
     <div class="toolbar" style="flex-wrap:wrap">
       <select class="sel-in" id="offer-client-filter" onchange="renderOffers()" style="font-size:13px;max-width:200px">
         <option value="0">Все клиенты</option>
@@ -2476,7 +2476,7 @@ const TYPE_BADGE_CLS={call:'badge-call',meet:'badge-meet',task:'badge-task'};
 const TAG_META={vip:{l:'⭐ VIP',cls:'tag-vip'},warm:{l:'🌤 Тёплый',cls:'tag-warm'},cold:{l:'❄️ Холодный',cls:'tag-cold'},new:{l:'🆕 Новый',cls:'tag-new'}};
 const REPEAT_DAYS={daily:1,weekly:7,biweekly:14,monthly:30};
 // СПРАВОЧНИК РЕГИОНОВ РФ — полный официальный перечень 85 субъектов Федерации
-// (ст. 65 Конституции РФ; в алф��витно�� порядке ��о типу субъекта).
+// (ст. 65 Конституции РФ; в алф��витно��� порядке ��о типу субъекта).
 const RU_REGIONS=[
   'Республика Адыгея','Республика Алтай','Республика Башкортостан','Республика Бурятия','Республика Дагестан',
   'Республика Ингушетия','Кабардино-Балкарская Республика','Республика Калмыкия','Карачаево-Черкесская Республика',
@@ -2519,7 +2519,7 @@ const RU_CITIES=[
   {name:'Ульяновск',region:'Ульяновская область'},{name:'Иркутск',region:'Иркутская область'},
   {name:'Владивосток',region:'Приморский край'},{name:'Ярославль',region:'Ярославская область'},
   {name:'Севастополь',region:'Севастополь'},{name:'Ставрополь',region:'Ставропольский край'},
-  {name:'Томск',region:'Томская область'},{name:'Кемерово',region:'Кемеровская область (��узбасс)'},
+  {name:'Томск',region:'Томская область'},{name:'Кемерово',region:'Кемеровская область (��узбас��)'},
   {name:'Наб��режные Челны',region:'Республика Татарстан'},{name:'Оренбург',region:'Оренбургская область'},
   {name:'Новокузнецк',region:'Кемеровская область (Кузбасс)'},{name:'Балашиха',region:'Московская область'},
   {name:'Рязань',region:'Рязанская область'},{name:'Чебоксары',region:'Чувашская Республика'},
@@ -2584,7 +2584,7 @@ const RU_CITIES=[
   {name:'Сергиев Посад',region:'Московская область'},{name:'Новокуйбышевск',region:'Самарская область'},
   {name:'Воткинск',region:'Удмуртская Республика'},{name:'Железногорск (Курская обл.)',region:'Курская область'},
   {name:'Междуреченск',region:'Кемеровская область (Кузбасс)'},{name:'Воскресенск',region:'Московская область'},
-  {name:'Елец',region:'Липецкая область'},{name:'Саров',region:'Нижегородска�� область'},
+  {name:'Елец',region:'Липецкая область'},{name:'Саров',region:'Нижегородска��� область'},
   {name:'Гатчина',region:'Ленинградская область'},{name:'Сарапул',region:'Удмуртская Республика'},
   {name:'Ленинск-Кузнецкий',region:'Кемеровская область (Кузбасс)'},{name:'Магадан',region:'Магаданская область'},
   {name:'Мичуринск',region:'Тамбовская область'},{name:'Клин',region:'Московская область'},
@@ -2670,7 +2670,7 @@ const TODAY=today();
 // новой присланной версии). Показывается в Профиле, чтобы можно было сверить «то, что
 // открыто на телефоне» с «тем, что прислали только что» — без гадания, обновился
 // ли сайт после деплоя на хостинг.
-const APP_BUILD='09.09.2026 · ver 8';
+const APP_BUILD='09.09.2026 · ver 9';
 // Преобразует Date обратно в строку 'YYYY-MM-DD' по ЛОКАЛЬНЫМ компонентам (не UTC) — пара к today().
 function dateToLocalStr(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 // Парсит строку 'YYYY-MM-DD' как ЛОКАЛЬНУЮ дату (полночь по местному времени), а не UTC.
@@ -3323,7 +3323,7 @@ function load(){
     S=JSON.parse(s);
     // Безопасная миграция: у пользователей с данными от старой версии (понятие "сделка"/"воронка")
     // поля offers/nid.o могло не быть — подставляем дефолты, чтобы не падать на S.offers.filter(...) и т.п.
-    // Старые "сделки" (S.deals) соз��ательно не ����реносим — по решению пользователя стартуем с чистого списка предложений.
+    // Старые "сделки" (S.deals) соз����тельно не ����реносим — по решению пользователя стартуем с чистого списка предложений.
     if(!Array.isArray(S.offers))S.offers=[];
     if(!Array.isArray(S.trips))S.trips=[];
     if(!S.nid)S.nid={c:1,t:1,o:1};
@@ -3440,7 +3440,7 @@ function gsFocus(inputId){
   if(val.trim())globalSearch(val,inputId);
 }
 function globalSearch(q,inputId){
-  // ИСПРАВЛЕНИЕ: раньше был только ��дин инпут поис��а (десктопный) — на мобильном
+  // ИСПРАВЛЕНИЕ: раньше ��ыл только ��дин инпут поис��а (десктопный) — на мобильном
   // (≤600px) строки поиска не было вообще. Теперь есть два инпута (десктопный
   // #gsearch и мобильный #gsearch-mobile), у каждого своя панель результатов
   // (#gsr / #gsr-mobile соответственно) — определяем нужную по инпуту, который вызвал поиск.
@@ -5201,7 +5201,7 @@ function emailSelectedClients(){
 // === CRUD CLIENTS ===
 function openAddClient(){ editClientId=null; ['c-company','c-sign','c-city','c-address','c-note','c-inn','c-nextcontact','c-servicemgr','c-payterms','c-shipping'].forEach(id=>document.getElementById(id).value=''); renderRegionOptions(); setRegionValue(''); document.getElementById('c-potential').value=''; document.getElementById('c-status').value='unknown'; renderNotWorkingOptions(); renderObjectCategoryOptions(); setNotWorkingReasons([]); onClientStatusChange(); document.getElementById('c-category').value=''; document.getElementById('c-revisit').value=''; setChannelBtns([]); setFormatBtns([]); resetGeoGroups(null); updGeoVisible(); document.querySelectorAll('#tag-selector input').forEach(cb=>cb.checked=false); (matchMedia('(max-width:600px)').matches?closeClientExtra():openClientExtra()); document.querySelector('#m-client h3').textContent='Новый клиент'; document.querySelector('#m-client .btn-primary').textContent='Добавить'; resetContacts(null); document.getElementById('c-owner-wrap').style.display='none'; document.getElementById('m-client').classList.add('open'); }
 // УЛУЧШЕНИЕ: Enter в модалке клиента работает так же, как клик по кнопке
-// «Сохранить»/«Добавить» — в полях компании, ИНН, региона, полях контактного
+// «Сохранить»/«Добавит��» — в пол��х компании, ИНН, региона, полях контактного
 // лица (имя/телефон/email) и т.д. В заметке (textarea) Enter, как обычно,
 // добавляет перенос строки — сохранить из неё можно через Ctrl+Enter (Cmd+Enter
 // на Mac). На кнопках («+ Добавить», «✕» у контакта, кнопки канала/формата)
@@ -6228,7 +6228,7 @@ async function saveVisitResult(){
       // История визита
       await dbWrite({table:'client_history', op:'insert', values:{client_id:clientId,date:TODAY,text:histText}});
       // Обновление точки в командировке.
-      // READ-BEFORE-WRITE работает только онлайн (нужно перечитать из БД). Оффлайн
+      // READ-BEFORE-WRITE работает только онлайн (нужно перечитать и�� БД). Оффлайн
       // опираемся на локальную копию t.stops — защита от гонки двух устройств на время
       // оффлайна ослабевает (для одного пользователя это неважно).
       let baseStops=t.stops;
@@ -6299,7 +6299,7 @@ async function markTripVisited(id,checked){
     if(!c)return;
     const text='🧳 Визит (командировка)';
     const newNextVisit=c.revisitCadence?computeNextVisitDate(c.revisitCadence,TODAY):(c.nextVisitDate||null);
-    // ОПТИМИСТИЧНО обновляем локальное состояние сразу — чтобы от��ет��а была видна
+    // ОПТИМИСТИЧНО обновляем локальное состояние сра��у — чтобы от��ет��а была видна
     // мгновенно, даже без сети (запись уйдёт в очередь и отправится позже).
     c.lastContact=TODAY; c.nextVisitDate=newNextVisit;
     (c.history||=[]).push({date:TODAY,text});
@@ -6351,7 +6351,7 @@ function renderCalendar(){
     const eventNames = eventsList.map(t=>t.text).join(', ');
     html += `<div class="cal-day${isToday?' today':''}${hasEvents?' has-events':''}" onclick="showDayEvents('${dateStr}')">
       <div class="day-num">${day}</div>
-      ${hasEvents ? `<div class="day-dot"></div><div class="day-events">${eventsList.length} событ.</div>` : ''}
+      ${hasEvents ? `<div class="day-dot"></div><div class="day-events">${eventsList.length} соб��т.</div>` : ''}
     </div>`;
   }
   grid.innerHTML = html;
@@ -6505,7 +6505,7 @@ function renderLinksPage(){
 /* --- Ручная настройка ширины столбцов мышкой (как в Excel) ---
    Работает только на ПК (мышь): к каждому <th>, кроме служебного .lk-x,
    добавляется узкая "ручка" у правого края. Перетаскивание меняет ширину
-   столбца в пикселях; результат запоминается в localStorage по id таблицы,
+   столбца в пикселях; результат запоминается в localStorage ��о id таблицы,
    по����ому после перезагрузки страницы ширина сохраняется. */
 function makeTableColumnsResizable(table){
   if(!table||table.dataset.resizable==='1')return;
@@ -6759,7 +6759,7 @@ function renderStuck(){
     .map(c=>({c, d:stalledDays(c)}))
     .sort((a,b)=>b.d-a.d);
   if(!rows.length){
-    el.innerHTML='<div class="an-empty">Застрявших нет — по всем клиентам в воронке есть движение или запланирован следующий шаг.</div>';
+    el.innerHTML='<div class="an-empty">Застрявших нет — по всем клиентам в воронке есть движение или запланирован ��ледующий шаг.</div>';
     return;
   }
   const pot=rows.reduce((s,r)=>s+Number(r.c.potential||0),0);
@@ -7219,7 +7219,7 @@ function enableBrowserNotifications(){
 }
 
 // === WEB PUSH: подписка на серверные push (приходят даже при закрытом приложении) ===
-const PUSH_VAPID_PUBLIC_KEY='BFtaz1ZPQro8zv0Y2rWJn1yUKcmI7WLsf2G7UmFQPzKg-Z9OCxhi7XK-wIi23-7BfnVJTr9CoGVTFVAERKJ45E0';
+const PUSH_VAPID_PUBLIC_KEY='BDFOZNX5B6WKHmFPi-CgFN3Lug1LvhWDb8KW4Ot1UHnKysZ0Eg2dbUNh5biU9MiOz4owriT7ncqYJ3fOvybLaRU';
 function urlB64ToU8(s){const pad='='.repeat((4-s.length%4)%4);const b=atob((s+pad).replace(/-/g,'+').replace(/_/g,'/'));return Uint8Array.from(b,c=>c.charCodeAt(0));}
 async function subscribeToPush(){
   try{
@@ -8348,7 +8348,7 @@ async function saveClientToDb() {
     tags:[...document.querySelectorAll('#tag-selector input:checked')].map(cb=>cb.value),
     // Отправляем, только если колонка реально существует — иначе Supabase отклонит
     // весь запрос, и клиент вообще не сохранится. (Раньше геоссылки собирались, но
-    // сюда, в реальный объект отправки, так и не попадали — при более ранней переделке
+    // сюда, �� реальный объект отправки, так и не попадали — при более ��анней переделке
     // этой функции строка потерялась, и ни одна ссылка ни у кого не сохранялась.)
     ...(HAS_GEO_COLS!==false ? {geo_links: getGeoLinks()} : {}),
     // Те же меры предосторожности, что и с геоколонками: не отправляем, если
