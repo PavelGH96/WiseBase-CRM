@@ -2670,7 +2670,7 @@ const TODAY=today();
 // новой присланной версии). Показывается в Профиле, чтобы можно было сверить «то, что
 // открыто на телефоне» с «тем, что прислали только что» — без гадания, обновился
 // ли сайт после деплоя на хостинг.
-const APP_BUILD='09.09.2026 · ver 10';
+const APP_BUILD='09.09.2026 · ver 11';
 // Преобразует Date обратно в строку 'YYYY-MM-DD' по ЛОКАЛЬНЫМ компонентам (не UTC) — пара к today().
 function dateToLocalStr(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 // Парсит строку 'YYYY-MM-DD' как ЛОКАЛЬНУЮ дату (полночь по местному времени), а не UTC.
@@ -4781,8 +4781,12 @@ function setClientSegment(k){
 }
 function renderSegmentChips(){
   const el=document.getElementById('client-segments'); if(!el)return;
+  // Считаем по той же видимой выборке, что и сам список (scopedClients), а не по
+  // всей базе — иначе счётчики на чипах-фильтрах не совпадали бы с тем, что реально
+  // показано под ними (например, «Без шага 36» при 6 видимых клиентах).
+  const visible=countScopeClients();
   el.innerHTML=CLIENT_SEGMENTS.map(sg=>{
-    const n=sg.key==='all'?S.clients.length:S.clients.filter(sg.pred).length;
+    const n=sg.key==='all'?visible.length:visible.filter(sg.pred).length;
     // пустые сегменты показываем приглушённо, но не прячем — иначе непонятно, что они бывают
     const ic=SEG_ICONS[sg.key]||'';
     return `<button class="seg-chip${clientSegment===sg.key?' active':''}${!n&&sg.key!=='all'?' empty':''}" onclick="setClientSegment('${sg.key}')">${ic}<span class="seg-t">${sg.label}</span><span class="seg-n">${n}</span></button>`;
