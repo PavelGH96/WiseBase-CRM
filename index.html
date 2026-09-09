@@ -99,7 +99,7 @@ body.t10 .tag-cold{background:#1a2740;color:#7cb6fb}
 body.t10 .tag-vip{background:#2a2340;color:#b39ae8}
 body.t10 .tag-new{background:#242b33;color:#9fb1c4}
 
-/* Новая тем��: Askona */
+/* Новая тема: Askona */
 body.t6 {
   --bg: #f5fbfc;
   --card: #ffffff;
@@ -537,7 +537,7 @@ body.t6 .tag-new{background:#eef2f7;color:#52606e}
 .dash-kanban-col.collapsed .dash-kanban-col-head{margin-bottom:0}
 .dash-kanban-cards.drag-over{background:color-mix(in srgb,var(--blue) 8%,transparent);border-radius:var(--radius);outline:2px dashed var(--blue);outline-offset:-2px}
 .dash-kanban-col.drop-ready .dash-kanban-col-head{opacity:.6}
-/* Drag-and-drop в списочном виде дашборда (перетаскива��ие строк между разделами) */
+/* Drag-and-drop в списочном виде дашборда (перетаскивание строк между разделами) */
 .task-row.dash-row-draggable{cursor:grab}
 .task-row.dash-row-draggable.dragging{opacity:.35;cursor:grabbing}
 .fs-body.drag-over{background:color-mix(in srgb,var(--blue) 8%,transparent);outline:2px dashed var(--blue);outline-offset:-2px}
@@ -718,7 +718,7 @@ body.col-resizing *{cursor:col-resize!important}
 .cal-day .day-dot{ width:6px; height:6px; border-radius:50%; background:var(--green); margin-top:3px; }
 .cal-day .day-events{ font-size:10px; color:var(--t2); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; }
 
-/* Остальные ст��ли (модалки, стат��стика, воронка и т.д.) — оставлены без изменений */
+/* Остальные стили (модалки, статистика, воронка и т.д.) — оставлены без изменений */
 .funnel-wrap{display:flex;flex-direction:column;gap:8px;flex:1;overflow-y:auto;padding-bottom:4px}
 .fs-wrap{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--sh-s);flex-shrink:0}
 .fs-hd{display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;transition:background .18s}
@@ -947,7 +947,7 @@ body.col-resizing *{cursor:col-resize!important}
 /* Эмодзи (⏰🎯🔥❄️) рисуются цветным шрифтом с более высокой строкой, чем обычный текст.
    Из-за этого чипы С иконкой были заметно выше чипа «Все», у которого иконки нет.
    Лечим не подгонкой, а метриками: фиксируем высоту чипа, обнуляем line-height и
-   задаём ��конке собственный размер — тогда все чипы одинаковы независимо от шрифта
+   задаём иконке собственный размер — тогда все чипы одинаковы независимо от шрифта
    эмодзи в системе. */
 .seg-chip{height:30px!important;min-height:30px;max-height:30px;line-height:1;padding:0 12px!important}
 .seg-chip .seg-ic{width:14px;height:14px;flex-shrink:0;display:block}
@@ -970,14 +970,14 @@ body.col-resizing *{cursor:col-resize!important}
    границы элемента вообще, поэтому не обрежется нигде: ни в панели, ни в
    прокручиваемой колонке, ни у края экрана.
    !important — потому что у активной вкладки есть своё правило box-shadow с более
-   высокой специфичностью (а в темах «Стиль Т» и «��тСтиль» — ещё в��ш����), и рамка ему
+   высокой специфичностью (а в темах «Стиль Т» и «АвтоСтиль» — ещё выше), и рамка ему
    проигрывала. Радиус НЕ переопределяем: inset-тень сама повторяет форму элемента,
    будь то «пилюля» или карточка. */
 .kb-editing{box-shadow:inset 0 0 0 2px var(--green), 0 0 0 3px color-mix(in srgb,var(--green) 25%,transparent) !important}
 .kb-focus{outline:none!important;position:relative;z-index:3;
   box-shadow:inset 0 0 0 2px var(--accent), inset 0 0 0 5px color-mix(in srgb,var(--accent) 14%,transparent) !important;
   animation:kbPop .22s cubic-bezier(.22,1,.36,1)}
-/* На кнопках со СПЛОШНОЙ заливкой акцентным цветом обычная рамка того же а��центного
+/* На кнопках со СПЛОШНОЙ заливкой акцентным цветом обычная рамка того же акцентного
    цвета попросту сливается с фоном и не видна. Используем --accent-fg — тот самый
    цвет, который тема уже применяет для текста/иконок поверх --accent, то есть
    гарантированно контрастный к нему в любой теме (в «WiseBase Dark», например, акцент
@@ -1932,7 +1932,7 @@ button,a,select,label{touch-action:manipulation}
 
   <!-- FUNNEL -->
   <div id="page-offers" class="page">
-    <!-- Строка 1: фильтры + кно��ки действий -->
+    <!-- Строка 1: фильтры + кнопки действий -->
     <div class="toolbar" style="flex-wrap:wrap">
       <select class="sel-in" id="offer-client-filter" onchange="renderOffers()" style="font-size:13px;max-width:200px">
         <option value="0">Все клиенты</option>
@@ -2171,7 +2171,7 @@ button,a,select,label{touch-action:manipulation}
 </div><!-- /shell -->
 
 <!-- Модалки (без изменений, оставлены для краткости) -->
-<div class="overlay" id="m-task" onkeydown="taskModalKeydown(event)" role="dialog" aria-modal="true" aria-labelledby="m-task-title"><div class="modal"><h3 id="m-task-title">Новая задача</h3><div class="fg-row"><div class="fg"><label for="t-type">Тип</label><select id="t-type"><option value="call">Звонок</option><option value="meet">Встреча</option><option value="task">Задача</option></select></div><div class="fg"><label for="t-prio">Приоритет</label><select id="t-prio"><option value="mid">Средни��</option><option value="high">Высокий</option><option value="low">Низкий</option></select></div></div><div class="fg"><label for="t-text">Описание *</label><input type="text" id="t-text" placeholder="Что нужно сделать?"></div><div class="fg"><label for="t-client">Клиент</label><select id="t-client"><option value="0">— без клиента —</option></select></div><div class="fg"><label class="lbl-check"><input type="checkbox" id="t-shared" class="w-auto"> 👥 Общая задача — видна и редактируется всеми пользователями</label></div><div class="fg-row"><div class="fg"><label for="t-date">Дата</label><input type="date" id="t-date"><label class="lbl-check-inline"><input type="checkbox" id="t-nodate" onchange="toggleNoDate()" class="w-auto"> Без даты</label></div><div class="fg"><label for="t-time">Время</label><input type="time" id="t-time" step="600"></div></div><div class="fg"><label for="t-repeat">Повтор</label><select id="t-repeat"><option value="">Без повтора</option><option value="daily">Каждый день</option><option value="weekly">Каждую неделю</option><option value="biweekly">Каждые 2 недели</option><option value="monthly">Каждый месяц</option></select></div><div class="fg"><label for="t-note">Заметка</label><textarea id="t-note" placeholder="Детали..."></textarea></div><div class="mfoot"><button class="btn btn-ghost" onclick="closeModal('m-task')">Отмена</button><button class="btn btn-primary" id="m-task-save-btn" onclick="saveTaskToDb()">Сохранить</button></div></div></div>
+<div class="overlay" id="m-task" onkeydown="taskModalKeydown(event)" role="dialog" aria-modal="true" aria-labelledby="m-task-title"><div class="modal"><h3 id="m-task-title">Новая задача</h3><div class="fg-row"><div class="fg"><label for="t-type">Тип</label><select id="t-type"><option value="call">Звонок</option><option value="meet">Встреча</option><option value="task">Задача</option></select></div><div class="fg"><label for="t-prio">Приоритет</label><select id="t-prio"><option value="mid">Средний</option><option value="high">Высокий</option><option value="low">Низкий</option></select></div></div><div class="fg"><label for="t-text">Описание *</label><input type="text" id="t-text" placeholder="Что нужно сделать?"></div><div class="fg"><label for="t-client">Клиент</label><select id="t-client"><option value="0">— без клиента —</option></select></div><div class="fg"><label class="lbl-check"><input type="checkbox" id="t-shared" class="w-auto"> 👥 Общая задача — видна и редактируется всеми пользователями</label></div><div class="fg-row"><div class="fg"><label for="t-date">Дата</label><input type="date" id="t-date"><label class="lbl-check-inline"><input type="checkbox" id="t-nodate" onchange="toggleNoDate()" class="w-auto"> Без даты</label></div><div class="fg"><label for="t-time">Время</label><input type="time" id="t-time" step="600"></div></div><div class="fg"><label for="t-repeat">Повтор</label><select id="t-repeat"><option value="">Без повтора</option><option value="daily">Каждый день</option><option value="weekly">Каждую неделю</option><option value="biweekly">Каждые 2 недели</option><option value="monthly">Каждый месяц</option></select></div><div class="fg"><label for="t-note">Заметка</label><textarea id="t-note" placeholder="Детали..."></textarea></div><div class="mfoot"><button class="btn btn-ghost" onclick="closeModal('m-task')">Отмена</button><button class="btn btn-primary" id="m-task-save-btn" onclick="saveTaskToDb()">Сохранить</button></div></div></div>
 
 <div class="overlay" id="m-client" onkeydown="clientModalKeydown(event)" role="dialog" aria-modal="true" aria-labelledby="m-client-title"><div class="modal"><h3 id="m-client-title">Новый клиент</h3>
 <div class="form-sec-lbl first">Основное</div>
@@ -2452,7 +2452,7 @@ button,a,select,label{touch-action:manipulation}
 <button class="fab" onclick="toggleFabMenu()" aria-label="Создать">＋</button>
 <div class="fab-backdrop" id="fab-backdrop" onclick="closeFabMenu()"></div>
 <div class="fab-menu" id="fab-menu" role="menu">
-  <button class="mob-more-item" id="fab-add-client" onclick="closeFabMenu();openAddClient()">👤 ��овый клиент</button>
+  <button class="mob-more-item" id="fab-add-client" onclick="closeFabMenu();openAddClient()">👤 Новый клиент</button>
   <button class="mob-more-item" id="fab-add-task" onclick="closeFabMenu();openAddTask()">✅ Новая задача</button>
   <button class="mob-more-item" id="fab-add-offer" onclick="closeFabMenu();openAddOffer()">💼 Новая сделка</button>
   <button class="mob-more-item" id="fab-add-visit" onclick="fabVisitResult()">📝 Итог визита</button>
@@ -2476,7 +2476,7 @@ const TYPE_BADGE_CLS={call:'badge-call',meet:'badge-meet',task:'badge-task'};
 const TAG_META={vip:{l:'⭐ VIP',cls:'tag-vip'},warm:{l:'🌤 Тёплый',cls:'tag-warm'},cold:{l:'❄️ Холодный',cls:'tag-cold'},new:{l:'🆕 Новый',cls:'tag-new'}};
 const REPEAT_DAYS={daily:1,weekly:7,biweekly:14,monthly:30};
 // СПРАВОЧНИК РЕГИОНОВ РФ — полный официальный перечень 85 субъектов Федерации
-// (ст. 65 Конституции РФ; в алф��витно��� порядке ��о типу субъекта).
+// (ст. 65 Конституции РФ; в алфавитном порядке по типу субъекта).
 const RU_REGIONS=[
   'Республика Адыгея','Республика Алтай','Республика Башкортостан','Республика Бурятия','Республика Дагестан',
   'Республика Ингушетия','Кабардино-Балкарская Республика','Республика Калмыкия','Карачаево-Черкесская Республика',
@@ -2519,8 +2519,8 @@ const RU_CITIES=[
   {name:'Ульяновск',region:'Ульяновская область'},{name:'Иркутск',region:'Иркутская область'},
   {name:'Владивосток',region:'Приморский край'},{name:'Ярославль',region:'Ярославская область'},
   {name:'Севастополь',region:'Севастополь'},{name:'Ставрополь',region:'Ставропольский край'},
-  {name:'Томск',region:'Томская область'},{name:'Кемерово',region:'Кемеровская область (��узбас��)'},
-  {name:'Наб��режные Челны',region:'Республика Татарстан'},{name:'Оренбург',region:'Оренбургская область'},
+  {name:'Томск',region:'Томская область'},{name:'Кемерово',region:'Кемеровская область (Кузбасс)'},
+  {name:'Набережные Челны',region:'Республика Татарстан'},{name:'Оренбург',region:'Оренбургская область'},
   {name:'Новокузнецк',region:'Кемеровская область (Кузбасс)'},{name:'Балашиха',region:'Московская область'},
   {name:'Рязань',region:'Рязанская область'},{name:'Чебоксары',region:'Чувашская Республика'},
   {name:'Калининград',region:'Калининградская область'},{name:'Пенза',region:'Пензенская область'},
@@ -2530,7 +2530,7 @@ const RU_CITIES=[
   {name:'Улан-Удэ',region:'Республика Бурятия'},{name:'Тверь',region:'Тверская область'},
   {name:'Брянск',region:'Брянская область'},{name:'Якутск',region:'Республика Саха (Якутия)'},
   {name:'Иваново',region:'Ивановская область'},{name:'Владимир',region:'Владимирская область'},
-  {name:'Симферополь',region:'Республика Крым'},{name:'Грозный',region:'��еченская Республика'},
+  {name:'Симферополь',region:'Республика Крым'},{name:'Грозный',region:'Чеченская Республика'},
   {name:'Чита',region:'Забайкальский край'},{name:'Калуга',region:'Калужская область'},
   {name:'Белгород',region:'Белгородская область'},{name:'Волжский',region:'Волгоградская область'},
   {name:'Подольск',region:'Московская область'},{name:'Вологда',region:'Вологодская область'},
@@ -2584,7 +2584,7 @@ const RU_CITIES=[
   {name:'Сергиев Посад',region:'Московская область'},{name:'Новокуйбышевск',region:'Самарская область'},
   {name:'Воткинск',region:'Удмуртская Республика'},{name:'Железногорск (Курская обл.)',region:'Курская область'},
   {name:'Междуреченск',region:'Кемеровская область (Кузбасс)'},{name:'Воскресенск',region:'Московская область'},
-  {name:'Елец',region:'Липецкая область'},{name:'Саров',region:'Нижегородска��� область'},
+  {name:'Елец',region:'Липецкая область'},{name:'Саров',region:'Нижегородская область'},
   {name:'Гатчина',region:'Ленинградская область'},{name:'Сарапул',region:'Удмуртская Республика'},
   {name:'Ленинск-Кузнецкий',region:'Кемеровская область (Кузбасс)'},{name:'Магадан',region:'Магаданская область'},
   {name:'Мичуринск',region:'Тамбовская область'},{name:'Клин',region:'Московская область'},
@@ -2650,7 +2650,7 @@ const RU_CITIES=[
   {name:'Кумертау',region:'Республика Башкортостан'},{name:'Мелеуз',region:'Республика Башкортостан'},
   {name:'Нефтекамск',region:'Республика Башкортостан'},{name:'Октябрьский',region:'Республика Башкортостан'},
   {name:'Салават',region:'Республика Башкортостан'},{name:'Сибай',region:'Республика Башкортостан'},
-  {name:'Стер��итамак',region:'Республика Башкортостан'},{name:'Туймазы',region:'Республика Башкортостан'},
+  {name:'Стерлитамак',region:'Республика Башкортостан'},{name:'Туймазы',region:'Республика Башкортостан'},
   {name:'Уфа',region:'Республика Башкортостан'},{name:'Учалы',region:'Республика Башкортостан'},
   {name:'Янаул',region:'Республика Башкортостан'},
 ];
@@ -2684,7 +2684,7 @@ function parseLocalDate(dateStr){
 let S={clients:[],tasks:[],offers:[],trips:[],links:[],staff:[],plans:{},nid:{c:1,t:1,o:1}};
 // ФУНКЦИЯ ОТМЕНЫ/ПОВТОРА: храним снимки всего состояния S (JSON-строками) до и после
 // каждого сохранения. Это проще и надёжнее, чем писать отдельную «обратную» операцию
-// для каждого действия (удаление/добавление/ре��актирование клиента/задачи/предложения) —
+// для каждого действия (удаление/добавление/редактирование клиента/задачи/предложения) —
 // один и тот же механизм автоматически покрывает вообще все изменения в приложении.
 let undoStack=[];
 let redoStack=[];
@@ -2752,7 +2752,7 @@ function addExtraPhone(rowId){
 function removeContactRow(id){const el=document.getElementById(id);if(el)el.remove();}
 // ВАЛИДАЦИЯ КОНТАКТНЫХ ДАННЫХ
 // Живая маска телефона: оставляем только цифры, отбрасываем код страны (7/8),
-// если пользователь начал ввод с него, и жёстк�� ограничиваем 10 цифрами после +7 —
+// если пользователь начал ввод с него, и жёстко ограничиваем 10 цифрами после +7 —
 // набрать одиннадцатую цифру просто не получится.
 function formatPhoneInput(el){
   let digits=el.value.replace(/\D/g,'');
@@ -2790,7 +2790,7 @@ function parseAmount(v){
   return Number(String(v||'').replace(/[\s\u00A0]/g,''))||0;
 }
 // Статический вариант — та же расстановка пробелов, но без курсора: для предзаполнения
-// поля готовым значением при открытии формы (правка клиента/��редложения/плана),
+// поля готовым значением при открытии формы (правка клиента/предложения/плана),
 // а не только при вводе с клавиатуры.
 function formatAmountStatic(n){
   const digits=String(Math.round(Number(n||0))).replace(/\D/g,'');
@@ -3192,7 +3192,7 @@ document.addEventListener('keydown',e=>{
   // ---- Текстовые поля ----
   //   ↑ ↓  — переход между элементами (в однострочном поле они всё равно бесполезны);
   //   ← →  — двигают курсор по тексту, но если курсор упёрся в край строки —
-  //          выводят из поля наружу. Так набор текста не ломаетс��.
+  //          выводят из поля наружу. Так набор текста не ломается.
   // Чекбоксы и радиокнопки сюда НЕ относятся: у них нет текстового курсора, и логика
   // «курсор на краю» к ним неприменима в принципе (в браузере попытка прочитать
   // selectionStart у чекбокса не сработает штатно). Без исключения чекбокс — карточки
@@ -3219,7 +3219,7 @@ document.addEventListener('keydown',e=>{
   // Не перехватывать с модификаторами (Ctrl/Cmd/Alt) — это могут быть системные/браузерные сочетания
   if(e.ctrlKey||e.metaKey||e.altKey)return;
   // Стрелки — пространственная навигация по всем элементам (вкладки, карточки,
-  // строки, ячейки). Shift не трогаем: там выделение текс��а и прочее штатное поведение.
+  // строки, ячейки). Shift не трогаем: там выделение текста и прочее штатное поведение.
   if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key) && !e.shiftKey){
     if(document.querySelector('.overlay.open'))return;
     e.preventDefault();
@@ -3323,7 +3323,7 @@ function load(){
     S=JSON.parse(s);
     // Безопасная миграция: у пользователей с данными от старой версии (понятие "сделка"/"воронка")
     // поля offers/nid.o могло не быть — подставляем дефолты, чтобы не падать на S.offers.filter(...) и т.п.
-    // Старые "сделки" (S.deals) соз����тельно не ����реносим — по решению пользователя стартуем с чистого списка предложений.
+    // Старые "сделки" (S.deals) сознательно не переносим — по решению пользователя стартуем с чистого списка предложений.
     if(!Array.isArray(S.offers))S.offers=[];
     if(!Array.isArray(S.trips))S.trips=[];
     if(!S.nid)S.nid={c:1,t:1,o:1};
@@ -3440,7 +3440,7 @@ function gsFocus(inputId){
   if(val.trim())globalSearch(val,inputId);
 }
 function globalSearch(q,inputId){
-  // ИСПРАВЛЕНИЕ: раньше ��ыл только ��дин инпут поис��а (десктопный) — на мобильном
+  // ИСПРАВЛЕНИЕ: раньше был только один инпут поиска (десктопный) — на мобильном
   // (≤600px) строки поиска не было вообще. Теперь есть два инпута (десктопный
   // #gsearch и мобильный #gsearch-mobile), у каждого своя панель результатов
   // (#gsr / #gsr-mobile соответственно) — определяем нужную по инпуту, который вызвал поиск.
@@ -3448,7 +3448,7 @@ function globalSearch(q,inputId){
   const resultsId=inputId==='gsearch-mobile'?'gsr-mobile':'gsr';
   const el=document.getElementById(resultsId); q=q.trim().toLowerCase(); if(!q){el.classList.remove('open');return;}
   const parts=[];
-  // ИСПРАВЛЕНИЕ: раньше поиск клиентов смотрел тол��ко на имя/компанию — телефон, email,
+  // ИСПРАВЛЕНИЕ: раньше поиск клиентов смотрел только на имя/компанию — телефон, email,
   // ИНН, заметка, теги и доп. контакты не проверялись, так что найти клиента по номеру
   // телефона было невозможно. Для телефонов сравниваем только цифры (без +, пробелов,
   // скобок и дефисов), чтобы "9001234567" находило "+7 900 123-45-67" и наоборот.
@@ -4407,7 +4407,7 @@ function renderDash(){
           ondragleave="dashDragLeave(event)"
           ondrop="dashDrop(event,'${col.key}')">
           ${col.tasks.length?col.tasks.map(t=>mkDashCard(t,col.key)).join(''):'<div class="dash-kanban-empty">Нет задач 🎉</div>'}
-          <button class="dash-kanban-add" onclick="openAddTask(null,'${col.key}')">+ Добавить зад��чу</button>
+          <button class="dash-kanban-add" onclick="openAddTask(null,'${col.key}')">+ Добавить задачу</button>
         </div>
       </div>`).join('')}</div>`;
     return;
@@ -4496,7 +4496,7 @@ const STATUS_META={
    Смены статуса пишутся в уже существующую таблицу client_history строго заданной
    строкой — «🔄 Статус: X → Y». Отдельная миграция БД не нужна: формат мы порождаем
    сами и сами же разбираем, поэтому парсинг детерминирован. Из этого журнала растут
-   честная воронка (д��ижение, а не срез), «срок в статусе» и «застрявшие». */
+   честная воронка (движение, а не срез), «срок в статусе» и «застрявшие». */
 const statusLabel = k => (STATUS_META[k]||STATUS_META.unknown).l.replace(/^\S+\s/,'');
 const STATUS_BY_LABEL = Object.fromEntries(Object.keys(STATUS_META).map(k=>[statusLabel(k),k]));
 STATUS_BY_LABEL['Неизвестный']='unknown'; // legacy: старые записи журнала со старым названием
@@ -4758,7 +4758,7 @@ let clientSegment='all';
 /* Иконки сегментов — векторные, а НЕ эмодзи. Эмодзи рисуются системным цветным
    шрифтом, у которого своя (большая) высота строки: из-за неё кнопки распирало до
    двойной высоты, и никакая фиксация height не помогала надёжно. У SVG размер задан
-   в самой картинке — он одинаков в любой ОС и любом брау��ере. */
+   в самой картинке — он одинаков в любой ОС и любом браузере. */
 const SEG_ICONS={
   due:    '<svg class="seg-ic" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="9" r="5.2"/><path d="M8 6.4V9l1.8 1.1M5.2 2.6 3.4 4M10.8 2.6 12.6 4"/></svg>',
   nostep: '<svg class="seg-ic" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="5.6"/><circle cx="8" cy="8" r="2.4"/></svg>',
@@ -4865,7 +4865,7 @@ function renderClients(){
   const mkStatusBadge=c=>{const sm=STATUS_META[c.status||'unknown']||STATUS_META.unknown;return`<span class="status-badge ${sm.cls}">${sm.l}</span>`;};
   // «в статусе N дней» — считается по журналу; у старых карточек данных ещё нет.
   const mkStatusAge=c=>{const d=daysInStatus(c);return d==null?'':`<span class="status-age">${d} ${pluralRu(d,'день','дня','дней')}</span>`;};
-  // Ссылки на карты — прямо в карточке, чтобы гля��уть рейтинг и отзывы без захода в
+  // Ссылки на карты — прямо в карточке, чтобы глянуть рейтинг и отзывы без захода в
   // редактирование. Точек может быть несколько — город показываем только когда их
   // больше одной, чтобы не загромождать карточку с единственным адресом.
   // Ссылки на карты вынесены на верхний уровень (не внутрь renderClients) — их
@@ -5201,7 +5201,7 @@ function emailSelectedClients(){
 // === CRUD CLIENTS ===
 function openAddClient(){ editClientId=null; ['c-company','c-sign','c-city','c-address','c-note','c-inn','c-nextcontact','c-servicemgr','c-payterms','c-shipping'].forEach(id=>document.getElementById(id).value=''); renderRegionOptions(); setRegionValue(''); document.getElementById('c-potential').value=''; document.getElementById('c-status').value='unknown'; renderNotWorkingOptions(); renderObjectCategoryOptions(); setNotWorkingReasons([]); onClientStatusChange(); document.getElementById('c-category').value=''; document.getElementById('c-revisit').value=''; setChannelBtns([]); setFormatBtns([]); resetGeoGroups(null); updGeoVisible(); document.querySelectorAll('#tag-selector input').forEach(cb=>cb.checked=false); (matchMedia('(max-width:600px)').matches?closeClientExtra():openClientExtra()); document.querySelector('#m-client h3').textContent='Новый клиент'; document.querySelector('#m-client .btn-primary').textContent='Добавить'; resetContacts(null); document.getElementById('c-owner-wrap').style.display='none'; document.getElementById('m-client').classList.add('open'); }
 // УЛУЧШЕНИЕ: Enter в модалке клиента работает так же, как клик по кнопке
-// «Сохранить»/«Добавит��» — в пол��х компании, ИНН, региона, полях контактного
+// «Сохранить»/«Добавить» — в полях компании, ИНН, региона, полях контактного
 // лица (имя/телефон/email) и т.д. В заметке (textarea) Enter, как обычно,
 // добавляет перенос строки — сохранить из неё можно через Ctrl+Enter (Cmd+Enter
 // на Mac). На кнопках («+ Добавить», «✕» у контакта, кнопки канала/формата)
@@ -5573,9 +5573,9 @@ function openEditOffer(id){
 }
 // УЛУЧШЕНИЕ: Enter в модалке предложения работает так же, как клик по кнопке
 // «Сохранить»/«Добавить» — в полях суммы, даты и в выпадающих списках (клиент,
-// статус, канал). Поле «Предложение» — тоже textarea (как за��етка у задачи),
+// статус, канал). Поле «Предложение» — тоже textarea (как заметка у задачи),
 // поэтому обычный Enter в нём вставляет перенос строки, а сохраняет — Ctrl+Enter
-// (Cmd+Enter на Mac), чтобы не обрывать ��линное описание на середине.
+// (Cmd+Enter на Mac), чтобы не обрывать длинное описание на середине.
 function offerModalKeydown(e){
   if(e.key!=='Enter')return;
   const tag=(e.target.tagName||'').toUpperCase();
@@ -5588,7 +5588,7 @@ function saveOffer(){
   const text=document.getElementById('o-text').value.trim();
   if(!text){alert('Введи текст предложения');return;}
   const channel=getOfferChannelBtnsValue().join(', ');
-  if(!channel){alert('Выбери канал прода��');return;}
+  if(!channel){alert('Выбери канал продажи');return;}
   const data={
     text,
     clientId:Number(document.getElementById('o-client').value),
@@ -6228,7 +6228,7 @@ async function saveVisitResult(){
       // История визита
       await dbWrite({table:'client_history', op:'insert', values:{client_id:clientId,date:TODAY,text:histText}});
       // Обновление точки в командировке.
-      // READ-BEFORE-WRITE работает только онлайн (нужно перечитать и�� БД). Оффлайн
+      // READ-BEFORE-WRITE работает только онлайн (нужно перечитать из БД). Оффлайн
       // опираемся на локальную копию t.stops — защита от гонки двух устройств на время
       // оффлайна ослабевает (для одного пользователя это неважно).
       let baseStops=t.stops;
@@ -6245,7 +6245,7 @@ async function saveVisitResult(){
       if(canResyncNow()) await syncFromSupabase();
       if(ru.queued) toast('Визит сохранён локально — отправлю, когда появится сеть');
       else toast('Визит сохранён'+(nextVisit?`, следующий — ${FD(nextVisit)}`:''));
-    }catch(e){toast('Не удал��сь сохранить визит: '+(e.message||e));return;}
+    }catch(e){toast('Не удалось сохранить визит: '+(e.message||e));return;}
     if(visitOpPending<=1) renderTrips();
   });
 }
@@ -6299,7 +6299,7 @@ async function markTripVisited(id,checked){
     if(!c)return;
     const text='🧳 Визит (командировка)';
     const newNextVisit=c.revisitCadence?computeNextVisitDate(c.revisitCadence,TODAY):(c.nextVisitDate||null);
-    // ОПТИМИСТИЧНО обновляем локальное состояние сра��у — чтобы от��ет��а была видна
+    // ОПТИМИСТИЧНО обновляем локальное состояние сразу — чтобы отметка была видна
     // мгновенно, даже без сети (запись уйдёт в очередь и отправится позже).
     c.lastContact=TODAY; c.nextVisitDate=newNextVisit;
     (c.history||=[]).push({date:TODAY,text});
@@ -6351,7 +6351,7 @@ function renderCalendar(){
     const eventNames = eventsList.map(t=>t.text).join(', ');
     html += `<div class="cal-day${isToday?' today':''}${hasEvents?' has-events':''}" onclick="showDayEvents('${dateStr}')">
       <div class="day-num">${day}</div>
-      ${hasEvents ? `<div class="day-dot"></div><div class="day-events">${eventsList.length} соб��т.</div>` : ''}
+      ${hasEvents ? `<div class="day-dot"></div><div class="day-events">${eventsList.length} событ.</div>` : ''}
     </div>`;
   }
   grid.innerHTML = html;
@@ -6505,8 +6505,8 @@ function renderLinksPage(){
 /* --- Ручная настройка ширины столбцов мышкой (как в Excel) ---
    Работает только на ПК (мышь): к каждому <th>, кроме служебного .lk-x,
    добавляется узкая "ручка" у правого края. Перетаскивание меняет ширину
-   столбца в пикселях; результат запоминается в localStorage ��о id таблицы,
-   по����ому после перезагрузки страницы ширина сохраняется. */
+   столбца в пикселях; результат запоминается в localStorage по id таблицы,
+   поэтому после перезагрузки страницы ширина сохраняется. */
 function makeTableColumnsResizable(table){
   if(!table||table.dataset.resizable==='1')return;
   table.dataset.resizable='1';
@@ -6565,7 +6565,7 @@ function renderLinksTable(){
     return;
   }
   b.innerHTML=rows.map(l=>`<tr>
-    <td><input class="lk-cell" value="${lkEsc(l.description)}" placeholder="Описан��е" oninput="editLink(${l.id},'description',this.value)" onblur="flushEdit()"></td>
+    <td><input class="lk-cell" value="${lkEsc(l.description)}" placeholder="Описание" oninput="editLink(${l.id},'description',this.value)" onblur="flushEdit()"></td>
     <td><input class="lk-cell" value="${lkEsc(l.url)}" placeholder="https://…" oninput="editLink(${l.id},'url',this.value)" onblur="normLinkCell(${l.id},this)"></td>
     <td class="lk-x">
       <button class="lk-open" onclick="openLink(${l.id})" ${l.url?'':'disabled'} title="Открыть в новой вкладке" aria-label="Открыть ссылку">↗</button>
@@ -6759,7 +6759,7 @@ function renderStuck(){
     .map(c=>({c, d:stalledDays(c)}))
     .sort((a,b)=>b.d-a.d);
   if(!rows.length){
-    el.innerHTML='<div class="an-empty">Застрявших нет — по всем клиентам в воронке есть движение или запланирован ��ледующий шаг.</div>';
+    el.innerHTML='<div class="an-empty">Застрявших нет — по всем клиентам в воронке есть движение или запланирован следующий шаг.</div>';
     return;
   }
   const pot=rows.reduce((s,r)=>s+Number(r.c.potential||0),0);
@@ -6774,7 +6774,7 @@ function openClientFromAnalytics(id){ showPage('clients'); setTimeout(()=>openHi
 
 // Остывающие: клиенты в воронке, которых давно не касались.
 // Отличие от «застрявших»: там важен отсутствующий следующий шаг, здесь — только
-// молчание. Клиент може�� иметь задачу «на когда-нибудь» и всё равно остывать.
+// молчание. Клиент может иметь задачу «на когда-нибудь» и всё равно остывать.
 let coolMin=60;
 function setCoolMin(d){ coolMin=d; const order=[30,60,90]; document.querySelectorAll('#cool-period button').forEach((b,i)=>b.classList.toggle('active',order[i]===d)); renderCooling(); }
 function renderCooling(){
@@ -6976,7 +6976,7 @@ function exportExcel(){ /* полный экспорт всех данных */
   XLSX.writeFile(wb,`WiseBase_${TODAY}.xlsx`); toast('Экспорт готов');
 }
 
-// Экспорт клиентов в формате ш��блона импорта (те же заголовки колонок) —
+// Экспорт клиентов в формате шаблона импорта (те же заголовки колонок) —
 // такой файл можно потом снова загрузить через «↓ Импорт» без правок.
 const CLIENT_TPL_STATUS_L={unknown:'Неизвестный',potential:'Потенциальный',negotiation:'Переговоры',active:'Действующий',inactive:'Не работаем'};
 // Обратная карта (человекочитаемый статус → внутренний код) — нужна импорту шаблона.
@@ -7049,7 +7049,7 @@ function updAutoSaveUI(){
     const d=new Date(UIP.lastAutoSave);
     lbl.textContent=`Включено · последний бэкап: ${d.toLocaleDateString('ru-RU')} ${d.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})}`;
   } else {
-    lbl.textContent='Включено · пе��вый бэкап будет через 30 минут';
+    lbl.textContent='Включено · первый бэкап будет через 30 минут';
   }
 }
 // Импорт клиентов в формате шаблона (те же колонки, что выдаёт «Экспорт клиентов»).
@@ -7606,7 +7606,7 @@ async function flushQueue(){
       try{ res=await execDescriptor({...d,returning:d.op==='insert'&&d.tmpId!=null}); }
       catch(e){ if(isNetworkError(e)){break;} res={error:e}; }
       if(res && res.error && isNetworkError(res.error)) break; // сеть снова пропала
-      // Успех (или неретраибл-ошибка данных, которую нет смысла крутить вечно): ��нимаем с очереди.
+      // Успех (или неретраибл-ошибка данных, которую нет смысла крутить вечно): снимаем с очереди.
       if(d.op==='insert' && d.tmpId!=null && res && res.data && res.data.id!=null){ tmpIdMap[d.tmpId]=res.data.id; }
       offlineQueue.shift();
       persistOfflineQueue();
@@ -7894,7 +7894,7 @@ function startLoginBg(){
       if(it.y+it.h>bh){it.y=bh-it.h;it.vy=-Math.abs(it.vy);}
       // карточка входа: выталкиваем по кратчайшей оси, но только туда,
       // где чип останется в пределах экрана (иначе его зажало бы между
-      // карточкой и краем — и он бы дрожал поверх фор��ы)
+      // карточкой и краем — и он бы дрожал поверх формы)
       if(lbHits(it,c)){
         const opts=[
           {p:it.x+it.w-c.l, nx:c.l-it.w, ny:it.y, ax:'x', d:-1},
@@ -7938,7 +7938,7 @@ window.addEventListener('resize',()=>{
 
 const PROFILE_CACHE_KEY='wisebase_profile_cache';
 async function loadProfile() {
-  // Профиль нужен для прав доступа (isAdmin / scopedClients). Без ��ети запрос падает,
+  // Профиль нужен для прав доступа (isAdmin / scopedClients). Без сети запрос падает,
   // и раньше это исключение обрывало ВЕСЬ запуск приложения — до initApp() дело не
   // доходило, экран оставался пустым. Теперь ошибку гасим и берём профиль из
   // локального кеша, сохранённого при прошлом удачном входе.
@@ -8134,7 +8134,7 @@ async function syncFromSupabase() {
   (hRes.data || []).forEach(h => { (histMap[h.client_id] ||= []).push({ id: h.id, date: h.date, text: statusText[h.id] }); });
   // Присваиваем ТОЛЬКО если сервер реально ответил без ошибки. Иначе (нет сети,
   // отказ в правах, сбой на сервере) data === null, и прежний код записывал пустой
-  // масс��в — то есть молча стирал локально видимые данные до следующей удачной
+  // массив — то есть молча стирал локально видимые данные до следующей удачной
   // синхронизации. Теперь в таком случае оставляем то, что уже загружено.
   if(!cRes.error) S.clients = (cRes.data || []).map(r => dbToClient(r, histMap[r.id] || []));
   migrateClientStatuses();
@@ -8348,7 +8348,7 @@ async function saveClientToDb() {
     tags:[...document.querySelectorAll('#tag-selector input:checked')].map(cb=>cb.value),
     // Отправляем, только если колонка реально существует — иначе Supabase отклонит
     // весь запрос, и клиент вообще не сохранится. (Раньше геоссылки собирались, но
-    // сюда, �� реальный объект отправки, так и не попадали — при более ��анней переделке
+    // сюда, в реальный объект отправки, так и не попадали — при более ранней переделке
     // этой функции строка потерялась, и ни одна ссылка ни у кого не сохранялась.)
     ...(HAS_GEO_COLS!==false ? {geo_links: getGeoLinks()} : {}),
     // Те же меры предосторожности, что и с геоколонками: не отправляем, если
@@ -8896,7 +8896,7 @@ async function initApp() {
       if(isAdmin()||isManagerRole()){
         ownerFilterSel.style.display='';
         const extra=allProfiles.filter(p=>p.id!==currentUser.id).map(p=>`<option value="${p.id}">${esc(p.full_name||p.email)}</option>`).join('');
-        ownerFilterSel.innerHTML=`<option value="">От��ет��твенный: все</option><option value="__none__">⚠️ Без ответственного</option><option value="${currentUser.id}">${esc(currentProfile?.full_name||currentUser.email)} (вы)</option>${extra}`;
+        ownerFilterSel.innerHTML=`<option value="">Ответственный: все</option><option value="__none__">⚠️ Без ответственного</option><option value="${currentUser.id}">${esc(currentProfile?.full_name||currentUser.email)} (вы)</option>${extra}`;
       } else {
         ownerFilterSel.style.display='none';
       }
