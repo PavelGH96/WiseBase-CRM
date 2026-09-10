@@ -1458,8 +1458,9 @@ button,a,select,label{touch-action:manipulation}
 .status-inactive{background:var(--red-bg);color:var(--red)}
 
 /* === DAYS WITHOUT CONTACT === */
-.client-card.no-contact-alert{border-left:3px solid var(--red)}
-.client-card.no-contact-alert .cc-name{color:var(--red)}
+/* Красная рамка и красное имя у карточки клиента без контакта — убраны по просьбе:
+   информация о «N дней без контакта» остаётся видна через жёлтый бейдж ниже
+   (.no-contact-badge), этого достаточно, сама карточка больше не подсвечивается. */
 .no-contact-badge{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:600;background:var(--red-bg);color:var(--red)}
 
 /* === PINNED STAR === */
@@ -2730,7 +2731,7 @@ const TODAY=today();
 // новой присланной версии). Показывается в Профиле, чтобы можно было сверить «то, что
 // открыто на телефоне» с «тем, что прислали только что» — без гадания, обновился
 // ли сайт после деплоя на хостинг.
-const APP_BUILD='10.09.2026 · ver 16';
+const APP_BUILD='10.09.2026 · ver 19';
 // Преобразует Date обратно в строку 'YYYY-MM-DD' по ЛОКАЛЬНЫМ компонентам (не UTC) — пара к today().
 function dateToLocalStr(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 // Парсит строку 'YYYY-MM-DD' как ЛОКАЛЬНУЮ дату (полночь по местному времени), а не UTC.
@@ -2747,6 +2748,10 @@ let S={clients:[],tasks:[],offers:[],trips:[],links:[],staff:[],plans:{},nid:{c:
 // для каждого действия (удаление/добавление/редактирование клиента/задачи/предложения) —
 // один и тот же механизм автоматически покрывает вообще все изменения в приложении.
 let undoStack=[];
+// Защита от повторного сохранения одной и той же формы, пока предыдущий вызов
+// ещё не завершился (двойной клик/тап по «Сохранить»). См. proceedSaveClient
+// и аналогичные места.
+let _savingClient=false, _savingTask=false, _savingOffer=false;
 let redoStack=[];
 let _lastSnapshot=null;
 const UNDO_LIMIT=50;
@@ -5026,7 +5031,7 @@ function renderClients(){
       // ── GRID CARD ──────────────────────────────────────
       const ncBadge=nc?`<span class="badge" style="background:${ncBg(nc)};color:${ncColor(nc)}">📅 ${FD(nc)}</span>`:'';
       const daysBadge=noContactAlert?`<span class="no-contact-badge">⚠️ ${days}д без контакта</span>`:'';
-      html+=`<div class="client-card${sel?' sel':''}${chk?' chk':''}${noContactAlert?' no-contact-alert':''}${c.pinned?' pinned-card':''}" data-client-id="${c.id}" onclick="selectClient(${c.id})">
+      html+=`<div class="client-card${sel?' sel':''}${chk?' chk':''}${c.pinned?' pinned-card':''}" data-client-id="${c.id}" onclick="selectClient(${c.id})">
         <div class="cc-top">
           <div class="cb-wrap" onclick="event.stopPropagation()"><input type="checkbox" ${chk?'checked':''} onchange="togSelC(${c.id},this.checked)"></div>
           <div class="avatar ${c.color}">${c.avatar}</div>
@@ -5049,13 +5054,24 @@ function renderClients(){
           ${mkQuickTags(c)}
         </div>
       </div>`;
+      // ИСПРАВЛЕНИЕ: раньше в карточном виде панель деталей всегда уезжала в САМЫЙ
+      // КОНЕЦ списка (см. код ниже, было отдельной веткой "в конце") — при большом
+      // числе клиентов приходилось прокручивать через всех, чтобы её увидеть, даже
+      // если открытая карточка была самой первой. Теперь, как и в табличном виде,
+      // вставляем панель сразу после карточки, по которой кликнули: grid-column:1/-1
+      // в CSS растягивает её на всю ширину сетки независимо от того, где именно в
+      // разметке она стоит, поэтому карточки после неё корректно переносятся ниже.
+      if(sel){
+        html+=`<div class="client-detail-wrap">${renderClientDetailHTML(c)}</div>`;
+      }
     }
   });
 
   html+=mkShowMore('clients',clientsRest);
-
-  // Панель деталей: в grid-view вставляем в конце, в list-view уже вставлена inline
-  if(activeClient && clientView!=='list'){
+  // Подстраховка: если открытый клиент из-за смены фильтра/сортировки вдруг выпал
+  // из текущей видимой страницы списка (redkий случай — сама карточка для него уже
+  // не отрисована выше), всё равно показываем его панель, а не прячем без объяснения.
+  if(activeClient && !pageClients.some(c=>c.id===activeClient)){
     const c=S.clients.find(x=>x.id===activeClient);
     if(c) html+=`<div class="client-detail-wrap">${renderClientDetailHTML(c)}</div>`;
   }
@@ -8341,8 +8357,17 @@ function rtFullResync(){
 function onRtChange(table){
   return payload => { if (applyRealtimeChange(table, payload)) rtRender(table); else rtFullResync(); };
 }
+// Ссылка на текущий канал realtime. initRealtime() может быть вызвана больше
+// одного раза за время жизни вкладки — например, если пользователь вышел из
+// аккаунта и вошёл снова без перезагрузки страницы (SIGNED_OUT → SIGNED_IN).
+// Без отписки от старого канала каждый такой цикл добавлял бы ЕЩЁ ОДНУ активную
+// подписку на изменения в базе — та же утечка, что была с таймерами, только
+// на уровне сетевого соединения: одно и то же изменение стало бы прилетать
+// и обрабатываться N раз подряд.
+let _rtChannel = null;
 function initRealtime() {
-  sb.channel('crm-changes')
+  if (_rtChannel) { sb.removeChannel(_rtChannel); _rtChannel = null; }
+  _rtChannel = sb.channel('crm-changes')
     .on('postgres_changes', { event: '*', schema: 'public', table: 'clients' }, onRtChange('clients'))
     .on('postgres_changes', { event: '*', schema: 'public', table: 'tasks' }, onRtChange('tasks'))
     .on('postgres_changes', { event: '*', schema: 'public', table: 'offers' }, onRtChange('offers'))
@@ -8432,6 +8457,13 @@ async function saveClientToDb() {
   if(innVal && !isValidInn(innVal)){toast(`Некорректный ИНН «${innVal}».\nПроверьте количество цифр (10 — для ЮЛ, 12 — для ИП/ФЛ) и правильность ввода — контрольная сумма не сходится.`);return;}
   const innDup=innVal?S.clients.find(c=>c.inn===innVal&&c.id!==editClientId):null;
   const proceedSaveClient=async()=>{
+  // Защита от двойного клика/тапа по «Сохранить»: проверено — без неё два быстрых
+  // клика подряд (обычное дело при нестабильном отклике формы) создавали ДВЕ
+  // одинаковые записи клиента, потому что вторая функция успевала запуститься
+  // до того, как первая закрыла модалку.
+  if(_savingClient)return;
+  _savingClient=true;
+  try{
   const dbData={
     name:displayName, company,
     sign:document.getElementById('c-sign').value.trim(),
@@ -8510,6 +8542,7 @@ async function saveClientToDb() {
     if(!r.queued) logAction('insert','client',newId,{name:displayName});
     return;
   }
+  }finally{ _savingClient=false; }
   };
   if(innDup){
     confirm2('Клиент с таким ИНН уже есть',`Клиент с ИНН ${innVal} уже существует: «${innDup.name}». Всё равно сохранить?`,proceedSaveClient,'Сохранить всё равно');
@@ -8571,6 +8604,11 @@ async function toggleClientTagDb(id,tag,e){
 async function saveTaskToDb(){
   const text=document.getElementById('t-text').value.trim();
   if(!text){toast('Введи описание');return;}
+  // Защита от двойного клика/тапа по «Сохранить» — без неё два быстрых клика
+  // создавали две одинаковые задачи (проверено).
+  if(_savingTask)return;
+  _savingTask=true;
+  try{
   const noDate=document.getElementById('t-nodate').checked;
   const dbData={
     type:document.getElementById('t-type').value, text,
@@ -8609,6 +8647,7 @@ async function saveTaskToDb(){
     save(); showPage(currentPageId());
     toast(r.queued?'Задача сохранена локально — отправлю, когда появится сеть':'Задача добавлена');
   }
+  }finally{ _savingTask=false; }
 }
 async function toggleDoneDb(id){
   const t=S.tasks.find(x=>x.id===id); if(!t)return;
@@ -8741,6 +8780,11 @@ async function saveOfferToDb(){
   if(!text){toast('Введи текст предложения');return;}
   const channel=getOfferChannelBtnsValue().join(', ');
   if(!channel){toast('Выбери канал продаж');return;}
+  // Защита от двойного клика/тапа по «Сохранить» — тот же принцип, что для
+  // клиентов и задач.
+  if(_savingOffer)return;
+  _savingOffer=true;
+  try{
   const dbData={
     text, client_id:Number(document.getElementById('o-client').value)||null,
     amount:parseAmount(document.getElementById('o-amount').value),
@@ -8773,6 +8817,7 @@ async function saveOfferToDb(){
     (currentPageId()==='offers'?renderOffers:renderClients)();
     toast(r.queued?'Предложение сохранено локально — отправлю, когда появится сеть':'Предложение добавлено');
   }
+  }finally{ _savingOffer=false; }
 }
 async function chgOfferStatusDb(id,status){
   const o=S.offers.find(x=>x.id===id); if(o)o.status=status;
@@ -9278,6 +9323,7 @@ function toggleClientFilters(){const p=document.getElementById('page-clients');i
       stopNotificationPolling();
       stopAutoSave();
       if(_lockTimer){ clearInterval(_lockTimer); _lockTimer=null; }
+      if(_rtChannel){ sb.removeChannel(_rtChannel); _rtChannel=null; }
       showLoginScreen();
     }
   });
