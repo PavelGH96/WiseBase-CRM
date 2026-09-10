@@ -11,7 +11,15 @@
 //      на iOS не принимает Service Worker, зарегистрированный из blob внутри страницы.
 // ============================================================
 
-const CACHE_NAME = 'wisebase-shell-v1';
+// Имя кеша привязано к версии приложения (та же метка, что и APP_BUILD в index.html).
+// БЕЗ этого при обновлении на хостинге закешированный при install index.html
+// остался бы старым в офлайне: имя кеша никогда не менялось, поэтому чистка в
+// activate() (см. ниже) не находила «чужих» кешей для удаления — эффективно не
+// работала. Теперь на каждую новую версию — новое имя кеша, значит install()
+// заново наполнит кеш свежим содержимым, а activate() корректно удалит старый.
+// ВАЖНО: при каждом бампе APP_BUILD в index.html меняйте и эту строку тоже —
+// они не связаны программно (Service Worker не видит JS-переменные страницы).
+const CACHE_NAME = 'wisebase-shell-ver13';
 
 // «Оболочка» — то, без чего приложение не откроется вообще. Кешируем при установке,
 // чтобы это точно было готово ДО первого открытия в офлайне (а не только после
@@ -19,10 +27,16 @@ const CACHE_NAME = 'wisebase-shell-v1';
 const SHELL_URLS = [
   './',
   './index.html',
-  'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js',
+  'https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js',
   'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js',
   'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:wght@500&display=swap',
 ];
+// Сам CSS с fonts.googleapis.com выше кешируется, но ОН ССЫЛАЕТСЯ на файлы шрифтов
+// (.woff2), которые лежат на ДРУГОМ домене — fonts.gstatic.com — и раньше не
+// кешировались вовсе, поэтому офлайн текст просто падал на системный шрифт.
+// Точных адресов файлов заранее не знаем (хэш меняется с версией шрифта), поэтому
+// не список конкретных URL, а совпадение по домену — см. использование ниже.
+const FONT_FILES_HOST = 'fonts.gstatic.com';
 
 self.addEventListener('install', e => {
   e.waitUntil(
@@ -62,7 +76,11 @@ self.addEventListener('fetch', e => {
   // Их адреса прибиты к конкретным версиям и никогда не меняются, поэтому ходить
   // за ними в сеть незачем: это и быстрее, и, главное, надёжнее в офлайне —
   // не зависим от того, как быстро браузер сообразит, что сети нет.
-  if (SHELL_URLS.some(u => u.startsWith('http') && req.url === u)) {
+  // Файлы шрифтов (fonts.gstatic.com) сюда же — по домену, а не по точному
+  // совпадению URL, потому что конкретный адрес каждого файла заранее не известен.
+  const isShellResource = SHELL_URLS.some(u => u.startsWith('http') && req.url === u)
+    || req.url.includes('://' + FONT_FILES_HOST + '/');
+  if (isShellResource) {
     e.respondWith(
       // Ищем и по объекту запроса, и по строке-адресу: сопоставление по Request
       // учитывает заголовок Vary у сохранённого ответа, а у кросс-доменных

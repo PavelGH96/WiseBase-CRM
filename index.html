@@ -3,6 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<!-- ===== Content Security Policy =====
+     Ограничивает, откуда странице разрешено грузить скрипты/стили/шрифты и куда
+     ходить за данными — если внешний CDN когда-нибудь скомпрометируют, вставленный
+     туда чужой код не сможет обратиться никуда, кроме перечисленного здесь.
+     Честная оговорка: 'unsafe-inline' в script-src — вынужденная мера. Приложение —
+     один HTML-файл с большим встроенным кодом приложения, а не отдельные .js-файлы, и
+     мета-тег CSP на статической странице не может раздавать одноразовый nonce
+     (тот генерируется на сервере под каждый запрос, здесь сервера нет). Без
+     'unsafe-inline' сам код приложения не выполнился бы вовсе. CSP тут защищает не
+     от внедрения кода в саму страницу, а ограничивает, куда встроенный код (в
+     штатной ситуации — и в случае, если через XSS подсунут чужой) может обратиться
+     за сетью и откуда может подгрузить дополнительные скрипты.
+     Директиву frame-ancestors (запрет встраивания сайта в чужой iframe — защита
+     от clickjacking) сюда осознанно не добавил: браузер её просто игнорирует,
+     если задавать через meta-тег — работает только настоящий HTTP-заголовок,
+     а GitHub Pages не даёт настраивать заголовки ответа. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.sheetjs.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' https://umgvbcmxbevbmyzhdsmr.supabase.co wss://umgvbcmxbevbmyzhdsmr.supabase.co; worker-src 'self' blob:; manifest-src 'self' blob:; object-src 'none'; base-uri 'self';">
 <title>WiseBase — умная CRM для роста бизнеса</title>
 <meta name="application-name" content="WiseBase">
 <meta name="apple-mobile-web-app-title" content="WiseBase">
@@ -24,7 +41,12 @@ var l=document.createElement("link");l.rel="manifest";l.href=URL.createObjectURL
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:wght@500&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<!-- Обновлено с 0.18.5 (cdnjs) на 0.20.3 (официальный CDN автора) — в 0.18.5
+     две подтверждённые уязвимости (CVE-2023-30533 prototype pollution,
+     CVE-2024-22363 ReDoS), актуальные именно для импорта: приложение читает
+     .xlsx-файлы, которые загружает пользователь. npm-пакет xlsx заброшен —
+     исправленная версия существует только на cdn.sheetjs.com. -->
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js" crossorigin="anonymous"></script>
 <style>
 /* ===== ТЕМЫ ===== */
 :root {
@@ -1561,7 +1583,7 @@ button,a,select,label{touch-action:manipulation}
 .empty-state .es-s{font-size:12.5px;color:var(--t2);max-width:360px;line-height:1.45}
 .empty-state .btn{margin-top:6px}
 </style>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin="anonymous"></script>
 </head>
 <body class="t9">
 
@@ -1660,14 +1682,14 @@ button,a,select,label{touch-action:manipulation}
     </svg>
     <span class="wb-word">Wise<em>Base</em></span>
   </div>
-  <div class="mob-page-title" id="mob-page-title"><span id="mob-page-title-text">Главная</span><span class="offline-chip" id="offline-chip" style="display:none" onclick="flushQueue()"></span></div>
+  <div class="mob-page-title" id="mob-page-title"><span id="mob-page-title-text">Главная</span><span class="offline-chip" id="offline-chip" role="status" aria-live="polite" style="display:none" onclick="flushQueue()"></span></div>
   <div class="today-lbl" id="today-lbl"></div>
   <div class="hdr-right">
     <div style="display:flex;gap:2px">
       <button class="btn-icon" id="undo-btn" onclick="undo()" title="Отменить (Ctrl+Z)" aria-label="Отменить последнее действие" disabled>↺</button>
       <button class="btn-icon" id="redo-btn" onclick="redo()" title="Повторить (Ctrl+Y)" aria-label="Повторить отменённое действие" disabled>↻</button>
     </div>
-    <input type="file" id="imp-f" accept=".xlsx" style="display:none" onchange="importExcel(this)">
+    <input type="file" id="imp-f" aria-label="Выбрать файл Excel для импорта клиентов" accept=".xlsx" style="display:none" onchange="importExcel(this)">
     <div style="position:relative">
       <div class="theme-picker" id="autosave-panel" style="width:260px">
         <h4>Автосохранение</h4>
@@ -1681,7 +1703,7 @@ button,a,select,label{touch-action:manipulation}
         </div>
       </div>
     </div>
-    <span class="offline-badge" id="offline-badge" style="display:none" onclick="flushQueue()" title="Нажмите, чтобы попробовать отправить сейчас"></span>
+    <span class="offline-badge" id="offline-badge" role="status" aria-live="polite" style="display:none" onclick="flushQueue()" title="Нажмите, чтобы попробовать отправить сейчас"></span>
     <button class="theme-btn" id="nav-layout-btn" onclick="toggleNavLayout()" aria-pressed="false" title="Навигация: сбоку. Нажмите — сверху" aria-label="Переключить вид навигации"><span id="nav-layout-ic">◧</span></button>
     <span class="hk-tip" onclick="document.getElementById('m-shortcuts').classList.add('open')" onkeydown="if(event.key===' '||event.key==='Enter'){event.preventDefault();document.getElementById('m-shortcuts').classList.add('open');}" role="button" tabindex="0" aria-label="Показать горячие клавиши" data-tip="N — новая задача&#10;C — новый клиент&#10;← ↑ → ↓ — перемещение, Enter — открыть&#10;Ctrl+Z — отменить&#10;Ctrl+Y — повторить&#10;Esc — закрыть окно&#10;&#10;Нажмите, чтобы увидеть полный список">⌨ N/C/←→</span>
     <div style="position:relative">
@@ -1829,7 +1851,7 @@ button,a,select,label{touch-action:manipulation}
   <div id="page-clients" class="page">
     <!-- Строка 1: фильтры + кнопки действий -->
     <div class="toolbar" style="flex-wrap:wrap">
-      <select class="sel-in" id="client-sort" onchange="clientSort=this.value;renderClients()" style="font-size:13px">
+      <select class="sel-in" id="client-sort" aria-label="Сортировка клиентов" onchange="clientSort=this.value;renderClients()" style="font-size:13px">
         <option value="name">А–Я</option>
         <option value="potential">По потенциалу</option>
         <option value="added">По дате добавления</option>
@@ -1837,19 +1859,19 @@ button,a,select,label{touch-action:manipulation}
         <option value="cooling">Давно не касались</option>
         <option value="owner" id="sort-owner-opt">По ответственному</option>
       </select>
-      <select class="sel-in" id="channel-filter" onchange="setChannelFilter(this.value)" style="font-size:13px">
+      <select class="sel-in" id="channel-filter" aria-label="Фильтр по каналу продажи" onchange="setChannelFilter(this.value)" style="font-size:13px">
         <option value="">Канал: все</option>
         <option value="ФМА">ФМА</option>
         <option value="Beyosa">Beyosa</option>
         <option value="Комплектация">Комплектация</option>
       </select>
-      <select class="sel-in" id="format-filter" onchange="setFormatFilter(this.value)" style="font-size:13px">
+      <select class="sel-in" id="format-filter" aria-label="Фильтр по формату точки" onchange="setFormatFilter(this.value)" style="font-size:13px">
         <option value="">Формат: все</option>
         <option value="Салон">Салон</option>
         <option value="Интернет-магазин">Интернет-магазин</option>
         <option value="Маркетплейс">Маркетплейс</option>
       </select>
-      <select class="sel-in" id="owner-filter" onchange="setOwnerFilter(this.value)" style="font-size:13px;display:none">
+      <select class="sel-in" id="owner-filter" aria-label="Фильтр по ответственному" onchange="setOwnerFilter(this.value)" style="font-size:13px;display:none">
         <option value="">Ответственный: все</option>
         <option value="__none__">⚠️ Без ответственного</option>
       </select>
@@ -1886,19 +1908,19 @@ button,a,select,label{touch-action:manipulation}
   <!-- TASKS -->
   <div id="page-tasks" class="page">
     <div class="toolbar">
-      <select class="sel-in" id="tf" onchange="renderTaskPage()">
+      <select class="sel-in" id="tf" aria-label="Фильтр задач по сроку" onchange="renderTaskPage()">
         <option value="all">Все задачи</option>
         <option value="today">Сегодня</option>
         <option value="overdue">Просроченные</option>
         <option value="upcoming">Предстоящие</option>
       </select>
-      <select class="sel-in" id="ttf" onchange="renderTaskPage()">
+      <select class="sel-in" id="ttf" aria-label="Фильтр задач по типу" onchange="renderTaskPage()">
         <option value="all">Все типы</option>
         <option value="call">Звонки</option>
         <option value="meet">Встречи</option>
         <option value="task">Задачи</option>
       </select>
-      <select class="sel-in" id="tpf" onchange="renderTaskPage()">
+      <select class="sel-in" id="tpf" aria-label="Фильтр задач по приоритету" onchange="renderTaskPage()">
         <option value="all">Все приоритеты</option>
         <option value="high">Высокий</option>
         <option value="mid">Средний</option>
@@ -1934,10 +1956,10 @@ button,a,select,label{touch-action:manipulation}
   <div id="page-offers" class="page">
     <!-- Строка 1: фильтры + кнопки действий -->
     <div class="toolbar" style="flex-wrap:wrap">
-      <select class="sel-in" id="offer-client-filter" onchange="renderOffers()" style="font-size:13px;max-width:200px">
+      <select class="sel-in" id="offer-client-filter" aria-label="Фильтр предложений по клиенту" onchange="renderOffers()" style="font-size:13px;max-width:200px">
         <option value="0">Все клиенты</option>
       </select>
-      <select class="sel-in" id="offer-status-filter" onchange="renderOffers()" style="font-size:13px">
+      <select class="sel-in" id="offer-status-filter" aria-label="Фильтр предложений по статусу" onchange="renderOffers()" style="font-size:13px">
         <option value="">Статус: все</option>
         <option value="proposed">Предложено</option>
         <option value="agreed">Согласовано</option>
@@ -1973,8 +1995,8 @@ button,a,select,label{touch-action:manipulation}
           <div class="vt-opt active" id="trvt-opt-list" onclick="setTripView('list')">☰ &nbsp;Список</div>
         </div>
       </div>
-      <select class="sel-in" id="trip-region" onchange="onTripRegionChange()" style="font-size:13px"><option value="">Все регионы</option></select>
-      <select class="sel-in" id="trip-city" onchange="renderTrips()" style="font-size:13px"><option value="">Все города</option></select>
+      <select class="sel-in" id="trip-region" aria-label="Фильтр командировок по региону" onchange="onTripRegionChange()" style="font-size:13px"><option value="">Все регионы</option></select>
+      <select class="sel-in" id="trip-city" aria-label="Фильтр командировок по городу" onchange="renderTrips()" style="font-size:13px"><option value="">Все города</option></select>
       <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;color:var(--t2)"><input type="checkbox" id="trip-hide-inactive" onchange="renderTrips()" checked> Скрыть «Не работаем»</label>
       <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;color:var(--t2)"><input type="checkbox" id="trip-due-only" onchange="renderTrips()"> Только «пора посетить»</label>
     </div>
@@ -2343,8 +2365,8 @@ button,a,select,label{touch-action:manipulation}
         <span id="tp-count" style="font-size:12px;color:var(--t2)"></span>
       </label>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin:6px 0">
-        <select class="sel-in" id="tp-filter-region" onchange="tpFilterRegionChange()" style="font-size:13px"><option value="">Все регионы</option></select>
-        <select class="sel-in" id="tp-filter-city" onchange="renderTpClientList()" style="font-size:13px"><option value="">Все города</option></select>
+        <select class="sel-in" id="tp-filter-region" aria-label="Фильтр контактов по региону" onchange="tpFilterRegionChange()" style="font-size:13px"><option value="">Все регионы</option></select>
+        <select class="sel-in" id="tp-filter-city" aria-label="Фильтр контактов по городу" onchange="renderTpClientList()" style="font-size:13px"><option value="">Все города</option></select>
         <input class="sel-in" id="tp-search" oninput="renderTpClientList()" placeholder="Поиск клиента..." style="font-size:13px;flex:1;min-width:120px">
       </div>
       <div id="tp-client-list" style="max-height:240px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--radius-s)"></div>
@@ -2466,6 +2488,44 @@ button,a,select,label{touch-action:manipulation}
 
 // === STATE ===
 const SK='mini_crm_v6';
+// === ЛОКАЛЬНОЕ ХРАНИЛИЩЕ СОСТОЯНИЯ: IndexedDB, а не localStorage ===
+// localStorage синхронный и ограничен ~5-10 МБ. JSON.stringify(S) — это вся база
+// целиком (клиенты с контактами и адресами, задачи, предложения, история) одной
+// строкой; при росте базы localStorage.setItem рано или поздно бросит
+// QuotaExceededError. IndexedDB устроена иначе — асинхронная и на порядки
+// просторнее (обычно сотни МБ и больше, точный лимит зависит от браузера и
+// свободного места на диске), такой проблемы практически не возникает.
+// Ключ (SK) и формат значения (JSON-строка) намеренно оставлены теми же, что были
+// в localStorage — это не смена формата данных, только смена места хранения.
+const IDB_NAME='wisebase_cache', IDB_STORE='kv';
+let _idbPromise=null;
+function openIdb(){
+  if(_idbPromise)return _idbPromise;
+  _idbPromise=new Promise((resolve,reject)=>{
+    if(!('indexedDB' in window)){ reject(new Error('IndexedDB недоступен в этом браузере')); return; }
+    const req=indexedDB.open(IDB_NAME,1);
+    req.onupgradeneeded=()=>{ req.result.createObjectStore(IDB_STORE); };
+    req.onsuccess=()=>resolve(req.result);
+    req.onerror=()=>reject(req.error);
+  });
+  return _idbPromise;
+}
+function idbGet(key){
+  return openIdb().then(db=>new Promise((resolve,reject)=>{
+    const tx=db.transaction(IDB_STORE,'readonly');
+    const req=tx.objectStore(IDB_STORE).get(key);
+    req.onsuccess=()=>resolve(req.result);
+    req.onerror=()=>reject(req.error);
+  }));
+}
+function idbSet(key,value){
+  return openIdb().then(db=>new Promise((resolve,reject)=>{
+    const tx=db.transaction(IDB_STORE,'readwrite');
+    tx.objectStore(IDB_STORE).put(value,key);
+    tx.oncomplete=()=>resolve();
+    tx.onerror=()=>reject(tx.error);
+  }));
+}
 const COLS=['av-blue','av-green','av-amber','av-pink','av-purple'];
 let ci=0;
 const OFFER_STATUSES=['proposed','agreed','declined'];
@@ -2670,7 +2730,7 @@ const TODAY=today();
 // новой присланной версии). Показывается в Профиле, чтобы можно было сверить «то, что
 // открыто на телефоне» с «тем, что прислали только что» — без гадания, обновился
 // ли сайт после деплоя на хостинг.
-const APP_BUILD='09.09.2026 · ver 11';
+const APP_BUILD='09.09.2026 · ver 15';
 // Преобразует Date обратно в строку 'YYYY-MM-DD' по ЛОКАЛЬНЫМ компонентам (не UTC) — пара к today().
 function dateToLocalStr(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 // Парсит строку 'YYYY-MM-DD' как ЛОКАЛЬНУЮ дату (полночь по местному времени), а не UTC.
@@ -3272,11 +3332,19 @@ function save(){
       redoStack=[];
       updateUndoRedoButtons();
     }
-    localStorage.setItem(SK,json);
     _lastSnapshot=json;
+    // Запись в IndexedDB асинхронная (в отличие от прежней localStorage) — не ждём
+    // её здесь: save() вызывается синхронно в 40+ местах кода, и это не должно
+    // меняться. Ошибку показываем тем же предупреждением, что было раньше.
+    idbSet(SK,json).catch(e=>{
+      console.error('Не удалось сохранить данные CRM:',e);
+      if(!_saveFailWarned){
+        _saveFailWarned=true;
+        toast('⚠️ Не удалось сохранить изменения! Сделайте экспорт в Excel, чтобы не потерять данные');
+      }
+    });
   }catch(e){
-    // ИСПРАВЛЕНИЕ: раньше ошибка сохранения (например, переполнена квота localStorage,
-    // ~5-10 МБ, или приватный режим браузера) полностью проглатывалась — данные могли
+    // ИСПРАВЛЕНИЕ: раньше ошибка сохранения полностью проглатывалась — данные могли
     // не сохраниться, а пользователь узнал бы об этом только после перезагрузки страницы.
     console.error('Не удалось сохранить данные CRM:',e);
     if(!_saveFailWarned){
@@ -3292,9 +3360,20 @@ function save(){
 // Зачем нужно: данные в приложение попадают ТОЛЬКО с сервера, а load() исторически
 // нигде не вызывалась (осталась со времён работы без Supabase). Из-за этого без сети
 // приложение открывалось полностью пустым, хотя всё уже лежало в localStorage.
-function loadLocalCache(){
+async function loadLocalCache(){
   try{
-    const s=localStorage.getItem(SK);
+    let s=await idbGet(SK);
+    if(!s){
+      // Разовая миграция: у тех, кто уже пользовался приложением до перехода на
+      // IndexedDB, кеш лежит в localStorage под тем же ключом — переносим один раз,
+      // дальше читаем и пишем только в IndexedDB.
+      const legacy=localStorage.getItem(SK);
+      if(legacy){
+        s=legacy;
+        try{ await idbSet(SK,legacy); }catch(_){}
+        try{ localStorage.removeItem(SK); }catch(_){}
+      }
+    }
     if(!s)return false;
     const parsed=JSON.parse(s);
     if(!parsed||!Array.isArray(parsed.clients))return false;
@@ -3312,11 +3391,11 @@ function loadLocalCache(){
     return true;
   }catch(e){ return false; }
 }
-// Сохранить свежесинхронизированное состояние в localStorage — чтобы в следующий раз
-// без сети приложению было что показать. save() вызывается только при действиях
+// Сохранить свежесинхронизированное состояние — чтобы в следующий раз без сети
+// приложению было что показать. save() вызывается только при действиях
 // пользователя, поэтому после чистой синхронизации данные иначе не попадали бы в кеш.
-function persistLocalCache(){
-  try{ localStorage.setItem(SK, JSON.stringify(S)); }catch(e){}
+async function persistLocalCache(){
+  try{ await idbSet(SK, JSON.stringify(S)); }catch(e){}
 }
 function load(){
   try{const s=localStorage.getItem(SK);if(s){
@@ -3973,7 +4052,7 @@ function mkTask(t,showCb=false){
     ${mkDoneCheckbox(t)}
     <div class="task-body">
       <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap">
-        <span class="badge ${TYPE_BADGE_CLS[t.type]||'badge-task'}">${TYPE_L[t.type]||t.type}</span>
+        <span class="badge ${TYPE_BADGE_CLS[t.type]||'badge-task'}">${TYPE_L[t.type]||esc(t.type)}</span>
         ${t.prio==='high'?'<span class="prio-badge high">Высокий</span>':t.prio==='low'?'<span class="prio-badge low">Низкий</span>':''}
         <span class="task-txt">${esc(t.text)}</span>
         ${td?'<span class="badge badge-today">сегодня</span>':''}
@@ -4005,7 +4084,7 @@ function mkTaskRow(t,showCb=false,compactClient=false,draggable=false){
     <div class="tl-row">
       <div onclick="event.stopPropagation()">${showCb?`<div class="cb-wrap"><input type="checkbox" ${sel?'checked':''} onchange="togSelT(${t.id},this.checked)"></div>`:''}</div>
       <div onclick="event.stopPropagation()">${mkDoneCheckbox(t,'margin:0')}</div>
-      <div><span class="badge ${TYPE_BADGE_CLS[t.type]||'badge-task'}">${TYPE_L[t.type]||t.type}</span></div>
+      <div><span class="badge ${TYPE_BADGE_CLS[t.type]||'badge-task'}">${TYPE_L[t.type]||esc(t.type)}</span></div>
       <div class="task-txt" style="${t.done?'text-decoration:line-through;opacity:.6':''}">${esc(t.text)}</div>
       <div style="color:var(--t2)">${clientCell}</div>
       <div>${prioCell}</div>
@@ -4219,7 +4298,7 @@ function mkDashCard(t,colKey){
     </div>
   </div>
   <div class="dash-card-badges">
-    <span class="badge ${TYPE_BADGE_CLS[t.type]||'badge-task'}">${TYPE_L[t.type]||t.type}</span>
+    <span class="badge ${TYPE_BADGE_CLS[t.type]||'badge-task'}">${TYPE_L[t.type]||esc(t.type)}</span>
     ${prioHtml}
     ${t.isShared?'<span class="badge" style="background:var(--bg);color:var(--t2);border:1px solid var(--border)">👥 общая</span>':''}
     ${t.repeat?`<span class="badge badge-repeat">↻ ${{daily:'ежедн.',weekly:'еженед.',biweekly:'2 нед.',monthly:'ежемес.'}[t.repeat]||''}</span>`:''}
@@ -4256,7 +4335,7 @@ function renderMetrics(){
   // занимает виджет «без следующего шага» (см. ниже), поэтому «Сегодня» и
   // «Просрочено» остаются вдвоём. Когда виджета нет (все клиенты в порядке),
   // растягиваем эти две плитки на всю строку, чтобы не оставлять пустоту справа.
-  const noStep=(S.clients||[]).filter(c=>PIPELINE.includes(c.status) && !hasNextStep(c));
+  const noStep=countScopeClients().filter(c=>PIPELINE.includes(c.status) && !hasNextStep(c));
   const span=noStep.length?1:2;
   document.getElementById('metrics').innerHTML=`
     <div class="metric" style="grid-column:span ${span}"><div class="metric-lbl">Сегодня</div><div class="metric-val" id="mv-today">${td}</div></div>
@@ -5221,15 +5300,15 @@ function clientModalKeydown(e){
 function saveClient(){
   const company=document.getElementById('c-company').value.trim();
   const contacts=getContacts();
-  if(!company && contacts.length===0){alert('Введи компанию или хотя бы одно контактное лицо');return;}
+  if(!company && contacts.length===0){toast('Введи компанию или хотя бы одно контактное лицо');return;}
   // ВАЛИДАЦИЯ: email и телефон у каждого контакта
   for(const ct of contacts){
     if(!isValidEmailOrEmpty(ct.email)){
-      alert(`Некорректный email «${ct.email}» у контакта «${ct.name}».\nEmail должен содержать «@» и «.» (например, ivan@mail.ru)`);
+      toast(`Некорректный email «${ct.email}» у контакта «${ct.name}».\nEmail должен содержать «@» и «.» (например, ivan@mail.ru)`);
       return;
     }
     if(!isValidPhoneOrEmpty(ct.phone)){
-      alert(`Некорректный телефон «${ct.phone}» у контакта «${ct.name}».\nПосле +7 должно быть ровно 10 цифр.`);
+      toast(`Некорректный телефон «${ct.phone}» у контакта «${ct.name}».\nПосле +7 должно быть ровно 10 цифр.`);
       return;
     }
   }
@@ -5239,16 +5318,12 @@ function saveClient(){
   const innVal=document.getElementById('c-inn').value.trim();
   // ВАЛИДАЦИЯ ИНН: сначала формат и контрольная сумма, потом — проверка на дубликат
   if(innVal && !isValidInn(innVal)){
-    alert(`Некорректный ИНН «${innVal}».\nПроверьте количество цифр (10 — для ЮЛ, 12 — для ИП/ФЛ) и правильность ввода — контрольная сумма не сходится.`);
+    toast(`Некорректный ИНН «${innVal}».\nПроверьте количество цифр (10 — для ЮЛ, 12 — для ИП/ФЛ) и правильность ввода — контрольная сумма не сходится.`);
     return;
   }
   // INN дубликат-проверка
-  if(innVal){
-    const dup=S.clients.find(c=>c.inn===innVal&&c.id!==editClientId);
-    if(dup){
-      if(!confirm(`⚠️ Клиент с ИНН ${innVal} уже существует: «${dup.name}».\nВсё равно сохранить?`))return;
-    }
-  }
+  const innDup2=innVal?S.clients.find(c=>c.inn===innVal&&c.id!==editClientId):null;
+  const proceedSaveClient2=()=>{
   const data={
     name:displayName,
     company,
@@ -5287,6 +5362,12 @@ function saveClient(){
     toast('Клиент добавлен');
   }
   save(); closeModal('m-client'); renderClients();
+  };
+  if(innDup2){
+    confirm2('Клиент с таким ИНН уже есть',`Клиент с ИНН ${innVal} уже существует: «${innDup2.name}». Всё равно сохранить?`,proceedSaveClient2,'Сохранить всё равно');
+  } else {
+    proceedSaveClient2();
+  }
 }
 function editClient(id){ const c=S.clients.find(x=>x.id===id); if(!c)return; editClientId=id; document.getElementById('c-company').value=c.company||''; document.getElementById('c-sign').value=c.sign||''; renderRegionOptions(); setRegionValue(c.region||''); document.getElementById('c-city').value=c.city||''; document.getElementById('c-address').value=c.address||''; document.getElementById('c-inn').value=c.inn||''; document.getElementById('c-potential').value=formatAmountStatic(c.potential); document.getElementById('c-nextcontact').value=c.nextContact||''; document.getElementById('c-note').value=c.note||''; document.getElementById('c-status').value=c.status||'unknown'; renderNotWorkingOptions(); renderObjectCategoryOptions(); setNotWorkingReasons(c.notWorkingReasons||[]); onClientStatusChange(); document.getElementById('c-category').value=c.objectCategory||''; document.getElementById('c-revisit').value=c.revisitCadence||''; document.getElementById('c-servicemgr').value=c.serviceManager||''; document.getElementById('c-payterms').value=c.payTerms||''; document.getElementById('c-shipping').value=c.shipping||''; resetGeoGroups(c.geoLinks||[]); setChannelBtns(getChannels(c)); setFormatBtns(getFormats(c)); renderOwnerSelect(c.owner_id); updGeoVisible(); document.querySelectorAll('#tag-selector input').forEach(cb=>cb.checked=(c.tags||[]).includes(cb.value)); document.querySelector('#m-client h3').textContent='Изменить клиента'; document.querySelector('#m-client .btn-primary').textContent='Сохранить';
   // Авто-раскрываем доп. поля если хоть одно заполнено
@@ -5391,7 +5472,7 @@ function taskModalKeydown(e){
 }
 function saveTask(){
   const text=document.getElementById('t-text').value.trim();
-  if(!text){alert('Введи описание');return;}
+  if(!text){toast('Введи описание');return;}
   const data={
     type:document.getElementById('t-type').value,
     text,
@@ -5590,9 +5671,9 @@ function offerModalKeydown(e){
 }
 function saveOffer(){
   const text=document.getElementById('o-text').value.trim();
-  if(!text){alert('Введи текст предложения');return;}
+  if(!text){toast('Введи текст предложения');return;}
   const channel=getOfferChannelBtnsValue().join(', ');
-  if(!channel){alert('Выбери канал продажи');return;}
+  if(!channel){toast('Выбери канал продажи');return;}
   const data={
     text,
     clientId:Number(document.getElementById('o-client').value),
@@ -5936,7 +6017,7 @@ async function saveTrip(){
   const title=document.getElementById('tp-title').value.trim();
   const date=document.getElementById('tp-date').value;
   const note=document.getElementById('tp-note').value.trim();
-  if(!title){alert('Введите название командировки');return;}
+  if(!title){toast('Введите название командировки');return;}
   // Собираем точки: существующие клиенты + новые адреса (только непустые).
   const stops=[];
   tpSelected.forEach(id=>{
@@ -5946,7 +6027,7 @@ async function saveTrip(){
   tpNewAddrs.forEach(a=>{
     if(a.address.trim()||a.name.trim())stops.push({type:'new',clientId:null,name:a.name.trim()||'(без названия)',city:a.city.trim(),address:a.address.trim(),done:false});
   });
-  if(!stops.length){alert('Добавьте хотя бы одну точку — клиента или новый адрес');return;}
+  if(!stops.length){toast('Добавьте хотя бы одну точку — клиента или новый адрес');return;}
   const payload={title,date:date||null,note,stops};
   try{
     if(editTripId){
@@ -7090,7 +7171,7 @@ function importClientsTemplateRows(rows){
   });
   return n;
 }
-function importExcel(input){ const file=input.files[0];if(!file)return; const reader=new FileReader(); reader.onload=e=>{ try{ const wb=XLSX.read(e.target.result,{type:'array'}); let n=0; if(wb.SheetNames.includes('Клиенты')){ const rowsC=XLSX.utils.sheet_to_json(wb.Sheets['Клиенты'],{header:1}); if(String((rowsC[0]||[])[0]||'').trim()==='Компания *'){ n+=importClientsTemplateRows(rowsC.slice(1)); } else rowsC.slice(1).forEach(r=>{ if(!r[1])return; const name=String(r[1]); if(S.clients.find(c=>c.name===name&&(c.company||'')===(r[2]||'')))return; const contacts=parseContactsCell(r[8]); const primary=contacts[0]||{name:'',phone:'',email:''}; const finalName=primary.name||name; const p=finalName.trim().split(/\s+/).filter(Boolean); S.clients.push({id:S.nid.c++,name:finalName,company:r[2]||'',phone:primary.phone||r[3]||'',email:primary.email||r[4]||'',potential:r[5]||0, tags:(r[6]||'').split(',').map(t=>t.trim()).filter(Boolean),note:r[7]||'', contacts, avatar:((p[0]?.[0]||'')+(p[1]?.[0]||'')).toUpperCase()||'—',color:COLS[ci++%COLS.length],history:[],channel:r[9]||'',format:r[10]||''}); n++; }); } if(wb.SheetNames.includes('Задачи')){ const tRev={};Object.keys(TYPE_L).forEach(k=>tRev[TYPE_L[k]]=k); const pRev={};Object.keys(PRIO_L).forEach(k=>pRev[PRIO_L[k]]=k); XLSX.utils.sheet_to_json(wb.Sheets['Задачи'],{header:1}).slice(1).forEach(r=>{ if(!r[3])return; const text=String(r[3]); if(S.tasks.find(t=>t.text===text))return; const cl=S.clients.find(c=>c.name===(r[4]||'')); let ds=''; if(r[5]&&String(r[5]).includes('.')){const p=String(r[5]).split('.');ds=`${p[2]}-${p[1]}-${p[0]}`;}else ds=TODAY; S.tasks.push({id:S.nid.t++,type:tRev[r[1]]||'task',prio:pRev[r[2]]||'mid',text,clientId:cl?cl.id:0,date:ds,time:r[6]||'',done:r[7]==='Да',repeat:r[8]||'',note:r[9]||''}); n++; }); } save(); toast(`Импортировано: ${n}`); const p=currentPageId(); showPage(p); }catch(err){alert('Ошибка: '+err.message);} input.value=''; }; reader.readAsArrayBuffer(file); }
+function importExcel(input){ const file=input.files[0];if(!file)return; const reader=new FileReader(); reader.onload=e=>{ try{ const wb=XLSX.read(e.target.result,{type:'array'}); let n=0; if(wb.SheetNames.includes('Клиенты')){ const rowsC=XLSX.utils.sheet_to_json(wb.Sheets['Клиенты'],{header:1}); if(String((rowsC[0]||[])[0]||'').trim()==='Компания *'){ n+=importClientsTemplateRows(rowsC.slice(1)); } else rowsC.slice(1).forEach(r=>{ if(!r[1])return; const name=String(r[1]); if(S.clients.find(c=>c.name===name&&(c.company||'')===(r[2]||'')))return; const contacts=parseContactsCell(r[8]); const primary=contacts[0]||{name:'',phone:'',email:''}; const finalName=primary.name||name; const p=finalName.trim().split(/\s+/).filter(Boolean); S.clients.push({id:S.nid.c++,name:finalName,company:r[2]||'',phone:primary.phone||r[3]||'',email:primary.email||r[4]||'',potential:r[5]||0, tags:(r[6]||'').split(',').map(t=>t.trim()).filter(Boolean),note:r[7]||'', contacts, avatar:((p[0]?.[0]||'')+(p[1]?.[0]||'')).toUpperCase()||'—',color:COLS[ci++%COLS.length],history:[],channel:r[9]||'',format:r[10]||''}); n++; }); } if(wb.SheetNames.includes('Задачи')){ const tRev={};Object.keys(TYPE_L).forEach(k=>tRev[TYPE_L[k]]=k); const pRev={};Object.keys(PRIO_L).forEach(k=>pRev[PRIO_L[k]]=k); XLSX.utils.sheet_to_json(wb.Sheets['Задачи'],{header:1}).slice(1).forEach(r=>{ if(!r[3])return; const text=String(r[3]); if(S.tasks.find(t=>t.text===text))return; const cl=S.clients.find(c=>c.name===(r[4]||'')); let ds=''; if(r[5]&&String(r[5]).includes('.')){const p=String(r[5]).split('.');ds=`${p[2]}-${p[1]}-${p[0]}`;}else ds=TODAY; S.tasks.push({id:S.nid.t++,type:tRev[r[1]]||'task',prio:pRev[r[2]]||'mid',text,clientId:cl?cl.id:0,date:ds,time:r[6]||'',done:r[7]==='Да',repeat:r[8]||'',note:r[9]||''}); n++; }); } save(); toast(`Импортировано: ${n}`); const p=currentPageId(); showPage(p); }catch(err){toast('Ошибка: '+err.message);} input.value=''; }; reader.readAsArrayBuffer(file); }
 
 // === PUSH NOTIFICATIONS + SERVICE WORKER + ЦЕНТР УВЕДОМЛЕНИЙ ===
 function registerSW(){
@@ -7175,8 +7256,8 @@ function renderNotifCenter(){
       <div onclick="clickNotif(${i})" style="display:flex;gap:10px;padding:11px 14px;border-bottom:1px solid var(--border);cursor:pointer;background:${n.read?'transparent':'var(--blue-bg,rgba(59,130,246,.08))'}">
         <div style="font-size:18px;flex-shrink:0">${n.icon||'🔔'}</div>
         <div style="min-width:0;flex:1">
-          <div style="font-size:13px;font-weight:${n.read?'500':'700'};margin-bottom:2px">${n.title}</div>
-          <div style="font-size:12px;color:var(--t2);word-break:break-word">${n.body||''}</div>
+          <div style="font-size:13px;font-weight:${n.read?'500':'700'};margin-bottom:2px">${esc(n.title)}</div>
+          <div style="font-size:12px;color:var(--t2);word-break:break-word">${esc(n.body||'')}</div>
           <div style="font-size:11px;color:var(--t3);margin-top:4px">${timeAgoRu(n.ts)}</div>
         </div>
         ${n.read?'':'<div style="width:7px;height:7px;border-radius:50%;background:var(--blue,#3b82f6);flex-shrink:0;margin-top:5px"></div>'}
@@ -7294,15 +7375,35 @@ function checkUpcomingReminders(){
   });
 }
 
-setInterval(()=>{
-  const now=new Date();
-  if(now.getHours()===0&&now.getMinutes()<1){
-    notifSeenKeys=new Set([...notifSeenKeys].filter(k=>!k.includes(today())));
-  }
-},60000);
-
-setInterval(checkOverdueAndNotify, 30000);
-setInterval(checkUpcomingReminders, 30000);
+// Три периодические проверки ниже раньше запускались один раз, сразу при загрузке
+// страницы, и ничем не останавливались — работали даже до входа в систему, при
+// свёрнутой вкладке и после выхода из аккаунта (на телефоне это заметно по батарее).
+// Теперь: 1) именованные переменные — есть что остановить; 2) пауза, когда вкладка
+// не видна (document.visibilityState), и возобновление при возврате; 3) полная
+// остановка при выходе из аккаунта (см. SIGNED_OUT ниже).
+let _notifSeenCleanupTimer=null, _overdueCheckTimer=null, _upcomingCheckTimer=null;
+function startNotificationPolling(){
+  if(_notifSeenCleanupTimer)return; // уже запущены — не плодим второй набор таймеров
+  _notifSeenCleanupTimer=setInterval(()=>{
+    const now=new Date();
+    if(now.getHours()===0&&now.getMinutes()<1){
+      notifSeenKeys=new Set([...notifSeenKeys].filter(k=>!k.includes(today())));
+    }
+  },60000);
+  _overdueCheckTimer=setInterval(checkOverdueAndNotify,30000);
+  _upcomingCheckTimer=setInterval(checkUpcomingReminders,30000);
+}
+function stopNotificationPolling(){
+  [_notifSeenCleanupTimer,_overdueCheckTimer,_upcomingCheckTimer].forEach(t=>{ if(t)clearInterval(t); });
+  _notifSeenCleanupTimer=_overdueCheckTimer=_upcomingCheckTimer=null;
+}
+// Запускаем сразу (как и раньше — эти проверки нужны и до входа, например для показа
+// «пора обновить» и подобного), но ставим на паузу, пока вкладка свёрнута/не видна.
+startNotificationPolling();
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='hidden')stopNotificationPolling();
+  else if(currentUser)startNotificationPolling(); // возобновляем только если ещё залогинены
+});
 
 // === INIT (запускается только после успешного входа — см. блок SUPABASE ИНТЕГРАЦИЯ) ===
 // === ГОЛОСОВОЙ ВВОД (Web Speech API) ===
@@ -8317,22 +8418,20 @@ async function logAction(action, entityType, entityId, details) {
 async function saveClientToDb() {
   const company=document.getElementById('c-company').value.trim();
   const contacts=getContacts();
-  if(!company && contacts.length===0){alert('Введи компанию или хотя бы одно контактное лицо');return;}
+  if(!company && contacts.length===0){toast('Введи компанию или хотя бы одно контактное лицо');return;}
   for(const ct of contacts){
-    if(!isValidEmailOrEmpty(ct.email)){alert(`Некорректный email «${ct.email}» у контакта «${ct.name}».\nEmail должен содержать «@» и «.» (например, ivan@mail.ru)`);return;}
-    if(!isValidPhoneOrEmpty(ct.phone)){alert(`Некорректный телефон «${ct.phone}» у контакта «${ct.name}».\nПосле +7 должно быть ровно 10 цифр.`);return;}
+    if(!isValidEmailOrEmpty(ct.email)){toast(`Некорректный email «${ct.email}» у контакта «${ct.name}».\nEmail должен содержать «@» и «.» (например, ivan@mail.ru)`);return;}
+    if(!isValidPhoneOrEmpty(ct.phone)){toast(`Некорректный телефон «${ct.phone}» у контакта «${ct.name}».\nПосле +7 должно быть ровно 10 цифр.`);return;}
     for(const ph of ct.extraPhones||[]){
-      if(!isValidPhoneOrEmpty(ph)){alert(`Некорректный телефон «${ph}» у контакта «${ct.name}».\nПосле +7 должно быть ровно 10 цифр.`);return;}
+      if(!isValidPhoneOrEmpty(ph)){toast(`Некорректный телефон «${ph}» у контакта «${ct.name}».\nПосле +7 должно быть ровно 10 цифр.`);return;}
     }
   }
   const primary=contacts[0]||{name:'',phone:'',email:''};
   const displayName=primary.name||company||'—';
   const innVal=document.getElementById('c-inn').value.trim();
-  if(innVal && !isValidInn(innVal)){alert(`Некорректный ИНН «${innVal}».\nПроверьте количество цифр (10 — для ЮЛ, 12 — для ИП/ФЛ) и правильность ввода — контрольная сумма не сходится.`);return;}
-  if(innVal){
-    const dup=S.clients.find(c=>c.inn===innVal&&c.id!==editClientId);
-    if(dup && !confirm(`⚠️ Клиент с ИНН ${innVal} уже существует: «${dup.name}».\nВсё равно сохранить?`))return;
-  }
+  if(innVal && !isValidInn(innVal)){toast(`Некорректный ИНН «${innVal}».\nПроверьте количество цифр (10 — для ЮЛ, 12 — для ИП/ФЛ) и правильность ввода — контрольная сумма не сходится.`);return;}
+  const innDup=innVal?S.clients.find(c=>c.inn===innVal&&c.id!==editClientId):null;
+  const proceedSaveClient=async()=>{
   const dbData={
     name:displayName, company,
     sign:document.getElementById('c-sign').value.trim(),
@@ -8411,6 +8510,12 @@ async function saveClientToDb() {
     if(!r.queued) logAction('insert','client',newId,{name:displayName});
     return;
   }
+  };
+  if(innDup){
+    confirm2('Клиент с таким ИНН уже есть',`Клиент с ИНН ${innVal} уже существует: «${innDup.name}». Всё равно сохранить?`,proceedSaveClient,'Сохранить всё равно');
+  } else {
+    await proceedSaveClient();
+  }
 }
 
 async function askDelClientDb(id){
@@ -8440,7 +8545,7 @@ async function editClientWithLock(id){
   const c=S.clients.find(x=>x.id===id); if(!c)return;
   if(checkLocked(c)){
     toast(`⚠️ Сейчас редактирует: ${c.locked_by}`);
-    if(isAdmin() && confirm(`Запись заблокирована пользователем ${c.locked_by}.\nСнять блокировку принудительно?`))await forceUnlock('clients',id);
+    if(isAdmin())confirm2('Запись заблокирована',`Запись заблокирована пользователем ${c.locked_by}. Снять блокировку принудительно?`,()=>forceUnlock('clients',id),'Снять блокировку');
     return;
   }
   await acquireLock('clients',id); editClient(id);
@@ -8465,7 +8570,7 @@ async function toggleClientTagDb(id,tag,e){
 // --- TASKS CRUD ---
 async function saveTaskToDb(){
   const text=document.getElementById('t-text').value.trim();
-  if(!text){alert('Введи описание');return;}
+  if(!text){toast('Введи описание');return;}
   const noDate=document.getElementById('t-nodate').checked;
   const dbData={
     type:document.getElementById('t-type').value, text,
@@ -8633,9 +8738,9 @@ async function applyBulkDate(){
 // --- OFFERS CRUD ---
 async function saveOfferToDb(){
   const text=document.getElementById('o-text').value.trim();
-  if(!text){alert('Введи текст предложения');return;}
+  if(!text){toast('Введи текст предложения');return;}
   const channel=getOfferChannelBtnsValue().join(', ');
-  if(!channel){alert('Выбери канал продаж');return;}
+  if(!channel){toast('Выбери канал продаж');return;}
   const dbData={
     text, client_id:Number(document.getElementById('o-client').value)||null,
     amount:parseAmount(document.getElementById('o-amount').value),
@@ -8690,7 +8795,7 @@ async function editOfferWithLock(id){
   const o=S.offers.find(x=>x.id===id); if(!o)return;
   if(checkLocked(o)){
     toast(`⚠️ Сейчас редактирует: ${o.locked_by}`);
-    if(isAdmin() && confirm(`Запись заблокирована пользователем ${o.locked_by}.\nСнять блокировку принудительно?`))await forceUnlock('offers',id);
+    if(isAdmin())confirm2('Запись заблокирована',`Запись заблокирована пользователем ${o.locked_by}. Снять блокировку принудительно?`,()=>forceUnlock('offers',id),'Снять блокировку');
     return;
   }
   await acquireLock('offers',id); openEditOffer(id);
@@ -8844,7 +8949,7 @@ async function undo(){
   const prev=undoStack.pop();
   S=JSON.parse(prev);
   _lastSnapshot=prev;
-  try{localStorage.setItem(SK,prev);}catch(e){}
+  idbSet(SK,prev).catch(()=>{});
   updateUndoRedoButtons();
   toast('↺ Отменяем и синхронизируем с сервером...');
   await reconcileToSupabase(oldS,S);
@@ -8860,7 +8965,7 @@ async function redo(){
   const next=redoStack.pop();
   S=JSON.parse(next);
   _lastSnapshot=next;
-  try{localStorage.setItem(SK,next);}catch(e){}
+  idbSet(SK,next).catch(()=>{});
   updateUndoRedoButtons();
   toast('↻ Повторяем и синхронизируем с сервером...');
   await reconcileToSupabase(oldS,S);
@@ -8879,12 +8984,12 @@ async function initApp() {
     // просто работаем на локальных данных, а изменения копятся в офлайн-очереди.
     // Сначала поднимаем последнее сохранённое состояние — приложение сразу готово
     // к работе (и это единственный источник данных, когда сети нет).
-    loadLocalCache();
+    await loadLocalCache();
     try{
       await syncFromSupabase();
       await loadAllProfiles();
       await loadDelegations();
-      persistLocalCache();   // свежие данные — в локальный кеш на случай офлайна
+      await persistLocalCache();   // свежие данные — в локальный кеш на случай офлайна
     }catch(syncErr){
       console.warn('Синхронизация при запуске не удалась — работаем офлайн:', syncErr);
       setTimeout(()=>toast('Нет соединения — работаем с локальными данными'), 800);
@@ -9168,6 +9273,11 @@ function toggleClientFilters(){const p=document.getElementById('page-clients');i
     } else if (event === 'SIGNED_OUT') {
       currentUser = null; currentProfile = null;
       appInitialized = false;
+      // Останавливаем всё периодическое — иначе продолжали бы тикать и после выхода
+      // из аккаунта (лишний расход батареи, особенно на телефоне в установленном PWA).
+      stopNotificationPolling();
+      stopAutoSave();
+      if(_lockTimer){ clearInterval(_lockTimer); _lockTimer=null; }
       showLoginScreen();
     }
   });
