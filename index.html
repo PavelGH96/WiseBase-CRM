@@ -720,6 +720,9 @@ body.col-resizing *{cursor:col-resize!important}
   max-height:600px; /* с запасом — больше любой реальной заметки */
 }
 .detail-panel .sec-lbl{font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px}
+.detail-sec-hd{cursor:pointer;display:flex;align-items:center;gap:5px;user-select:none;-webkit-tap-highlight-color:transparent}
+.detail-sec-hd:hover{color:var(--text)}
+.detail-sec-chev{display:inline-block;font-size:9px;width:9px;text-align:center;transition:transform .15s}
 
 /* Лента активности */
 .activity-timeline{ display:flex; flex-direction:column; gap:6px; margin-top:8px; }
@@ -2198,7 +2201,8 @@ button,a,select,label{touch-action:manipulation}
 
 <div class="overlay" id="m-client" onkeydown="clientModalKeydown(event)" role="dialog" aria-modal="true" aria-labelledby="m-client-title"><div class="modal"><h3 id="m-client-title">Новый клиент</h3>
 <div class="form-sec-lbl first">Основное</div>
-<div class="fg-row"><div class="fg"><label for="c-company">Компания *</label><input type="text" id="c-company" autocomplete="organization" placeholder="ООО Ромашка"></div><div class="fg"><label for="c-sign">Вывеска</label><input type="text" id="c-sign" placeholder="Название на вывеске"></div></div>
+<div class="fg-row"><div class="fg"><label for="c-company">Компания *</label><input type="text" id="c-company" autocomplete="organization" placeholder="ООО Ромашка"></div><div class="fg"><label for="c-inn">ИНН</label><input type="text" id="c-inn" placeholder="Введите ИНН" inputmode="numeric" maxlength="12" oninput="this.value=this.value.replace(/\D/g,'').slice(0,12)"><div class="field-hint">10 цифр — для ЮЛ, 12 цифр — для ИП или ФЛ</div></div></div>
+<div class="fg"><label for="c-sign">Вывеска</label><input type="text" id="c-sign" placeholder="Название на вывеске"></div>
 <div class="fg" id="c-owner-wrap" style="display:none">
   <label for="c-owner">Ответственный</label>
   <select id="c-owner"></select>
@@ -2222,6 +2226,11 @@ button,a,select,label{touch-action:manipulation}
 <div class="form-sec-lbl">Адрес</div>
 <div class="fg-row"><div class="fg"><label for="c-region">Регион</label><select id="c-region" onchange="onRegionChange()"><option value="">— не указан —</option></select></div><div class="fg"><label for="c-city">Город</label><input type="text" id="c-city" list="c-city-list" placeholder="Начните вводить название" autocomplete="off"><datalist id="c-city-list"></datalist></div></div>
 <div class="fg"><label for="c-address">Адрес</label><input type="text" id="c-address" autocomplete="street-address" placeholder="ул. Ленина, 1, офис 101"></div>
+<div class="fg ct-extra-wrap">
+  <div class="ct-extra-list" id="c-addr-extra-list"></div>
+  <button type="button" class="ct-add-phone" onclick="addAddrRow()">+ ещё адрес</button>
+  <div id="c-addr-warn" class="geo-warn" style="display:none"></div>
+</div>
 <div class="form-sec-lbl">Продажи</div>
 <div class="fg-row"><div class="fg"><label for="c-potential">Потенциал (₽)</label><input type="text" inputmode="decimal" id="c-potential" placeholder="100 000" oninput="formatAmountInput(this)"></div><div class="fg"><label for="c-category">Категория объекта</label><select id="c-category"><option value="">— не указана —</option></select></div></div>
 <div class="fg-row">
@@ -2261,7 +2270,7 @@ button,a,select,label{touch-action:manipulation}
   <span class="coll-arrow">▼</span>
 </div>
 <div class="collapsible-body" id="client-extra-body" style="display:none">
-<div class="fg-row"><div class="fg"><label for="c-inn">ИНН</label><input type="text" id="c-inn" placeholder="Введите ИНН" inputmode="numeric" maxlength="12" oninput="this.value=this.value.replace(/\D/g,'').slice(0,12)"><div class="field-hint">10 цифр — для ЮЛ, 12 цифр — для ИП или ФЛ</div></div><div class="fg"><label for="c-revisit">Повторить визит</label><select id="c-revisit"><option value="">— не задано —</option><option value="3m">через 3 месяца</option><option value="6m">через 6 месяцев</option><option value="12m">через 12 месяцев</option><option value="never">никогда</option></select></div></div>
+<div class="fg-row"><div class="fg"><label for="c-revisit">Повторить визит</label><select id="c-revisit"><option value="">— не задано —</option><option value="3m">через 3 месяца</option><option value="6m">через 6 месяцев</option><option value="12m">через 12 месяцев</option><option value="never">никогда</option></select></div>
 <div class="fg"><label id="lbl-tag-selector">Теги</label><div class="chip-row" id="tag-selector" role="group" aria-labelledby="lbl-tag-selector"><label class="lbl-check-sm"><input type="checkbox" value="vip"> ⭐ VIP</label><label class="lbl-check-sm"><input type="checkbox" value="warm" style="accent-color:var(--amber)"> 🌤 Тёплый</label><label class="lbl-check-sm"><input type="checkbox" value="cold" style="accent-color:var(--blue)"> ❄️ Холодный</label><label class="lbl-check-sm"><input type="checkbox" value="new"> 🆕 Новый</label></div></div>
 <div class="fg"><label for="c-note">Заметка</label><textarea id="c-note" placeholder="Источник лида..."></textarea></div>
 </div>
@@ -2731,7 +2740,7 @@ const TODAY=today();
 // новой присланной версии). Показывается в Профиле, чтобы можно было сверить «то, что
 // открыто на телефоне» с «тем, что прислали только что» — без гадания, обновился
 // ли сайт после деплоя на хостинг.
-const APP_BUILD='10.09.2026 · ver 19';
+const APP_BUILD='13.09.2026 · ver 23';
 // Преобразует Date обратно в строку 'YYYY-MM-DD' по ЛОКАЛЬНЫМ компонентам (не UTC) — пара к today().
 function dateToLocalStr(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 // Парсит строку 'YYYY-MM-DD' как ЛОКАЛЬНУЮ дату (полночь по местному времени), а не UTC.
@@ -3443,6 +3452,22 @@ function loadUIPrefs(){
   if(UIP.tripView)tripView=UIP.tripView;
 }
 function saveUIPref(key,val){UIP[key]=val;try{localStorage.setItem(UIK,JSON.stringify(UIP));}catch(e){}}
+// Свёрнутость разделов детальной карточки клиента (Информация/Контакты/Предложения/
+// Активность) — общая настройка на все карточки, не по каждому клиенту отдельно:
+// если решили не смотреть ленту активности по умолчанию — так для всех клиентов сразу.
+function toggleDetailSection(key,event){
+  event?.stopPropagation();
+  UIP.detailCollapsed=UIP.detailCollapsed||{};
+  UIP.detailCollapsed[key]=!UIP.detailCollapsed[key];
+  saveUIPref('detailCollapsed',UIP.detailCollapsed);
+  renderClients();
+}
+function mkSecHeader(key,label,extraHtml){
+  const collapsed=!!(UIP.detailCollapsed&&UIP.detailCollapsed[key]);
+  return `<div class="sec-lbl detail-sec-hd" onclick="toggleDetailSection('${key}',event)" role="button" tabindex="0" aria-expanded="${!collapsed}" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleDetailSection('${key}',event);}">
+    <span class="detail-sec-chev">${collapsed?'▸':'▾'}</span>${label}
+  </div>${extraHtml||''}`;
+}
 function getColWidths(group){return UIP.colWidths&&UIP.colWidths[group]?UIP.colWidths[group]:null;}
 function saveColWidth(group,varName,px){
   UIP.colWidths=UIP.colWidths||{};
@@ -4675,6 +4700,24 @@ function updSrvWarn(){
   } else w.style.display='none';
 }
 
+// Та же защита для дополнительных адресов — колонка extra_addresses могла ещё не
+// попасть в базу на момент открытия приложения.
+let HAS_ADDR_COLS=null;
+async function addrColsProbe(){
+  try{
+    const {error}=await sb.from('clients').select('extra_addresses').limit(1);
+    HAS_ADDR_COLS=!error;
+  }catch(_){ HAS_ADDR_COLS=false; }
+  updAddrWarn();
+}
+function updAddrWarn(){
+  const w=document.getElementById('c-addr-warn'); if(!w)return;
+  if(HAS_ADDR_COLS===false){
+    w.style.display='';
+    w.textContent='Дополнительные адреса не сохранятся: в базе нет колонки extra_addresses. Выполните SQL-миграцию (см. инструкцию), затем перезагрузите страницу.';
+  } else w.style.display='none';
+}
+
 let HAS_GEO_COLS=null;   // null — ещё не проверяли, true/false — результат пробы
 async function geoColsProbe(){
   try{
@@ -4817,6 +4860,39 @@ function migrateClientStatuses(){
   });
 }
 let listSortCol='name', listSortDir=1; // for list-view column sort
+
+// === ДОПОЛНИТЕЛЬНЫЕ АДРЕСА КЛИЕНТА ===
+// У части клиентов несколько салонов/точек продаж — одно поле «Адрес» этого не
+// покрывало. Тот же принцип, что у geo-групп выше (добавить/убрать строку), но
+// доступно всем клиентам, а не только каналу ФМА, и без привязки к городу/картам —
+// просто список адресов. Первый адрес остаётся в обычном поле «Адрес» (обратная
+// совместимость со старыми данными), это — только ДОПОЛНИТЕЛЬНЫЕ.
+let addrRowCounter=0;
+function mkAddrRow(value){
+  const id='ar'+(++addrRowCounter);
+  return `<div class="ct-extra-row" id="${id}">
+    <input type="text" class="c-addr-extra" placeholder="Ещё один адрес салона" value="${esc(value||'')}">
+    <button type="button" class="ct-phone-del" onclick="removeAddrRow('${id}')" title="Удалить адрес" aria-label="Удалить адрес">✕</button>
+  </div>`;
+}
+function addAddrRow(value){
+  const list=document.getElementById('c-addr-extra-list');
+  if(!list)return;
+  list.insertAdjacentHTML('beforeend', mkAddrRow(value));
+}
+function removeAddrRow(id){
+  const el=document.getElementById(id); if(el)el.remove();
+}
+// Пересобрать список — при открытии формы: openAddClient даёт [], editClient — c.extraAddresses.
+function resetAddrRows(extraAddresses){
+  const list=document.getElementById('c-addr-extra-list');
+  if(!list)return;
+  list.innerHTML='';
+  (extraAddresses||[]).forEach(a=>list.insertAdjacentHTML('beforeend', mkAddrRow(a)));
+}
+function getExtraAddresses(){
+  return [...document.querySelectorAll('#c-addr-extra-list .c-addr-extra')].map(i=>i.value.trim()).filter(Boolean);
+}
 
 function getDaysWithoutContact(c){
   // Use stored lastContact, or scan history/completed tasks
@@ -5134,7 +5210,8 @@ function renderClientDetailHTML(c){
       </div>
     </div>
     ${mkMobCta(c)}
-    <div class="info-g">
+    ${mkSecHeader('info','ℹ️ Информация')}
+    <div class="info-g" style="${UIP.detailCollapsed?.info?'display:none':''}">
       <div class="info-it"><span>ИНН</span><strong>${esc(c.inn)||'—'}</strong></div>
       ${c.nextContact?`<div class="info-it"><span>Следующий контакт</span><strong style="color:${c.nextContact<TODAY?'var(--red)':c.nextContact===TODAY?'var(--amber)':'var(--text)'}">${FD(c.nextContact)}</strong></div>`:''}
       ${c.potential?`<div class="info-it"><span>Потенциал</span><strong>${RM(c.potential)}</strong></div>`:''}
@@ -5148,14 +5225,15 @@ function renderClientDetailHTML(c){
       ${c.region?`<div class="info-it"><span>Регион</span><strong>${esc(c.region)}</strong></div>`:''}
       ${c.city?`<div class="info-it"><span>Город</span><strong>${esc(c.city)}</strong></div>`:''}
       ${c.address?`<div class="info-it" style="grid-column:1/-1"><span>Адрес</span><strong>${esc(c.address)}</strong></div>`:''}
+      ${(c.extraAddresses||[]).map(a=>`<div class="info-it" style="grid-column:1/-1"><span>Ещё адрес</span><strong>${esc(a)}</strong></div>`).join('')}
       ${c.note?`<div class="info-it note-it" style="grid-column:1/-1"><span>Заметка</span><em class="note-preview" tabindex="0" style="color:var(--t2)">${esc(c.note)}</em></div>`:''}
     </div>
-    ${(()=>{const cts=c.contacts&&c.contacts.length?c.contacts:[{name:c.name||'',phone:c.phone||'',email:c.email||'',position:''}];const hasAny=cts.some(ct=>ct.name||ct.phone||ct.email);if(!hasAny)return '';return `<div class="sec-lbl" style="margin-bottom:6px">👤 Контактные лица</div><div class="contacts-block" style="margin-bottom:14px">${cts.map(ct=>ct.name||ct.phone||ct.email?`<div class="contact-item"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="cn">${esc(ct.name)||'—'}</span>${ct.position?`<span class="cp">${esc(ct.position)}</span>`:''}</div>${ct.phone?`<div class="ci">📞 <a href="#" class="phone-link" data-phone="${esc(ct.phone)}" onclick="openPhoneMenu(event,this)">${esc(ct.phone)}</a></div>`:''}${(ct.extraPhones||[]).map(ph=>`<div class="ci">📞 <a href="#" class="phone-link" data-phone="${esc(ph)}" onclick="openPhoneMenu(event,this)">${esc(ph)}</a></div>`).join('')}${ct.email?`<div class="ci">✉️ <a href="mailto:${esc(ct.email)}">${esc(ct.email)}</a></div>`:''}</div>`:'').join('')}</div>`;})()}
+    ${(()=>{const cts=c.contacts&&c.contacts.length?c.contacts:[{name:c.name||'',phone:c.phone||'',email:c.email||'',position:''}];const hasAny=cts.some(ct=>ct.name||ct.phone||ct.email);if(!hasAny)return '';return mkSecHeader('contacts','👤 Контактные лица')+`<div class="contacts-block" style="${UIP.detailCollapsed?.contacts?'display:none':''}" style="margin-bottom:14px">${cts.map(ct=>ct.name||ct.phone||ct.email?`<div class="contact-item"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="cn">${esc(ct.name)||'—'}</span>${ct.position?`<span class="cp">${esc(ct.position)}</span>`:''}</div>${ct.phone?`<div class="ci">📞 <a href="#" class="phone-link" data-phone="${esc(ct.phone)}" onclick="openPhoneMenu(event,this)">${esc(ct.phone)}</a></div>`:''}${(ct.extraPhones||[]).map(ph=>`<div class="ci">📞 <a href="#" class="phone-link" data-phone="${esc(ph)}" onclick="openPhoneMenu(event,this)">${esc(ph)}</a></div>`).join('')}${ct.email?`<div class="ci">✉️ <a href="mailto:${esc(ct.email)}">${esc(ct.email)}</a></div>`:''}</div>`:'').join('')}</div>`;})()}
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-      <div class="sec-lbl" style="margin-bottom:0">💼 Предложения</div>
+      <div class="sec-lbl detail-sec-hd" style="margin-bottom:0" onclick="toggleDetailSection('offers',event)" role="button" tabindex="0" aria-expanded="${!(UIP.detailCollapsed?.offers)}" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleDetailSection('offers',event);}"><span class="detail-sec-chev">${UIP.detailCollapsed?.offers?'▸':'▾'}</span>💼 Предложения</div>
       <button class="btn btn-ghost btn-sm" onclick="openAddOffer(${c.id})">+ Предложение</button>
     </div>
-    <div class="contacts-block" style="margin-bottom:14px">
+    <div class="contacts-block" style="margin-bottom:14px;${UIP.detailCollapsed?.offers?'display:none':''}">
       ${offers.length?[...offers].sort((a,b)=>(b.date||'').localeCompare(a.date||'')).map(o=>`<div class="contact-item">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">
           <span class="cn">${esc(o.text)}</span>
@@ -5170,8 +5248,8 @@ function renderClientDetailHTML(c){
         </div>
       </div>`).join(''):'<div style="color:var(--t2);font-size:12px">Пока нет предложений по этому клиенту</div>'}
     </div>
-    <div class="sec-lbl">📋 Лента активности</div>
-    ${activityHtml}
+    ${mkSecHeader('activity','📋 Лента активности')}
+    <div style="${UIP.detailCollapsed?.activity?'display:none':''}">${activityHtml}</div>
   </div>`;
 }
 
@@ -5298,7 +5376,7 @@ function emailSelectedClients(){
 }
 
 // === CRUD CLIENTS ===
-function openAddClient(){ editClientId=null; ['c-company','c-sign','c-city','c-address','c-note','c-inn','c-nextcontact','c-servicemgr','c-payterms','c-shipping'].forEach(id=>document.getElementById(id).value=''); renderRegionOptions(); setRegionValue(''); document.getElementById('c-potential').value=''; document.getElementById('c-status').value='unknown'; renderNotWorkingOptions(); renderObjectCategoryOptions(); setNotWorkingReasons([]); onClientStatusChange(); document.getElementById('c-category').value=''; document.getElementById('c-revisit').value=''; setChannelBtns([]); setFormatBtns([]); resetGeoGroups(null); updGeoVisible(); document.querySelectorAll('#tag-selector input').forEach(cb=>cb.checked=false); (matchMedia('(max-width:600px)').matches?closeClientExtra():openClientExtra()); document.querySelector('#m-client h3').textContent='Новый клиент'; document.querySelector('#m-client .btn-primary').textContent='Добавить'; resetContacts(null); document.getElementById('c-owner-wrap').style.display='none'; document.getElementById('m-client').classList.add('open'); }
+function openAddClient(){ editClientId=null; ['c-company','c-sign','c-city','c-address','c-note','c-inn','c-nextcontact','c-servicemgr','c-payterms','c-shipping'].forEach(id=>document.getElementById(id).value=''); resetAddrRows([]); renderRegionOptions(); setRegionValue(''); document.getElementById('c-potential').value=''; document.getElementById('c-status').value='unknown'; renderNotWorkingOptions(); renderObjectCategoryOptions(); setNotWorkingReasons([]); onClientStatusChange(); document.getElementById('c-category').value=''; document.getElementById('c-revisit').value=''; setChannelBtns([]); setFormatBtns([]); resetGeoGroups(null); updGeoVisible(); document.querySelectorAll('#tag-selector input').forEach(cb=>cb.checked=false); (matchMedia('(max-width:600px)').matches?closeClientExtra():openClientExtra()); document.querySelector('#m-client h3').textContent='Новый клиент'; document.querySelector('#m-client .btn-primary').textContent='Добавить'; resetContacts(null); document.getElementById('c-owner-wrap').style.display='none'; document.getElementById('m-client').classList.add('open'); }
 // УЛУЧШЕНИЕ: Enter в модалке клиента работает так же, как клик по кнопке
 // «Сохранить»/«Добавить» — в полях компании, ИНН, региона, полях контактного
 // лица (имя/телефон/email) и т.д. В заметке (textarea) Enter, как обычно,
@@ -5385,7 +5463,7 @@ function saveClient(){
     proceedSaveClient2();
   }
 }
-function editClient(id){ const c=S.clients.find(x=>x.id===id); if(!c)return; editClientId=id; document.getElementById('c-company').value=c.company||''; document.getElementById('c-sign').value=c.sign||''; renderRegionOptions(); setRegionValue(c.region||''); document.getElementById('c-city').value=c.city||''; document.getElementById('c-address').value=c.address||''; document.getElementById('c-inn').value=c.inn||''; document.getElementById('c-potential').value=formatAmountStatic(c.potential); document.getElementById('c-nextcontact').value=c.nextContact||''; document.getElementById('c-note').value=c.note||''; document.getElementById('c-status').value=c.status||'unknown'; renderNotWorkingOptions(); renderObjectCategoryOptions(); setNotWorkingReasons(c.notWorkingReasons||[]); onClientStatusChange(); document.getElementById('c-category').value=c.objectCategory||''; document.getElementById('c-revisit').value=c.revisitCadence||''; document.getElementById('c-servicemgr').value=c.serviceManager||''; document.getElementById('c-payterms').value=c.payTerms||''; document.getElementById('c-shipping').value=c.shipping||''; resetGeoGroups(c.geoLinks||[]); setChannelBtns(getChannels(c)); setFormatBtns(getFormats(c)); renderOwnerSelect(c.owner_id); updGeoVisible(); document.querySelectorAll('#tag-selector input').forEach(cb=>cb.checked=(c.tags||[]).includes(cb.value)); document.querySelector('#m-client h3').textContent='Изменить клиента'; document.querySelector('#m-client .btn-primary').textContent='Сохранить';
+function editClient(id){ const c=S.clients.find(x=>x.id===id); if(!c)return; editClientId=id; document.getElementById('c-company').value=c.company||''; document.getElementById('c-sign').value=c.sign||''; renderRegionOptions(); setRegionValue(c.region||''); document.getElementById('c-city').value=c.city||''; document.getElementById('c-address').value=c.address||''; resetAddrRows(c.extraAddresses); document.getElementById('c-inn').value=c.inn||''; document.getElementById('c-potential').value=formatAmountStatic(c.potential); document.getElementById('c-nextcontact').value=c.nextContact||''; document.getElementById('c-note').value=c.note||''; document.getElementById('c-status').value=c.status||'unknown'; renderNotWorkingOptions(); renderObjectCategoryOptions(); setNotWorkingReasons(c.notWorkingReasons||[]); onClientStatusChange(); document.getElementById('c-category').value=c.objectCategory||''; document.getElementById('c-revisit').value=c.revisitCadence||''; document.getElementById('c-servicemgr').value=c.serviceManager||''; document.getElementById('c-payterms').value=c.payTerms||''; document.getElementById('c-shipping').value=c.shipping||''; resetGeoGroups(c.geoLinks||[]); setChannelBtns(getChannels(c)); setFormatBtns(getFormats(c)); renderOwnerSelect(c.owner_id); updGeoVisible(); document.querySelectorAll('#tag-selector input').forEach(cb=>cb.checked=(c.tags||[]).includes(cb.value)); document.querySelector('#m-client h3').textContent='Изменить клиента'; document.querySelector('#m-client .btn-primary').textContent='Сохранить';
   // Авто-раскрываем доп. поля если хоть одно заполнено
   const hasExtra=c.inn||c.potential||getChannels(c).length||getFormats(c).length||c.region||c.city||c.address;
   if(hasExtra) openClientExtra(); else closeClientExtra();
@@ -5622,13 +5700,28 @@ END:VCALENDAR`;
 // === CRUD DEALS ===
 let editOfferId=null;
 // preselectClientId — опциональный id клиента, если открываем форму из карточки клиента
+// Список <option> для выбора клиента в форме предложения. Обычно — только видимые
+// клиенты (scopedClients). Но если редактируется УЖЕ существующее предложение,
+// чей клиент почему-то оказался вне текущей видимости (старые данные, смена
+// ответственного и т.п.) — этого клиента всё равно добавляем в список. Иначе
+// <select> молча остался бы без нужного значения, и при сохранении предложение
+// незаметно переехало бы на первого клиента в списке.
+function offerClientOptionsHTML(currentClientId){
+  const visible=scopedClients();
+  let list=visible;
+  if(currentClientId!=null && !visible.some(c=>c.id===currentClientId)){
+    const extra=S.clients.find(c=>c.id===currentClientId);
+    if(extra) list=[...visible, extra];
+  }
+  return list.map(c=>`<option value="${c.id}">${esc(c.company||c.name)}</option>`).join('');
+}
 function openAddOffer(preselectClientId){
   editOfferId=null;
   document.getElementById('o-text').value='';
   document.getElementById('o-amount').value='';
   document.getElementById('o-status').value='proposed';
   document.getElementById('o-date').value=TODAY;
-  document.getElementById('o-client').innerHTML=S.clients.map(c=>`<option value="${c.id}">${esc(c.company||c.name)}</option>`).join('');
+  document.getElementById('o-client').innerHTML=offerClientOptionsHTML(preselectClientId!=null?Number(preselectClientId):null);
   let defChannels=[];
   if(preselectClientId){
     document.getElementById('o-client').value=preselectClientId;
@@ -5647,7 +5740,7 @@ function duplicateOffer(id){
   const o=S.offers.find(x=>x.id===id);
   if(!o)return;
   editOfferId=null;
-  document.getElementById('o-client').innerHTML=S.clients.map(c=>`<option value="${c.id}">${esc(c.company||c.name)}</option>`).join('');
+  document.getElementById('o-client').innerHTML=offerClientOptionsHTML(o.clientId);
   document.getElementById('o-text').value=o.text||'';
   document.getElementById('o-client').value=o.clientId||'';
   document.getElementById('o-amount').value=formatAmountStatic(o.amount);
@@ -5661,7 +5754,7 @@ function duplicateOffer(id){
 function openEditOffer(id){
   const o=S.offers.find(x=>x.id===id); if(!o)return;
   editOfferId=id;
-  document.getElementById('o-client').innerHTML=S.clients.map(c=>`<option value="${c.id}">${esc(c.company||c.name)}</option>`).join('');
+  document.getElementById('o-client').innerHTML=offerClientOptionsHTML(o.clientId);
   document.getElementById('o-text').value=o.text;
   document.getElementById('o-client').value=o.clientId;
   document.getElementById('o-amount').value=formatAmountStatic(o.amount);
@@ -5718,24 +5811,33 @@ function mkOffersEmptyState(){
   return `<div class="empty-state"><div class="es-ic">🎯</div><div class="es-t">Пока нет предложений</div><div class="es-s">Создайте первое коммерческое предложение — оно появится в воронке по статусам</div><button class="btn btn-primary" onclick="openAddOffer()">+ Предложение</button></div>`;
 }
 function renderOffers(){
+  // ИСПРАВЛЕНИЕ: раньше и список клиентов в фильтре, и счётчик «Клиентов: N», и сами
+  // предложения показывались по ВСЕЙ базе — руководитель видел клиентов и сделки
+  // коллег, а не только свои (в отличие от страницы «Клиенты», где видимость уже
+  // учитывалась). Теперь везде на этой странице — тот же принцип видимости, что и
+  // в «Клиентах»: scopedClients().
+  const visibleClients=scopedClients();
+  const visibleClientIds=new Set(visibleClients.map(c=>c.id));
+  const visibleOffers=S.offers.filter(o=>visibleClientIds.has(o.clientId));
+
   // Обновляем список клиентов в фильтре
   const fcEl=document.getElementById('offer-client-filter');
   if(fcEl){
     const cur=fcEl.value;
-    fcEl.innerHTML='<option value="0">Все клиенты</option>'+S.clients.map(c=>`<option value="${c.id}"${String(c.id)===cur?' selected':''}>${esc(c.company||c.name)}</option>`).join('');
+    fcEl.innerHTML='<option value="0">Все клиенты</option>'+visibleClients.map(c=>`<option value="${c.id}"${String(c.id)===cur?' selected':''}>${esc(c.company||c.name)}</option>`).join('');
   }
   const fcId=fcEl?Number(fcEl.value):0;
   const statusFilter=document.getElementById('offer-status-filter')?.value||'';
   const q=(document.getElementById('osearch')?.value||'').toLowerCase().trim();
 
-  const baseFiltered=S.offers.filter(o=>(!fcId||o.clientId===fcId)&&(!q||o.text.toLowerCase().includes(q)));
+  const baseFiltered=visibleOffers.filter(o=>(!fcId||o.clientId===fcId)&&(!q||o.text.toLowerCase().includes(q)));
   const proposed=baseFiltered.filter(o=>o.status==='proposed').reduce((s,o)=>s+Number(o.amount||0),0);
   const agreed=baseFiltered.filter(o=>o.status==='agreed').reduce((s,o)=>s+Number(o.amount||0),0);
-  const filtLabel=fcId?(S.clients.find(c=>c.id===fcId)?.name||''):'все';
-  document.getElementById('offer-sum').innerHTML=`Предложено: <strong>${R(proposed)}</strong> &nbsp;·&nbsp; Согласовано: <strong style="color:var(--green)">${R(agreed)}</strong> &nbsp;·&nbsp; ${fcId?'Клиент: <strong>'+esc(filtLabel)+'</strong>':'Клиентов: <strong>'+S.clients.length+'</strong>'}`;
+  const filtLabel=fcId?(visibleClients.find(c=>c.id===fcId)?.name||''):'все';
+  document.getElementById('offer-sum').innerHTML=`Предложено: <strong>${R(proposed)}</strong> &nbsp;·&nbsp; Согласовано: <strong style="color:var(--green)">${R(agreed)}</strong> &nbsp;·&nbsp; ${fcId?'Клиент: <strong>'+esc(filtLabel)+'</strong>':'Клиентов: <strong>'+visibleClients.length+'</strong>'}`;
 
   const statusesToShow=statusFilter?[statusFilter]:OFFER_STATUSES;
-  document.getElementById('offers-wrap').innerHTML=!S.offers.length?mkOffersEmptyState():statusesToShow.map(st=>{
+  document.getElementById('offers-wrap').innerHTML=!visibleOffers.length?mkOffersEmptyState():statusesToShow.map(st=>{
     const offers=baseFiltered.filter(o=>o.status===st);
     const amt=offers.reduce((s,o)=>s+Number(o.amount||0),0);
     return`<div class="fs-wrap">
@@ -5996,7 +6098,7 @@ function renderTpClientList(){
   let list=S.clients.slice();
   if(region)list=list.filter(c=>c.region===region);
   if(city)list=list.filter(c=>c.city===city);
-  if(q)list=list.filter(c=>(c.company||'').toLowerCase().includes(q)||(c.name||'').toLowerCase().includes(q)||(c.address||'').toLowerCase().includes(q));
+  if(q)list=list.filter(c=>(c.company||'').toLowerCase().includes(q)||(c.name||'').toLowerCase().includes(q)||(c.address||'').toLowerCase().includes(q)||(c.extraAddresses||[]).some(a=>a.toLowerCase().includes(q)));
   list.sort((a,b)=>(a.company||a.name||'').localeCompare(b.company||b.name||'','ru'));
   const el=document.getElementById('tp-client-list');
   if(!list.length){el.innerHTML='<div style="padding:14px;color:var(--t2);font-size:13px">Нет клиентов по фильтру</div>';}
@@ -7543,6 +7645,7 @@ function localInit(){
   registerSW();
   geoColsProbe();   // есть в базе колонки под геосервисы
   srvColsProbe();   // есть ли колонки под сервис-менеджера / условия оплаты / отгрузку
+  addrColsProbe();  // есть ли колонка под дополнительные адреса
   initAutoGrowNotes(); // авто-высота полей «Заметка» в модалках
   loadAdminViewOwners(); // персональный фильтр видимости учёток (только для админа)
   initVoiceInputButtons(); // кнопки микрофона на текстовые поля заметок/комментариев
@@ -8186,6 +8289,7 @@ function dbToClient(row, history) {
     potential: row.potential || 0, nextContact: row.next_contact || '', status: row.status || 'unknown',
     notWorkingReasons: row.not_working_reasons || [], objectCategory: row.object_category || '',
     geoLinks: row.geo_links || [],
+    extraAddresses: row.extra_addresses || [],
     serviceManager: row.service_manager || '', payTerms: row.payment_terms || '', shipping: row.shipping || '',
     revisitCadence: row.revisit_cadence || '', nextVisitDate: row.next_visit_date || '',
     channels: row.channels || [], formats: row.formats || [], contacts: row.contacts || [],
@@ -8493,6 +8597,7 @@ async function saveClientToDb() {
       payment_terms: document.getElementById('c-payterms').value.trim(),
       shipping: document.getElementById('c-shipping').value.trim(),
     } : {}),
+    ...(HAS_ADDR_COLS!==false ? { extra_addresses: getExtraAddresses() } : {}),
   };
   if(editClientId){
     // Ответственного может сменить только admin/manager, и только осознанно — через видимое
