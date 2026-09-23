@@ -2265,14 +2265,31 @@ button,a,select,label{touch-action:manipulation}
   <button type="button" class="ct-add-phone" onclick="addGeoGroup()">+ добавить точку</button>
 </div>
 <div class="collapsible-section">
-<div class="collapsible-toggle" id="client-extra-toggle" onclick="toggleClientExtra()">
-  <span>Добавить подробности</span>
-  <span class="coll-arrow">▼</span>
+<div class="collapsible-toggle" id="cf-revisit-toggle" onclick="toggleFormSection('revisit')">
+  <span>Повторить визит</span>
+  <span class="coll-arrow" id="cf-revisit-arrow">▼</span>
 </div>
-<div class="collapsible-body" id="client-extra-body" style="display:none">
-<div class="fg-row"><div class="fg"><label for="c-revisit">Повторить визит</label><select id="c-revisit"><option value="">— не задано —</option><option value="3m">через 3 месяца</option><option value="6m">через 6 месяцев</option><option value="12m">через 12 месяцев</option><option value="never">никогда</option></select></div>
+<div class="collapsible-body" id="cf-revisit-body">
+<div class="fg"><label for="c-revisit">Повторить визит</label><select id="c-revisit"><option value="">— не задано —</option><option value="3m">через 3 месяца</option><option value="6m">через 6 месяцев</option><option value="12m">через 12 месяцев</option><option value="never">никогда</option></select></div>
+</div>
+</div>
+<div class="collapsible-section">
+<div class="collapsible-toggle" id="cf-tags-toggle" onclick="toggleFormSection('tags')">
+  <span>Теги</span>
+  <span class="coll-arrow" id="cf-tags-arrow">▼</span>
+</div>
+<div class="collapsible-body" id="cf-tags-body">
 <div class="fg"><label id="lbl-tag-selector">Теги</label><div class="chip-row" id="tag-selector" role="group" aria-labelledby="lbl-tag-selector"><label class="lbl-check-sm"><input type="checkbox" value="vip"> ⭐ VIP</label><label class="lbl-check-sm"><input type="checkbox" value="warm" style="accent-color:var(--amber)"> 🌤 Тёплый</label><label class="lbl-check-sm"><input type="checkbox" value="cold" style="accent-color:var(--blue)"> ❄️ Холодный</label><label class="lbl-check-sm"><input type="checkbox" value="new"> 🆕 Новый</label></div></div>
+</div>
+</div>
+<div class="collapsible-section">
+<div class="collapsible-toggle" id="cf-note-toggle" onclick="toggleFormSection('note')">
+  <span>Заметка</span>
+  <span class="coll-arrow" id="cf-note-arrow">▼</span>
+</div>
+<div class="collapsible-body" id="cf-note-body">
 <div class="fg"><label for="c-note">Заметка</label><textarea id="c-note" placeholder="Источник лида..."></textarea></div>
+</div>
 </div>
 </div>
 <div class="mfoot"><button class="btn btn-ghost" onclick="cancelClientModal()">Отмена</button><button class="btn btn-primary" onclick="saveClientToDb()">Добавить</button></div></div></div>
@@ -2740,7 +2757,7 @@ const TODAY=today();
 // новой присланной версии). Показывается в Профиле, чтобы можно было сверить «то, что
 // открыто на телефоне» с «тем, что прислали только что» — без гадания, обновился
 // ли сайт после деплоя на хостинг.
-const APP_BUILD='13.09.2026 · ver 23';
+const APP_BUILD='13.09.2026 · ver 25';
 // Преобразует Date обратно в строку 'YYYY-MM-DD' по ЛОКАЛЬНЫМ компонентам (не UTC) — пара к today().
 function dateToLocalStr(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 // Парсит строку 'YYYY-MM-DD' как ЛОКАЛЬНУЮ дату (полночь по местному времени), а не UTC.
@@ -3008,31 +3025,25 @@ function parseContactsCell(str){
 
 // Совместимость: channel (старый string) → channels (array)
 function getChannels(c){ return c.channels||(c.channel?[c.channel]:[]); }
-function toggleClientExtra(){
-  const body=document.getElementById('client-extra-body');
-  const toggle=document.getElementById('client-extra-toggle');
-  const open=body.style.display==='none';
-  body.style.display=open?'flex':'none';
-  toggle.classList.toggle('open',open);
+// Сворачивание разделов формы клиента (Повторить визит / Теги / Заметка) — раньше
+// это был один общий блок «Добавить подробности», теперь каждый раздел сам по себе
+// и запоминает своё состояние отдельно (тем же способом, что и на карточке
+// просмотра клиента — UIP, сохраняется между сессиями).
+function toggleFormSection(key){
+  UIP.formCollapsed=UIP.formCollapsed||{};
+  UIP.formCollapsed[key]=!UIP.formCollapsed[key];
+  saveUIPref('formCollapsed',UIP.formCollapsed);
+  applyFormSectionState(key);
 }
-function openClientExtra(){
-  const body=document.getElementById('client-extra-body');
-  const toggle=document.getElementById('client-extra-toggle');
-  body.style.display='flex';
-  toggle.classList.add('open');
+function applyFormSectionState(key){
+  const collapsed=!!(UIP.formCollapsed&&UIP.formCollapsed[key]);
+  const body=document.getElementById('cf-'+key+'-body');
+  const toggle=document.getElementById('cf-'+key+'-toggle');
+  if(body)body.style.display=collapsed?'none':'flex';
+  if(toggle)toggle.classList.toggle('open',!collapsed);
 }
-function closeClientExtra(){
-  const body=document.getElementById('client-extra-body');
-  const toggle=document.getElementById('client-extra-toggle');
-  if(!body||!toggle)return;
-  body.style.display='none';
-  toggle.classList.remove('open');
-}
-function closeClientExtra(){
-  const body=document.getElementById('client-extra-body');
-  const toggle=document.getElementById('client-extra-toggle');
-  body.style.display='none';
-  toggle.classList.remove('open');
+function applyAllFormSectionStates(){
+  ['revisit','tags','note'].forEach(applyFormSectionState);
 }
 function toggleChannel(btn){
   btn.classList.toggle('active');
@@ -4868,30 +4879,39 @@ let listSortCol='name', listSortDir=1; // for list-view column sort
 // просто список адресов. Первый адрес остаётся в обычном поле «Адрес» (обратная
 // совместимость со старыми данными), это — только ДОПОЛНИТЕЛЬНЫЕ.
 let addrRowCounter=0;
-function mkAddrRow(value){
+function mkAddrRow(city,address){
   const id='ar'+(++addrRowCounter);
-  return `<div class="ct-extra-row" id="${id}">
-    <input type="text" class="c-addr-extra" placeholder="Ещё один адрес салона" value="${esc(value||'')}">
+  return `<div class="ct-extra-row addr-extra-row" id="${id}">
+    <input type="text" class="c-addr-extra-city" placeholder="Город" value="${esc(city||'')}" style="max-width:130px;flex:0 0 auto">
+    <input type="text" class="c-addr-extra-addr" placeholder="Ещё один адрес салона" value="${esc(address||'')}">
     <button type="button" class="ct-phone-del" onclick="removeAddrRow('${id}')" title="Удалить адрес" aria-label="Удалить адрес">✕</button>
   </div>`;
 }
-function addAddrRow(value){
+function addAddrRow(city,address){
   const list=document.getElementById('c-addr-extra-list');
   if(!list)return;
-  list.insertAdjacentHTML('beforeend', mkAddrRow(value));
+  list.insertAdjacentHTML('beforeend', mkAddrRow(city,address));
 }
 function removeAddrRow(id){
   const el=document.getElementById(id); if(el)el.remove();
 }
 // Пересобрать список — при открытии формы: openAddClient даёт [], editClient — c.extraAddresses.
+// Раньше это были просто строки (без города) — старые данные в таком виде читаем
+// как {city:'', address: строка}, чтобы ничего не потерялось и не сломалось.
 function resetAddrRows(extraAddresses){
   const list=document.getElementById('c-addr-extra-list');
   if(!list)return;
   list.innerHTML='';
-  (extraAddresses||[]).forEach(a=>list.insertAdjacentHTML('beforeend', mkAddrRow(a)));
+  (extraAddresses||[]).forEach(a=>{
+    const item=typeof a==='string'?{city:'',address:a}:(a||{});
+    list.insertAdjacentHTML('beforeend', mkAddrRow(item.city,item.address));
+  });
 }
 function getExtraAddresses(){
-  return [...document.querySelectorAll('#c-addr-extra-list .c-addr-extra')].map(i=>i.value.trim()).filter(Boolean);
+  return [...document.querySelectorAll('#c-addr-extra-list .addr-extra-row')].map(row=>({
+    city: row.querySelector('.c-addr-extra-city').value.trim(),
+    address: row.querySelector('.c-addr-extra-addr').value.trim(),
+  })).filter(a=>a.city||a.address);
 }
 
 function getDaysWithoutContact(c){
@@ -5225,7 +5245,7 @@ function renderClientDetailHTML(c){
       ${c.region?`<div class="info-it"><span>Регион</span><strong>${esc(c.region)}</strong></div>`:''}
       ${c.city?`<div class="info-it"><span>Город</span><strong>${esc(c.city)}</strong></div>`:''}
       ${c.address?`<div class="info-it" style="grid-column:1/-1"><span>Адрес</span><strong>${esc(c.address)}</strong></div>`:''}
-      ${(c.extraAddresses||[]).map(a=>`<div class="info-it" style="grid-column:1/-1"><span>Ещё адрес</span><strong>${esc(a)}</strong></div>`).join('')}
+      ${(c.extraAddresses||[]).map(a=>{const item=typeof a==='string'?{city:'',address:a}:(a||{});const txt=[item.city,item.address].filter(Boolean).join(', ');return txt?`<div class="info-it" style="grid-column:1/-1"><span>Ещё адрес</span><strong>${esc(txt)}</strong></div>`:'';}).join('')}
       ${c.note?`<div class="info-it note-it" style="grid-column:1/-1"><span>Заметка</span><em class="note-preview" tabindex="0" style="color:var(--t2)">${esc(c.note)}</em></div>`:''}
     </div>
     ${(()=>{const cts=c.contacts&&c.contacts.length?c.contacts:[{name:c.name||'',phone:c.phone||'',email:c.email||'',position:''}];const hasAny=cts.some(ct=>ct.name||ct.phone||ct.email);if(!hasAny)return '';return mkSecHeader('contacts','👤 Контактные лица')+`<div class="contacts-block" style="${UIP.detailCollapsed?.contacts?'display:none':''}" style="margin-bottom:14px">${cts.map(ct=>ct.name||ct.phone||ct.email?`<div class="contact-item"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="cn">${esc(ct.name)||'—'}</span>${ct.position?`<span class="cp">${esc(ct.position)}</span>`:''}</div>${ct.phone?`<div class="ci">📞 <a href="#" class="phone-link" data-phone="${esc(ct.phone)}" onclick="openPhoneMenu(event,this)">${esc(ct.phone)}</a></div>`:''}${(ct.extraPhones||[]).map(ph=>`<div class="ci">📞 <a href="#" class="phone-link" data-phone="${esc(ph)}" onclick="openPhoneMenu(event,this)">${esc(ph)}</a></div>`).join('')}${ct.email?`<div class="ci">✉️ <a href="mailto:${esc(ct.email)}">${esc(ct.email)}</a></div>`:''}</div>`:'').join('')}</div>`;})()}
@@ -5376,7 +5396,7 @@ function emailSelectedClients(){
 }
 
 // === CRUD CLIENTS ===
-function openAddClient(){ editClientId=null; ['c-company','c-sign','c-city','c-address','c-note','c-inn','c-nextcontact','c-servicemgr','c-payterms','c-shipping'].forEach(id=>document.getElementById(id).value=''); resetAddrRows([]); renderRegionOptions(); setRegionValue(''); document.getElementById('c-potential').value=''; document.getElementById('c-status').value='unknown'; renderNotWorkingOptions(); renderObjectCategoryOptions(); setNotWorkingReasons([]); onClientStatusChange(); document.getElementById('c-category').value=''; document.getElementById('c-revisit').value=''; setChannelBtns([]); setFormatBtns([]); resetGeoGroups(null); updGeoVisible(); document.querySelectorAll('#tag-selector input').forEach(cb=>cb.checked=false); (matchMedia('(max-width:600px)').matches?closeClientExtra():openClientExtra()); document.querySelector('#m-client h3').textContent='Новый клиент'; document.querySelector('#m-client .btn-primary').textContent='Добавить'; resetContacts(null); document.getElementById('c-owner-wrap').style.display='none'; document.getElementById('m-client').classList.add('open'); }
+function openAddClient(){ editClientId=null; ['c-company','c-sign','c-city','c-address','c-note','c-inn','c-nextcontact','c-servicemgr','c-payterms','c-shipping'].forEach(id=>document.getElementById(id).value=''); resetAddrRows([]); renderRegionOptions(); setRegionValue(''); document.getElementById('c-potential').value=''; document.getElementById('c-status').value='unknown'; renderNotWorkingOptions(); renderObjectCategoryOptions(); setNotWorkingReasons([]); onClientStatusChange(); document.getElementById('c-category').value=''; document.getElementById('c-revisit').value=''; setChannelBtns([]); setFormatBtns([]); resetGeoGroups(null); updGeoVisible(); document.querySelectorAll('#tag-selector input').forEach(cb=>cb.checked=false); applyAllFormSectionStates(); document.querySelector('#m-client h3').textContent='Новый клиент'; document.querySelector('#m-client .btn-primary').textContent='Добавить'; resetContacts(null); document.getElementById('c-owner-wrap').style.display='none'; document.getElementById('m-client').classList.add('open'); }
 // УЛУЧШЕНИЕ: Enter в модалке клиента работает так же, как клик по кнопке
 // «Сохранить»/«Добавить» — в полях компании, ИНН, региона, полях контактного
 // лица (имя/телефон/email) и т.д. В заметке (textarea) Enter, как обычно,
@@ -5464,9 +5484,7 @@ function saveClient(){
   }
 }
 function editClient(id){ const c=S.clients.find(x=>x.id===id); if(!c)return; editClientId=id; document.getElementById('c-company').value=c.company||''; document.getElementById('c-sign').value=c.sign||''; renderRegionOptions(); setRegionValue(c.region||''); document.getElementById('c-city').value=c.city||''; document.getElementById('c-address').value=c.address||''; resetAddrRows(c.extraAddresses); document.getElementById('c-inn').value=c.inn||''; document.getElementById('c-potential').value=formatAmountStatic(c.potential); document.getElementById('c-nextcontact').value=c.nextContact||''; document.getElementById('c-note').value=c.note||''; document.getElementById('c-status').value=c.status||'unknown'; renderNotWorkingOptions(); renderObjectCategoryOptions(); setNotWorkingReasons(c.notWorkingReasons||[]); onClientStatusChange(); document.getElementById('c-category').value=c.objectCategory||''; document.getElementById('c-revisit').value=c.revisitCadence||''; document.getElementById('c-servicemgr').value=c.serviceManager||''; document.getElementById('c-payterms').value=c.payTerms||''; document.getElementById('c-shipping').value=c.shipping||''; resetGeoGroups(c.geoLinks||[]); setChannelBtns(getChannels(c)); setFormatBtns(getFormats(c)); renderOwnerSelect(c.owner_id); updGeoVisible(); document.querySelectorAll('#tag-selector input').forEach(cb=>cb.checked=(c.tags||[]).includes(cb.value)); document.querySelector('#m-client h3').textContent='Изменить клиента'; document.querySelector('#m-client .btn-primary').textContent='Сохранить';
-  // Авто-раскрываем доп. поля если хоть одно заполнено
-  const hasExtra=c.inn||c.potential||getChannels(c).length||getFormats(c).length||c.region||c.city||c.address;
-  if(hasExtra) openClientExtra(); else closeClientExtra();
+  applyAllFormSectionStates();
   let cts=c.contacts;
   if(!cts||!cts.length){ cts=[{name:c.name||'',phone:c.phone||'+7 ',email:c.email||'',position:''}]; }
   resetContacts(cts);
@@ -6098,7 +6116,7 @@ function renderTpClientList(){
   let list=S.clients.slice();
   if(region)list=list.filter(c=>c.region===region);
   if(city)list=list.filter(c=>c.city===city);
-  if(q)list=list.filter(c=>(c.company||'').toLowerCase().includes(q)||(c.name||'').toLowerCase().includes(q)||(c.address||'').toLowerCase().includes(q)||(c.extraAddresses||[]).some(a=>a.toLowerCase().includes(q)));
+  if(q)list=list.filter(c=>(c.company||'').toLowerCase().includes(q)||(c.name||'').toLowerCase().includes(q)||(c.address||'').toLowerCase().includes(q)||(c.extraAddresses||[]).some(a=>{const item=typeof a==='string'?{city:'',address:a}:(a||{});return (item.city+' '+item.address).toLowerCase().includes(q);}));
   list.sort((a,b)=>(a.company||a.name||'').localeCompare(b.company||b.name||'','ru'));
   const el=document.getElementById('tp-client-list');
   if(!list.length){el.innerHTML='<div style="padding:14px;color:var(--t2);font-size:13px">Нет клиентов по фильтру</div>';}
