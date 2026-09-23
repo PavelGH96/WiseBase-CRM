@@ -2214,7 +2214,12 @@ button,a,select,label{touch-action:manipulation}
   <div id="c-notworking" role="group" aria-labelledby="lbl-c-notworking" style="display:flex;flex-direction:column;gap:4px;margin-top:4px"></div>
   <input type="text" id="c-notworking-other" placeholder="Свой вариант..." style="margin-top:6px;display:none">
 </div>
-<div class="form-sec-lbl">Контакты</div>
+<div class="collapsible-section">
+<div class="collapsible-toggle" id="cf-contacts-toggle" onclick="toggleFormSection('contacts')">
+  <span>Контакты</span>
+  <span class="coll-arrow" id="cf-contacts-arrow">▼</span>
+</div>
+<div class="collapsible-body" id="cf-contacts-body">
 <div class="fg" style="margin-bottom:6px">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
     <label style="margin-bottom:0" id="lbl-contacts-list">Контактные лица</label>
@@ -2223,15 +2228,24 @@ button,a,select,label{touch-action:manipulation}
   <div id="contacts-list" role="group" aria-labelledby="lbl-contacts-list"></div>
 </div>
 <div class="fg"><label for="c-nextcontact">📅 Следующий контакт</label><input type="date" id="c-nextcontact"></div>
-<div class="form-sec-lbl">Адрес</div>
+</div>
+</div>
+<div class="collapsible-section">
+<div class="collapsible-toggle" id="cf-address-toggle" onclick="toggleFormSection('address')">
+  <span>Адрес</span>
+  <span class="coll-arrow" id="cf-address-arrow">▼</span>
+</div>
+<div class="collapsible-body" id="cf-address-body">
 <div class="fg-row"><div class="fg"><label for="c-region">Регион</label><select id="c-region" onchange="onRegionChange()"><option value="">— не указан —</option></select></div><div class="fg"><label for="c-city">Город</label><input type="text" id="c-city" list="c-city-list" placeholder="Начните вводить название" autocomplete="off"><datalist id="c-city-list"></datalist></div></div>
 <div class="fg"><label for="c-address">Адрес</label><input type="text" id="c-address" autocomplete="street-address" placeholder="ул. Ленина, 1, офис 101"></div>
-<div class="fg ct-extra-wrap">
-  <div class="ct-extra-list" id="c-addr-extra-list"></div>
-  <button type="button" class="ct-add-phone" onclick="addAddrRow()">+ ещё адрес</button>
-  <div id="c-addr-warn" class="geo-warn" style="display:none"></div>
 </div>
-<div class="form-sec-lbl">Продажи</div>
+</div>
+<div class="collapsible-section">
+<div class="collapsible-toggle" id="cf-sales-toggle" onclick="toggleFormSection('sales')">
+  <span>Продажи</span>
+  <span class="coll-arrow" id="cf-sales-arrow">▼</span>
+</div>
+<div class="collapsible-body" id="cf-sales-body">
 <div class="fg-row"><div class="fg"><label for="c-potential">Потенциал (₽)</label><input type="text" inputmode="decimal" id="c-potential" placeholder="100 000" oninput="formatAmountInput(this)"></div><div class="fg"><label for="c-category">Категория объекта</label><select id="c-category"><option value="">— не указана —</option></select></div></div>
 <div class="fg-row">
   <div class="fg"><label id="lbl-channel-btns">Канал продаж</label>
@@ -2253,16 +2267,32 @@ button,a,select,label{touch-action:manipulation}
   <div class="fg"><label for="c-servicemgr">Сервис-менеджер</label><select id="c-servicemgr"><option value="">— не указан —</option><option value="Бизяева Екатерина">Бизяева Екатерина</option><option value="Килюшева Екатерина">Килюшева Екатерина</option><option value="Рукавцева Ольга">Рукавцева Ольга</option></select></div>
   <div class="fg"><label for="c-payterms">Условия оплаты</label><input type="text" id="c-payterms" placeholder="Например: отсрочка 14 дней"></div>
 </div>
+<div class="fg-row">
+  <div class="fg"><label for="c-paydelay">Отсрочка платежа, дни</label><input type="text" id="c-paydelay" inputmode="numeric" placeholder="14" oninput="this.value=this.value.replace(/\D/g,'')"></div>
+  <div class="fg"><label for="c-creditlimit">Кредитный лимит (₽)</label><input type="text" id="c-creditlimit" inputmode="decimal" placeholder="500 000" oninput="formatAmountInput(this)"></div>
+</div>
 <div class="fg"><label for="c-shipping">Отгрузка</label><select id="c-shipping"><option value="">— не указана —</option><option value="Прямая">Прямая</option><option value="РС">РС</option></select></div>
 <div id="c-srv-warn" class="geo-warn" style="display:none"></div>
-<!-- Геосервисы: появляются только у клиентов канала ФМА — там важны рейтинг и отзывы.
-     Точек может быть несколько (сеть по городам), поэтому список динамический —
-     поле «Город» показывается само, как только точек становится больше одной. -->
-<div id="c-geo-block" style="display:none">
-  <label id="lbl-c-geo" style="display:block;font-size:12px;font-weight:600;color:var(--t2);margin-bottom:4px">Геосервисы</label>
+</div>
+</div>
+<div class="collapsible-section">
+<div class="collapsible-toggle" id="cf-salons-toggle" onclick="toggleFormSection('salons')">
+  <span>Салоны / точки продаж</span>
+  <span class="coll-arrow" id="cf-salons-arrow">▼</span>
+</div>
+<div class="collapsible-body" id="cf-salons-body">
+<!-- Салоны/точки клиента: город + адрес + ссылки на 2ГИС/Яндекс Карты — всё вместе
+     в одной строке, чтобы сразу было видно, какие ссылки к какому салону относятся.
+     Раньше это были два разных списка (адреса и геоссылки отдельно, последний —
+     только для канала ФМА); объединены в один, доступный всем. Поле «Город»
+     показывается само, как только точек становится больше одной. -->
+<div id="c-geo-block">
   <div id="c-geo-warn" class="geo-warn" style="display:none"></div>
   <div id="c-geo-list" role="group" aria-labelledby="lbl-c-geo"></div>
   <button type="button" class="ct-add-phone" onclick="addGeoGroup()">+ добавить точку</button>
+
+</div>
+</div>
 </div>
 <div class="collapsible-section">
 <div class="collapsible-toggle" id="cf-revisit-toggle" onclick="toggleFormSection('revisit')">
@@ -2290,6 +2320,15 @@ button,a,select,label{touch-action:manipulation}
 <div class="collapsible-body" id="cf-note-body">
 <div class="fg"><label for="c-note">Заметка</label><textarea id="c-note" placeholder="Источник лида..."></textarea></div>
 </div>
+</div>
+<div class="collapsible-section">
+<div class="collapsible-toggle" id="cf-web-toggle" onclick="toggleFormSection('web')">
+  <span>Сайт и ссылки</span>
+  <span class="coll-arrow" id="cf-web-arrow">▼</span>
+</div>
+<div class="collapsible-body" id="cf-web-body">
+<div class="ct-extra-list" id="c-web-list"></div>
+<button type="button" class="ct-add-phone" onclick="addWebsiteRow()">+ добавить ссылку</button>
 </div>
 </div>
 <div class="mfoot"><button class="btn btn-ghost" onclick="cancelClientModal()">Отмена</button><button class="btn btn-primary" onclick="saveClientToDb()">Добавить</button></div></div></div>
@@ -2363,6 +2402,16 @@ button,a,select,label{touch-action:manipulation}
 </div></div>
 
 <div class="overlay" id="m-confirm" role="dialog" aria-modal="true" aria-labelledby="conf-title"><div class="conf-modal"><h3 id="conf-title">Подтвердите</h3><p id="conf-msg"></p><div class="mfoot"><button class="btn btn-ghost" onclick="closeModal('m-confirm')">Отмена</button><button class="btn btn-danger" id="conf-ok">Удалить</button></div></div></div>
+<!-- ОБЪЕДИНЕНИЕ РАЗНЫХ ЮР. ЛИЦ В ОДИН ХОЛДИНГ -->
+<div class="overlay" id="m-holding-search" role="dialog" aria-modal="true" aria-labelledby="m-holding-search-title">
+  <div class="conf-modal">
+    <h3 id="m-holding-search-title">Объединить с другим юр. лицом</h3>
+    <p style="font-size:12px;color:var(--t2);margin:-4px 0 10px">Найдите клиента, который фактически то же самое юр. лицо или тот же холдинг — например, другое название или форма собственности того же бизнеса.</p>
+    <input type="text" id="holding-search-input" placeholder="Начните вводить название..." oninput="renderHoldingSearchResults()" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-s);background:var(--card);color:var(--text);outline:none;box-sizing:border-box">
+    <div id="holding-search-results" style="max-height:260px;overflow-y:auto;margin-top:8px;display:flex;flex-direction:column;gap:4px"></div>
+    <div class="mfoot"><button class="btn btn-ghost" onclick="closeModal('m-holding-search')">Закрыть</button></div>
+  </div>
+</div>
 <!-- МАССОВЫЙ ПЕРЕНОС ДАТЫ ЗАДАЧ -->
 <div class="overlay" id="m-bulk-date" role="dialog" aria-modal="true" aria-labelledby="m-bulk-date-title">
   <div class="conf-modal">
@@ -2757,7 +2806,7 @@ const TODAY=today();
 // новой присланной версии). Показывается в Профиле, чтобы можно было сверить «то, что
 // открыто на телефоне» с «тем, что прислали только что» — без гадания, обновился
 // ли сайт после деплоя на хостинг.
-const APP_BUILD='13.09.2026 · ver 25';
+const APP_BUILD='13.09.2026 · ver 29';
 // Преобразует Date обратно в строку 'YYYY-MM-DD' по ЛОКАЛЬНЫМ компонентам (не UTC) — пара к today().
 function dateToLocalStr(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 // Парсит строку 'YYYY-MM-DD' как ЛОКАЛЬНУЮ дату (полночь по местному времени), а не UTC.
@@ -2887,6 +2936,12 @@ function formatAmountStatic(n){
   const digits=String(Math.round(Number(n||0))).replace(/\D/g,'');
   if(!digits||digits==='0')return '';
   return digits.replace(/\B(?=(\d{3})+(?!\d))/g,'\u00A0');
+}
+// Сумма с пробелами (обычный или неразрывный, formatAmountInput расставляет
+// неразрывный) → чистое число для сохранения в БД.
+function parseAmountInput(el){
+  const digits=(el.value||'').replace(/[\s\u00A0]/g,'');
+  return digits?Number(digits):null;
 }
 // Телефон необязателен, но если что-то введено — после +7 должно быть ровно 10 цифр.
 function isValidPhoneOrEmpty(phone){
@@ -3043,18 +3098,15 @@ function applyFormSectionState(key){
   if(toggle)toggle.classList.toggle('open',!collapsed);
 }
 function applyAllFormSectionStates(){
-  ['revisit','tags','note'].forEach(applyFormSectionState);
+  ['contacts','address','sales','salons','revisit','tags','note','web'].forEach(applyFormSectionState);
 }
 function toggleChannel(btn){
   btn.classList.toggle('active');
   const on=btn.classList.contains('active');
   btn.setAttribute('aria-pressed',on);
   btn.textContent=on?'✓ '+btn.dataset.ch:btn.dataset.ch;
-  // Геосервисы привязаны к каналу ФМА — реагируем сразу
-  if(btn.closest('#c-channel-btns'))updGeoVisible();
 }
 function setChannelBtns(arr){
-  setTimeout(updGeoVisible,0);
   document.querySelectorAll('#c-channel-btns .ch-btn').forEach(b=>{
     const on=(arr||[]).includes(b.dataset.ch);
     b.classList.toggle('active',on);
@@ -4711,24 +4763,6 @@ function updSrvWarn(){
   } else w.style.display='none';
 }
 
-// Та же защита для дополнительных адресов — колонка extra_addresses могла ещё не
-// попасть в базу на момент открытия приложения.
-let HAS_ADDR_COLS=null;
-async function addrColsProbe(){
-  try{
-    const {error}=await sb.from('clients').select('extra_addresses').limit(1);
-    HAS_ADDR_COLS=!error;
-  }catch(_){ HAS_ADDR_COLS=false; }
-  updAddrWarn();
-}
-function updAddrWarn(){
-  const w=document.getElementById('c-addr-warn'); if(!w)return;
-  if(HAS_ADDR_COLS===false){
-    w.style.display='';
-    w.textContent='Дополнительные адреса не сохранятся: в базе нет колонки extra_addresses. Выполните SQL-миграцию (см. инструкцию), затем перезагрузите страницу.';
-  } else w.style.display='none';
-}
-
 let HAS_GEO_COLS=null;   // null — ещё не проверяли, true/false — результат пробы
 async function geoColsProbe(){
   try{
@@ -4745,12 +4779,6 @@ function updGeoWarn(){
   } else w.style.display='none';
 }
 // Показать/скрыть блок геосервисов по текущему выбору каналов в форме
-function updGeoVisible(){
-  const on=[...document.querySelectorAll('#c-channel-btns .ch-btn')].some(b=>b.dataset.ch==='ФМА'&&b.getAttribute('aria-pressed')==='true');
-  const blk=document.getElementById('c-geo-block');
-  if(blk)blk.style.display=on?'':'none';
-  if(on)updGeoWarn();
-}
 // Нормализуем: человек может вставить ссылку без протокола
 function normGeoUrl(v){
   v=(v||'').trim();
@@ -4763,12 +4791,18 @@ let geoGroupCounter=0;
 // городам), поэтому это повторяемый блок, как контакты, а не фиксированная пара полей.
 function mkGeoGroupRow(data){
   const id='gg'+(++geoGroupCounter);
-  const city=data?.city||'', g2=data?.map2gis||'', ym=data?.mapYandex||'';
+  const city=data?.city||'', addr=data?.address||'', g2=data?.map2gis||'', ym=data?.mapYandex||'';
   return `<div class="geo-group" id="${id}">
     <button type="button" class="contact-del" onclick="removeGeoGroup('${id}')" title="Удалить точку" aria-label="Удалить точку">✕</button>
-    <div class="fg geo-city-fg" style="display:none">
-      <label for="${id}-city">Город</label>
-      <input type="text" id="${id}-city" class="geo-city" placeholder="Например, Екатеринбург" value="${esc(city)}">
+    <div class="fg-row">
+      <div class="fg geo-city-fg" style="display:none">
+        <label for="${id}-city">Город</label>
+        <input type="text" id="${id}-city" class="geo-city" placeholder="Например, Екатеринбург" value="${esc(city)}">
+      </div>
+      <div class="fg">
+        <label for="${id}-addr">Адрес</label>
+        <input type="text" id="${id}-addr" class="geo-addr" placeholder="ул. Ленина, 1" value="${esc(addr)}">
+      </div>
     </div>
     <div class="fg-row">
       <div class="fg">
@@ -4785,12 +4819,31 @@ function mkGeoGroupRow(data){
 // Полностью пересобрать список точек — используется при открытии формы (openAddClient
 // даёт [], editClient — c.geoLinks). Всегда хотя бы одна пустая точка, чтобы было куда
 // сразу вписать ссылки типичному клиенту с одним адресом.
-function resetGeoGroups(geoLinks){
+// Объединяем старые «Геосервисы» (город+ссылки) и «Дополнительные адреса»
+// (город+адрес) в один список точек — раньше это были два независимых списка,
+// и было непонятно, какая ссылка на карту относится к какому салону. Слияние по
+// городу (без учёта регистра): если город совпал — забираем адрес из одного
+// списка и ссылки из другого в одну точку. Несовпавшие остатки добавляются
+// отдельными точками, чтобы ничего из старых данных не потерялось.
+function mergeGeoAndAddresses(geoLinks, extraAddresses){
+  const geo=(geoLinks||[]).map(g=>({city:g.city||'', address:g.address||'', map2gis:g.map2gis||'', mapYandex:g.mapYandex||''}));
+  const extra=(extraAddresses||[]).map(a=>typeof a==='string'?{city:'',address:a}:{city:a?.city||'',address:a?.address||''});
+  const usedExtra=new Set();
+  geo.forEach(g=>{
+    if(g.address||!g.city)return; // уже есть адрес, или нечего сопоставлять по городу
+    const idx=extra.findIndex((e,i)=>!usedExtra.has(i)&&e.city.trim().toLowerCase()===g.city.trim().toLowerCase()&&e.address);
+    if(idx!==-1){ g.address=extra[idx].address; usedExtra.add(idx); }
+  });
+  extra.forEach((e,i)=>{ if(!usedExtra.has(i)&&(e.city||e.address)) geo.push({city:e.city,address:e.address,map2gis:'',mapYandex:''}); });
+  return geo;
+}
+function resetGeoGroups(geoLinks, extraAddresses){
   const list=document.getElementById('c-geo-list');
   if(!list)return;
   list.innerHTML='';
   geoGroupCounter=0;
-  if(geoLinks&&geoLinks.length){ geoLinks.forEach(g=>list.insertAdjacentHTML('beforeend', mkGeoGroupRow(g))); }
+  const merged=mergeGeoAndAddresses(geoLinks, extraAddresses);
+  if(merged.length){ merged.forEach(g=>list.insertAdjacentHTML('beforeend', mkGeoGroupRow(g))); }
   else{ list.insertAdjacentHTML('beforeend', mkGeoGroupRow()); }
   updGeoCityVisibility();
   updGeoLinks();
@@ -4850,11 +4903,49 @@ function getGeoLinks(){
   return [...document.querySelectorAll('#c-geo-list .geo-group')].map(g=>{
     const id=g.id;
     const city=(document.getElementById(id+'-city')||{}).value?.trim()||'';
+    const address=(document.getElementById(id+'-addr')||{}).value?.trim()||'';
     const map2gis=normGeoUrl((document.getElementById(id+'-2gis')||{}).value);
     const mapYandex=normGeoUrl((document.getElementById(id+'-ymaps')||{}).value);
-    return {city, map2gis, mapYandex};
-  }).filter(g=>g.city||g.map2gis||g.mapYandex);
+    return {city, address, map2gis, mapYandex};
+  }).filter(g=>g.city||g.address||g.map2gis||g.mapYandex);
 }
+
+// === САЙТ И ССЫЛКИ КЛИЕНТА ===
+// Сколько угодно строк «подпись + ссылка» — сайт, группа ВК, Instagram и т.п.
+// Тот же принцип добавления/удаления строки, что у точек продаж и телефонов контакта.
+let webRowCounter=0;
+function mkWebsiteRow(label,url){
+  const id='wr'+(++webRowCounter);
+  return `<div class="ct-extra-row" id="${id}">
+    <input type="text" class="c-web-label" placeholder="Сайт" value="${esc(label||'')}" style="max-width:110px;flex:0 0 auto">
+    <input type="url" class="c-web-url" placeholder="https://..." value="${esc(url||'')}">
+    <button type="button" class="ct-phone-del" onclick="removeWebsiteRow('${id}')" title="Удалить ссылку" aria-label="Удалить ссылку">✕</button>
+  </div>`;
+}
+function addWebsiteRow(label,url){
+  const list=document.getElementById('c-web-list');
+  if(!list)return;
+  // Первой строке по умолчанию подставляем подпись «Сайт» — обычно так и есть,
+  // но поле остаётся редактируемым, если нужно что-то другое.
+  const isFirst=!list.children.length;
+  list.insertAdjacentHTML('beforeend', mkWebsiteRow(label!=null?label:(isFirst?'Сайт':''), url));
+}
+function removeWebsiteRow(id){
+  const el=document.getElementById(id); if(el)el.remove();
+}
+function resetWebsiteRows(websites){
+  const list=document.getElementById('c-web-list');
+  if(!list)return;
+  list.innerHTML='';
+  (websites||[]).forEach(w=>list.insertAdjacentHTML('beforeend', mkWebsiteRow(w?.label, w?.url)));
+}
+function getWebsites(){
+  return [...document.querySelectorAll('#c-web-list .ct-extra-row')].map(row=>({
+    label: row.querySelector('.c-web-label').value.trim(),
+    url: normGeoUrl(row.querySelector('.c-web-url').value),
+  })).filter(w=>w.label||w.url);
+}
+
 // Периодичность повторного визита -> сколько дней прибавлять к дате визита для расчёта next_visit_date.
 const REVISIT_DAYS={'3m':90,'6m':180,'12m':365,'never':null};
 const REVISIT_L={'3m':'через 3 месяца','6m':'через 6 месяцев','12m':'через 12 месяцев','never':'никогда'};
@@ -4871,48 +4962,6 @@ function migrateClientStatuses(){
   });
 }
 let listSortCol='name', listSortDir=1; // for list-view column sort
-
-// === ДОПОЛНИТЕЛЬНЫЕ АДРЕСА КЛИЕНТА ===
-// У части клиентов несколько салонов/точек продаж — одно поле «Адрес» этого не
-// покрывало. Тот же принцип, что у geo-групп выше (добавить/убрать строку), но
-// доступно всем клиентам, а не только каналу ФМА, и без привязки к городу/картам —
-// просто список адресов. Первый адрес остаётся в обычном поле «Адрес» (обратная
-// совместимость со старыми данными), это — только ДОПОЛНИТЕЛЬНЫЕ.
-let addrRowCounter=0;
-function mkAddrRow(city,address){
-  const id='ar'+(++addrRowCounter);
-  return `<div class="ct-extra-row addr-extra-row" id="${id}">
-    <input type="text" class="c-addr-extra-city" placeholder="Город" value="${esc(city||'')}" style="max-width:130px;flex:0 0 auto">
-    <input type="text" class="c-addr-extra-addr" placeholder="Ещё один адрес салона" value="${esc(address||'')}">
-    <button type="button" class="ct-phone-del" onclick="removeAddrRow('${id}')" title="Удалить адрес" aria-label="Удалить адрес">✕</button>
-  </div>`;
-}
-function addAddrRow(city,address){
-  const list=document.getElementById('c-addr-extra-list');
-  if(!list)return;
-  list.insertAdjacentHTML('beforeend', mkAddrRow(city,address));
-}
-function removeAddrRow(id){
-  const el=document.getElementById(id); if(el)el.remove();
-}
-// Пересобрать список — при открытии формы: openAddClient даёт [], editClient — c.extraAddresses.
-// Раньше это были просто строки (без города) — старые данные в таком виде читаем
-// как {city:'', address: строка}, чтобы ничего не потерялось и не сломалось.
-function resetAddrRows(extraAddresses){
-  const list=document.getElementById('c-addr-extra-list');
-  if(!list)return;
-  list.innerHTML='';
-  (extraAddresses||[]).forEach(a=>{
-    const item=typeof a==='string'?{city:'',address:a}:(a||{});
-    list.insertAdjacentHTML('beforeend', mkAddrRow(item.city,item.address));
-  });
-}
-function getExtraAddresses(){
-  return [...document.querySelectorAll('#c-addr-extra-list .addr-extra-row')].map(row=>({
-    city: row.querySelector('.c-addr-extra-city').value.trim(),
-    address: row.querySelector('.c-addr-extra-addr').value.trim(),
-  })).filter(a=>a.city||a.address);
-}
 
 function getDaysWithoutContact(c){
   // Use stored lastContact, or scan history/completed tasks
@@ -5240,14 +5289,42 @@ function renderClientDetailHTML(c){
       ${getFormats(c).length?`<div class="info-it"><span>Формат клиента</span><strong style="display:flex;gap:4px;flex-wrap:wrap">${getFormats(c).map(f=>`<span style="padding:2px 8px;border-radius:20px;font-size:12px;font-weight:500;background:var(--blue-bg);color:var(--blue)">${f}</span>`).join('')}</strong></div>`:''}
       ${c.serviceManager?`<div class="info-it"><span>Сервис-менеджер</span><strong>${esc(c.serviceManager)}</strong></div>`:''}
       ${c.payTerms?`<div class="info-it"><span>Условия оплаты</span><strong>${esc(c.payTerms)}</strong></div>`:''}
+      ${c.paymentDelayDays!=null?`<div class="info-it"><span>Отсрочка платежа</span><strong>${c.paymentDelayDays} ${pluralRu(c.paymentDelayDays,'день','дня','дней')}</strong></div>`:''}
+      ${c.creditLimit!=null?`<div class="info-it"><span>Кредитный лимит</span><strong>${RM(c.creditLimit)}</strong></div>`:''}
+      ${(c.websites||[]).length?`<div class="info-it" style="grid-column:1/-1"><span>Сайт и ссылки</span><strong style="display:flex;gap:8px;flex-wrap:wrap">${c.websites.map(w=>w.url?`<a href="${esc(w.url)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${esc(w.label||w.url)}</a>`:'').join('')}</strong></div>`:''}
       ${c.shipping?`<div class="info-it"><span>Отгрузка</span><strong>${esc(c.shipping)}</strong></div>`:''}
       ${c.sign?`<div class="info-it"><span>Вывеска</span><strong>${esc(c.sign)}</strong></div>`:''}
       ${c.region?`<div class="info-it"><span>Регион</span><strong>${esc(c.region)}</strong></div>`:''}
       ${c.city?`<div class="info-it"><span>Город</span><strong>${esc(c.city)}</strong></div>`:''}
       ${c.address?`<div class="info-it" style="grid-column:1/-1"><span>Адрес</span><strong>${esc(c.address)}</strong></div>`:''}
-      ${(c.extraAddresses||[]).map(a=>{const item=typeof a==='string'?{city:'',address:a}:(a||{});const txt=[item.city,item.address].filter(Boolean).join(', ');return txt?`<div class="info-it" style="grid-column:1/-1"><span>Ещё адрес</span><strong>${esc(txt)}</strong></div>`:'';}).join('')}
+      ${mergeGeoAndAddresses(c.geoLinks,c.extraAddresses).map(p=>{
+        const txt=[p.city,p.address].filter(Boolean).join(', ');
+        if(!txt&&!p.map2gis&&!p.mapYandex)return '';
+        const links=[
+          p.map2gis?`<a class="geo-link" href="${esc(p.map2gis)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">📍 2ГИС</a>`:'',
+          p.mapYandex?`<a class="geo-link" href="${esc(p.mapYandex)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">📍 Яндекс</a>`:'',
+        ].filter(Boolean).join(' ');
+        return `<div class="info-it" style="grid-column:1/-1"><span>Ещё салон</span><strong>${esc(txt)||'—'}${links?' '+links:''}</strong></div>`;
+      }).join('')}
       ${c.note?`<div class="info-it note-it" style="grid-column:1/-1"><span>Заметка</span><em class="note-preview" tabindex="0" style="color:var(--t2)">${esc(c.note)}</em></div>`:''}
     </div>
+    ${(()=>{
+      const siblings=getHoldingSiblings(c);
+      if(!c.holdingId){
+        return `<div style="margin-bottom:14px"><button class="btn btn-ghost btn-sm" onclick="openHoldingSearch(${c.id})">🏢 Объединить с другим юр. лицом</button></div>`;
+      }
+      return mkSecHeader('holding',`🏢 Холдинг (${siblings.length+1} юр. лица)`)+`<div class="contacts-block" style="margin-bottom:14px;${UIP.detailCollapsed?.holding?'display:none':''}">
+        ${siblings.map(s=>`<div class="contact-item" style="cursor:pointer" onclick="showPage('clients');selectClient(${s.id})">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+            <span class="cn">${esc(s.company||s.name)}</span>
+          </div>
+        </div>`).join('')}
+        <div style="display:flex;gap:8px;margin-top:6px;flex-wrap:wrap">
+          <button class="btn btn-ghost btn-sm" onclick="openHoldingSearch(${c.id})">+ Добавить ещё</button>
+          <button class="btn btn-ghost btn-sm" onclick="unlinkFromHolding(${c.id})">Исключить из холдинга</button>
+        </div>
+      </div>`;
+    })()}
     ${(()=>{const cts=c.contacts&&c.contacts.length?c.contacts:[{name:c.name||'',phone:c.phone||'',email:c.email||'',position:''}];const hasAny=cts.some(ct=>ct.name||ct.phone||ct.email);if(!hasAny)return '';return mkSecHeader('contacts','👤 Контактные лица')+`<div class="contacts-block" style="${UIP.detailCollapsed?.contacts?'display:none':''}" style="margin-bottom:14px">${cts.map(ct=>ct.name||ct.phone||ct.email?`<div class="contact-item"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="cn">${esc(ct.name)||'—'}</span>${ct.position?`<span class="cp">${esc(ct.position)}</span>`:''}</div>${ct.phone?`<div class="ci">📞 <a href="#" class="phone-link" data-phone="${esc(ct.phone)}" onclick="openPhoneMenu(event,this)">${esc(ct.phone)}</a></div>`:''}${(ct.extraPhones||[]).map(ph=>`<div class="ci">📞 <a href="#" class="phone-link" data-phone="${esc(ph)}" onclick="openPhoneMenu(event,this)">${esc(ph)}</a></div>`).join('')}${ct.email?`<div class="ci">✉️ <a href="mailto:${esc(ct.email)}">${esc(ct.email)}</a></div>`:''}</div>`:'').join('')}</div>`;})()}
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
       <div class="sec-lbl detail-sec-hd" style="margin-bottom:0" onclick="toggleDetailSection('offers',event)" role="button" tabindex="0" aria-expanded="${!(UIP.detailCollapsed?.offers)}" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleDetailSection('offers',event);}"><span class="detail-sec-chev">${UIP.detailCollapsed?.offers?'▸':'▾'}</span>💼 Предложения</div>
@@ -5396,7 +5473,7 @@ function emailSelectedClients(){
 }
 
 // === CRUD CLIENTS ===
-function openAddClient(){ editClientId=null; ['c-company','c-sign','c-city','c-address','c-note','c-inn','c-nextcontact','c-servicemgr','c-payterms','c-shipping'].forEach(id=>document.getElementById(id).value=''); resetAddrRows([]); renderRegionOptions(); setRegionValue(''); document.getElementById('c-potential').value=''; document.getElementById('c-status').value='unknown'; renderNotWorkingOptions(); renderObjectCategoryOptions(); setNotWorkingReasons([]); onClientStatusChange(); document.getElementById('c-category').value=''; document.getElementById('c-revisit').value=''; setChannelBtns([]); setFormatBtns([]); resetGeoGroups(null); updGeoVisible(); document.querySelectorAll('#tag-selector input').forEach(cb=>cb.checked=false); applyAllFormSectionStates(); document.querySelector('#m-client h3').textContent='Новый клиент'; document.querySelector('#m-client .btn-primary').textContent='Добавить'; resetContacts(null); document.getElementById('c-owner-wrap').style.display='none'; document.getElementById('m-client').classList.add('open'); }
+function openAddClient(){ editClientId=null; ['c-company','c-sign','c-city','c-address','c-note','c-inn','c-nextcontact','c-servicemgr','c-payterms','c-paydelay','c-creditlimit','c-shipping'].forEach(id=>document.getElementById(id).value=''); renderRegionOptions(); setRegionValue(''); document.getElementById('c-potential').value=''; document.getElementById('c-status').value='unknown'; renderNotWorkingOptions(); renderObjectCategoryOptions(); setNotWorkingReasons([]); onClientStatusChange(); document.getElementById('c-category').value=''; document.getElementById('c-revisit').value=''; setChannelBtns([]); setFormatBtns([]); resetGeoGroups(null,null); updGeoWarn(); resetWebsiteRows(null); document.querySelectorAll('#tag-selector input').forEach(cb=>cb.checked=false); applyAllFormSectionStates(); document.querySelector('#m-client h3').textContent='Новый клиент'; document.querySelector('#m-client .btn-primary').textContent='Добавить'; resetContacts(null); document.getElementById('c-owner-wrap').style.display='none'; document.getElementById('m-client').classList.add('open'); }
 // УЛУЧШЕНИЕ: Enter в модалке клиента работает так же, как клик по кнопке
 // «Сохранить»/«Добавить» — в полях компании, ИНН, региона, полях контактного
 // лица (имя/телефон/email) и т.д. В заметке (textarea) Enter, как обычно,
@@ -5483,7 +5560,7 @@ function saveClient(){
     proceedSaveClient2();
   }
 }
-function editClient(id){ const c=S.clients.find(x=>x.id===id); if(!c)return; editClientId=id; document.getElementById('c-company').value=c.company||''; document.getElementById('c-sign').value=c.sign||''; renderRegionOptions(); setRegionValue(c.region||''); document.getElementById('c-city').value=c.city||''; document.getElementById('c-address').value=c.address||''; resetAddrRows(c.extraAddresses); document.getElementById('c-inn').value=c.inn||''; document.getElementById('c-potential').value=formatAmountStatic(c.potential); document.getElementById('c-nextcontact').value=c.nextContact||''; document.getElementById('c-note').value=c.note||''; document.getElementById('c-status').value=c.status||'unknown'; renderNotWorkingOptions(); renderObjectCategoryOptions(); setNotWorkingReasons(c.notWorkingReasons||[]); onClientStatusChange(); document.getElementById('c-category').value=c.objectCategory||''; document.getElementById('c-revisit').value=c.revisitCadence||''; document.getElementById('c-servicemgr').value=c.serviceManager||''; document.getElementById('c-payterms').value=c.payTerms||''; document.getElementById('c-shipping').value=c.shipping||''; resetGeoGroups(c.geoLinks||[]); setChannelBtns(getChannels(c)); setFormatBtns(getFormats(c)); renderOwnerSelect(c.owner_id); updGeoVisible(); document.querySelectorAll('#tag-selector input').forEach(cb=>cb.checked=(c.tags||[]).includes(cb.value)); document.querySelector('#m-client h3').textContent='Изменить клиента'; document.querySelector('#m-client .btn-primary').textContent='Сохранить';
+function editClient(id){ const c=S.clients.find(x=>x.id===id); if(!c)return; editClientId=id; document.getElementById('c-company').value=c.company||''; document.getElementById('c-sign').value=c.sign||''; renderRegionOptions(); setRegionValue(c.region||''); document.getElementById('c-city').value=c.city||''; document.getElementById('c-address').value=c.address||''; document.getElementById('c-inn').value=c.inn||''; document.getElementById('c-potential').value=formatAmountStatic(c.potential); document.getElementById('c-nextcontact').value=c.nextContact||''; document.getElementById('c-note').value=c.note||''; document.getElementById('c-status').value=c.status||'unknown'; renderNotWorkingOptions(); renderObjectCategoryOptions(); setNotWorkingReasons(c.notWorkingReasons||[]); onClientStatusChange(); document.getElementById('c-category').value=c.objectCategory||''; document.getElementById('c-revisit').value=c.revisitCadence||''; document.getElementById('c-servicemgr').value=c.serviceManager||''; document.getElementById('c-payterms').value=c.payTerms||''; document.getElementById('c-paydelay').value=c.paymentDelayDays!=null?c.paymentDelayDays:''; document.getElementById('c-creditlimit').value=formatAmountStatic(c.creditLimit); document.getElementById('c-shipping').value=c.shipping||''; resetGeoGroups(c.geoLinks||[], c.extraAddresses); resetWebsiteRows(c.websites); setChannelBtns(getChannels(c)); setFormatBtns(getFormats(c)); renderOwnerSelect(c.owner_id); updGeoWarn(); document.querySelectorAll('#tag-selector input').forEach(cb=>cb.checked=(c.tags||[]).includes(cb.value)); document.querySelector('#m-client h3').textContent='Изменить клиента'; document.querySelector('#m-client .btn-primary').textContent='Сохранить';
   applyAllFormSectionStates();
   let cts=c.contacts;
   if(!cts||!cts.length){ cts=[{name:c.name||'',phone:c.phone||'+7 ',email:c.email||'',position:''}]; }
@@ -6116,7 +6193,7 @@ function renderTpClientList(){
   let list=S.clients.slice();
   if(region)list=list.filter(c=>c.region===region);
   if(city)list=list.filter(c=>c.city===city);
-  if(q)list=list.filter(c=>(c.company||'').toLowerCase().includes(q)||(c.name||'').toLowerCase().includes(q)||(c.address||'').toLowerCase().includes(q)||(c.extraAddresses||[]).some(a=>{const item=typeof a==='string'?{city:'',address:a}:(a||{});return (item.city+' '+item.address).toLowerCase().includes(q);}));
+  if(q)list=list.filter(c=>(c.company||'').toLowerCase().includes(q)||(c.name||'').toLowerCase().includes(q)||(c.address||'').toLowerCase().includes(q)||mergeGeoAndAddresses(c.geoLinks,c.extraAddresses).some(p=>(p.city+' '+p.address).toLowerCase().includes(q)));
   list.sort((a,b)=>(a.company||a.name||'').localeCompare(b.company||b.name||'','ru'));
   const el=document.getElementById('tp-client-list');
   if(!list.length){el.innerHTML='<div style="padding:14px;color:var(--t2);font-size:13px">Нет клиентов по фильтру</div>';}
@@ -7663,7 +7740,6 @@ function localInit(){
   registerSW();
   geoColsProbe();   // есть в базе колонки под геосервисы
   srvColsProbe();   // есть ли колонки под сервис-менеджера / условия оплаты / отгрузку
-  addrColsProbe();  // есть ли колонка под дополнительные адреса
   initAutoGrowNotes(); // авто-высота полей «Заметка» в модалках
   loadAdminViewOwners(); // персональный фильтр видимости учёток (только для админа)
   initVoiceInputButtons(); // кнопки микрофона на текстовые поля заметок/комментариев
@@ -8309,6 +8385,8 @@ function dbToClient(row, history) {
     geoLinks: row.geo_links || [],
     extraAddresses: row.extra_addresses || [],
     serviceManager: row.service_manager || '', payTerms: row.payment_terms || '', shipping: row.shipping || '',
+    paymentDelayDays: row.payment_delay_days ?? null, creditLimit: row.credit_limit ?? null,
+    websites: row.websites || [], holdingId: row.holding_id || null,
     revisitCadence: row.revisit_cadence || '', nextVisitDate: row.next_visit_date || '',
     channels: row.channels || [], formats: row.formats || [], contacts: row.contacts || [],
     note: row.note || '', tags: row.tags || [], avatar: row.avatar || '', color: row.color || COLS[0],
@@ -8346,6 +8424,11 @@ function clientToDbFields(c) {
     // Отправляем только если колонка реально существует — иначе Supabase отклонит
     // весь запрос, и клиент вообще не сохранится.
     ...(HAS_GEO_COLS!==false ? {geo_links: c.geoLinks||[]} : {}),
+    ...(HAS_SRV_COLS!==false ? {
+      service_manager: c.serviceManager||'', payment_terms: c.payTerms||'', shipping: c.shipping||'',
+    } : {}),
+    payment_delay_days: c.paymentDelayDays ?? null, credit_limit: c.creditLimit ?? null,
+    websites: c.websites||[], holding_id: c.holdingId||null,
   };
 }
 function taskToDbFields(t) {
@@ -8615,7 +8698,9 @@ async function saveClientToDb() {
       payment_terms: document.getElementById('c-payterms').value.trim(),
       shipping: document.getElementById('c-shipping').value.trim(),
     } : {}),
-    ...(HAS_ADDR_COLS!==false ? { extra_addresses: getExtraAddresses() } : {}),
+    payment_delay_days: document.getElementById('c-paydelay').value.trim()?Number(document.getElementById('c-paydelay').value.trim()):null,
+    credit_limit: parseAmountInput(document.getElementById('c-creditlimit')),
+    websites: getWebsites(),
   };
   if(editClientId){
     // Ответственного может сменить только admin/manager, и только осознанно — через видимое
@@ -8674,6 +8759,72 @@ async function saveClientToDb() {
   }
 }
 
+// === ОБЪЕДИНЕНИЕ РАЗНЫХ ЮР. ЛИЦ В ОДИН ХОЛДИНГ ===
+// Клиенты с одинаковым holdingId считаются одним реальным бизнесом под разными
+// юридическими названиями (например, ООО и ИП собственника). Группа держится на
+// общем текстовом id — при первом объединении генерируем его сами ('h'+меньший
+// из двух id), при последующих подключениях новый участник просто получает уже
+// существующий id группы.
+let _holdingSearchClientId=null;
+function getHoldingSiblings(c){
+  if(!c || !c.holdingId) return [];
+  return scopedClients().filter(x=>x.holdingId===c.holdingId && x.id!==c.id);
+}
+function openHoldingSearch(clientId){
+  _holdingSearchClientId=clientId;
+  document.getElementById('holding-search-input').value='';
+  document.getElementById('holding-search-results').innerHTML='';
+  document.getElementById('m-holding-search').classList.add('open');
+  setTimeout(()=>document.getElementById('holding-search-input').focus(),50);
+}
+function renderHoldingSearchResults(){
+  const q=(document.getElementById('holding-search-input').value||'').trim().toLowerCase();
+  const el=document.getElementById('holding-search-results');
+  if(!q){ el.innerHTML=''; return; }
+  const c=S.clients.find(x=>x.id===_holdingSearchClientId);
+  const already=new Set([_holdingSearchClientId, ...getHoldingSiblings(c).map(s=>s.id)]);
+  const matches=scopedClients()
+    .filter(x=>!already.has(x.id) && ((x.company||'').toLowerCase().includes(q) || (x.name||'').toLowerCase().includes(q)))
+    .slice(0,15);
+  if(!matches.length){ el.innerHTML='<div style="font-size:12px;color:var(--t2);padding:6px 2px">Ничего не найдено</div>'; return; }
+  el.innerHTML=matches.map(m=>`<div class="contact-item" style="cursor:pointer" onclick="linkClientToHolding(${_holdingSearchClientId},${m.id})">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+      <span class="cn">${esc(m.company||m.name)}</span>
+      ${m.holdingId?'<span style="font-size:11px;color:var(--t2)">уже в холдинге</span>':''}
+    </div>
+  </div>`).join('');
+}
+async function linkClientToHolding(clientId, otherId){
+  const c1=S.clients.find(x=>x.id===clientId), c2=S.clients.find(x=>x.id===otherId);
+  if(!c1||!c2)return;
+  // Если у одного или обоих уже была группа — используем существующий id (не плодим
+  // новый), приоритет — группе первого клиента. Если группы не было ни у кого —
+  // генерируем новый на основе меньшего id, он и так уникален и детерминирован.
+  const targetId=c1.holdingId || c2.holdingId || ('h'+Math.min(clientId,otherId));
+  // Если у любого из них уже была СВОЯ группа с другими участниками — подтягиваем
+  // и их тоже, чтобы объединение двух существующих холдингов не оставило часть
+  // участников в старой, брошенной группе.
+  const toUpdate=S.clients.filter(x=>x.id===clientId || x.id===otherId
+    || (c1.holdingId && x.holdingId===c1.holdingId)
+    || (c2.holdingId && x.holdingId===c2.holdingId));
+  for(const c of toUpdate){
+    c.holdingId=targetId;
+    await dbWrite({table:'clients', op:'update', values:{holding_id:targetId}, match:{eq:[['id',c.id]]}});
+  }
+  save();
+  closeModal('m-holding-search');
+  toast(`Объединено: ${toUpdate.length} юр. лиц в одном холдинге`);
+  showPage(currentPageId());
+}
+async function unlinkFromHolding(clientId){
+  const c=S.clients.find(x=>x.id===clientId);
+  if(!c)return;
+  c.holdingId=null;
+  await dbWrite({table:'clients', op:'update', values:{holding_id:null}, match:{eq:[['id',clientId]]}});
+  save();
+  toast('Клиент исключён из холдинга');
+  showPage(currentPageId());
+}
 async function askDelClientDb(id){
   const c=S.clients.find(x=>x.id===id);
   confirm2('Удалить клиента',`«${c?.name}» и все задачи/предложения?`,async()=>{
