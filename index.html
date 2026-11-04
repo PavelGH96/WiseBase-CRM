@@ -3278,7 +3278,7 @@ let TODAY=today(); // обновляется без перезагрузки п�
 // новой присланной версии). Показывается в Профиле, чтобы можно было сверить «то, что
 // открыто на телефоне» с «тем, что прислали только что» — без гадания, обновился
 // ли сайт после деплоя на хостинг.
-const APP_BUILD='ver 29.2 · прежний интерфейс, импорт исходной формы Excel';
+const APP_BUILD='ver 29.3 · шаблон импорта клиентов — все поля карточки, дозаполнение пустых без риска для заполненных';
 // Преобразует Date обратно в строку 'YYYY-MM-DD' по ЛОКАЛЬНЫМ компонентам (не UTC) — пара к today().
 function dateToLocalStr(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 // Парсит строку 'YYYY-MM-DD' как ЛОКАЛЬНУЮ дату (полночь по местному времени), а не UTC.
@@ -8649,30 +8649,43 @@ function exportExcel(){ /* выгрузка по правилам текущей
 const CLIENT_TPL_STATUS_L={unknown:'Неизвестный',potential:'Потенциальный',negotiation:'Переговоры',active:'Действующий',inactive:'Не работаем'};
 // Обратная карта (человекочитаемый статус → внутренний код) — нужна импорту шаблона.
 const CLIENT_TPL_STATUS_R=Object.fromEntries(Object.entries(CLIENT_TPL_STATUS_L).map(([k,v])=>[v,k]));
+// Обратная карта периодичности визитов (человекочитаемая подпись → внутренний код) — нужна импорту шаблона.
+const CLIENT_TPL_REVISIT_R=Object.fromEntries(Object.entries(REVISIT_L).map(([k,v])=>[v,k]));
+// Единый список колонок шаблона экспорта/импорта клиентов — те же поля, что в карточке клиента,
+// чтобы в выгрузке сразу было видно, что по текущей базе не заполнено, и можно было дозаполнить
+// в Excel. Точки на карте, доп. адреса и связь с холдингом не включены — это ссылки на другие
+// записи, в плоскую таблицу их переносить рискованно; такие поля правятся только в самой CRM.
+// Порядок колонок здесь и позиции, которые читает wbParseClientRows, совпадают 1-в-1.
+const CLIENT_TPL_HEADERS=['Компания *','Вывеска','Контакт: Имя','Контакт: Должность','Контакт: Телефон','Контакт: Email',
+  'ИНН','Регион','Город','Адрес','Категория объекта','Потенциал, ₽','Статус','Причины «не работаем»',
+  'Канал: ФМА','Канал: Beyosa','Канал: Комплектация',
+  'Формат: Салон','Формат: Интернет-магазин','Формат: Маркетплейс',
+  'Тег: VIP','Тег: Тёплый','Тег: Холодный','Тег: Новый',
+  'Периодичность визитов','Сервис-менеджер','Условия оплаты','Отсрочка платежа, дней','Кредитный лимит, ₽','Доставка',
+  'Сайт (подпись)','Сайт (ссылка)','Дата след. контакта','Заметка'];
 function exportClientsTemplate(){
-  const headers=['Компания *','Контакт: Имя','Контакт: Должность','Контакт: Телефон','Контакт: Email',
-    'ИНН','Регион','Город','Адрес','Потенциал, ₽','Статус',
-    'Канал: ФМА','Канал: Beyosa','Канал: Комплектация',
-    'Формат: Салон','Формат: Интернет-магазин','Формат: Маркетплейс',
-    'Тег: VIP','Тег: Тёплый','Тег: Холодный','Тег: Новый',
-    'Дата след. контакта','Заметка'];
+  const headers=CLIENT_TPL_HEADERS;
   const rows=wbExportClients().flatMap(c=>{
     const primary=(c.contacts&&c.contacts[0])||{name:c.name,position:'',phone:c.phone,email:c.email};
     const chans=getChannels(c), fmts=getFormats(c), tags=c.tags||[];
+    const site=(c.websites||[])[0]||{};
     const primaryRow=[
-      c.company||'', primary.name||'', primary.position||'', primary.phone||c.phone||'', primary.email||c.email||'',
-      c.inn||'', c.region||'', c.city||'', c.address||'', Number(c.potential||0), CLIENT_TPL_STATUS_L[c.status]||'Неизвестный',
+      c.company||'', c.sign||'', primary.name||'', primary.position||'', primary.phone||c.phone||'', primary.email||c.email||'',
+      c.inn||'', c.region||'', c.city||'', c.address||'', c.objectCategory||'', Number(c.potential||0), CLIENT_TPL_STATUS_L[c.status]||'Неизвестный',
+      (c.notWorkingReasons||[]).join(', '),
       chans.includes('ФМА')?'X':'', chans.includes('Beyosa')?'X':'', chans.includes('Комплектация')?'X':'',
       fmts.includes('Салон')?'X':'', fmts.includes('Интернет-магазин')?'X':'', fmts.includes('Маркетплейс')?'X':'',
       tags.includes('vip')?'X':'', tags.includes('warm')?'X':'', tags.includes('cold')?'X':'', tags.includes('new')?'X':'',
+      REVISIT_L[c.revisitCadence]||'', c.serviceManager||'', c.payTerms||'', c.paymentDelayDays??'', c.creditLimit??'', c.shipping||'',
+      site.label||'', site.url||'',
       c.nextContact||'', c.note||'',
     ];
-    const extra=(c.contacts||[]).slice(1).map(ct=>['',ct.name||'',ct.position||'',ct.phone||'',ct.email||'',...Array(18).fill('')]);
+    const extra=(c.contacts||[]).slice(1).map(ct=>['','',ct.name||'',ct.position||'',ct.phone||'',ct.email||'',...Array(CLIENT_TPL_HEADERS.length-6).fill('')]);
     return [primaryRow,...extra];
   });
   const wb=XLSX.utils.book_new();
   const ws=XLSX.utils.aoa_to_sheet([headers,...rows]);
-  ws['!cols']=headers.map((h,i)=>({wch:i===0?26:i===22?30:i===8?26:16}));
+  ws['!cols']=headers.map((h,i)=>({wch:i===0||i===1?22:i===9?26:i===headers.length-1?30:16}));
   XLSX.utils.book_append_sheet(wb,ws,'Клиенты');
   XLSX.writeFile(wb,`Клиенты_${TODAY}.xlsx`);
   toast(`Экспортировано клиентов: ${wbExportClients().length}`);
@@ -8741,14 +8754,27 @@ function wbParseClientRows(rows,template){
   for(const r of rows){
     if(r.some(v=>sv(v).length>10000))throw new Error('Слишком длинный текст в ячейке');
     if(template){
-      const company=sv(r[0]), ct={name:sv(r[1]),position:sv(r[2]),phone:sv(r[3]),email:sv(r[4])};
+      const company=sv(r[0]), sign=sv(r[1]), ct={name:sv(r[2]),position:sv(r[3]),phone:sv(r[4]),email:sv(r[5])};
       const has=!!(ct.name||ct.position||ct.phone||ct.email);
-      if(!company && !sv(r[10]) && has && cur){cur.contacts.push(ct);if(!cur.phone)cur.phone=ct.phone;if(!cur.email)cur.email=ct.email;continue;}
+      // Продолжение строки с доп. контактом: ни компании, ни вывески, ни статуса не заполнено —
+      // так выглядят «лишние» строки контактов, которые экспорт пишет под основной строкой клиента.
+      if(!company && !sign && !sv(r[12]) && has && cur){cur.contacts.push(ct);if(!cur.phone)cur.phone=ct.phone;if(!cur.email)cur.email=ct.email;continue;}
       if(!company && !has)continue;
-      const channels=['ФМА','Beyosa','Комплектация'].filter((_,i)=>sv(r[11+i]));
-      const formats=['Салон','Интернет-магазин','Маркетплейс'].filter((_,i)=>sv(r[14+i]));
-      const tags=['vip','warm','cold','new'].filter((_,i)=>sv(r[17+i]));
-      cur={name:ct.name||company,company,phone:ct.phone,email:ct.email,inn:sv(r[5]),region:sv(r[6]),city:sv(r[7]),address:sv(r[8]),potential:Number(r[9])||0,status:CLIENT_TPL_STATUS_R[sv(r[10])]||'unknown',channels,formats,tags,nextContact:wbImportDate(r[21]),note:sv(r[22]),contacts:has?[ct]:[]};
+      const channels=['ФМА','Beyosa','Комплектация'].filter((_,i)=>sv(r[14+i]));
+      const formats=['Салон','Интернет-магазин','Маркетплейс'].filter((_,i)=>sv(r[17+i]));
+      const tags=['vip','warm','cold','new'].filter((_,i)=>sv(r[20+i]));
+      const status=CLIENT_TPL_STATUS_R[sv(r[12])]||'unknown';
+      // Причины «не работаем» имеют смысл только при статусе «Не работаем» — как и в форме карточки.
+      const notWorkingReasons=status==='inactive'?sv(r[13]).split(',').map(s=>s.trim()).filter(Boolean):[];
+      const pdRaw=sv(r[27]), pd=pdRaw===''?null:Number(pdRaw);
+      const clRaw=sv(r[28]), cl=clRaw===''?null:Number(clRaw);
+      const siteLabel=sv(r[30]), siteUrl=sv(r[31]);
+      cur={name:ct.name||company,company,sign,phone:ct.phone,email:ct.email,inn:sv(r[6]),region:sv(r[7]),city:sv(r[8]),address:sv(r[9]),
+        objectCategory:sv(r[10]),potential:Number(r[11])||0,status,notWorkingReasons,channels,formats,tags,
+        revisitCadence:CLIENT_TPL_REVISIT_R[sv(r[24])]||'',serviceManager:sv(r[25]),payTerms:sv(r[26]),
+        paymentDelayDays:Number.isFinite(pd)?pd:null,creditLimit:Number.isFinite(cl)?cl:null,shipping:sv(r[29]),
+        websites:(siteLabel||siteUrl)?[{label:siteLabel,url:siteUrl}]:[],
+        nextContact:wbImportDate(r[32]),note:sv(r[33]),contacts:has?[ct]:[]};
     }else{
       if(!sv(r[1]))continue;
       const contacts=parseContactsCell(sv(r[8]));const primary=contacts[0]||{};
@@ -8758,12 +8784,49 @@ function wbParseClientRows(rows,template){
   }
   return out;
 }
+// Поля, которые можно дозаполнить у уже существующего клиента — но ТОЛЬКО если в базе они
+// сейчас пустые. Уже заполненное значение импорт не трогает никогда — поэтому повторная
+// загрузка того же (или обновлённого) файла шаблона безопасна для текущих данных.
+const WB_FILL_TEXT_FIELDS=[['sign','sign'],['region','region'],['city','city'],['address','address'],
+  ['phone','phone'],['email','email'],['inn','inn'],['objectCategory','object_category'],
+  ['note','note'],['nextContact','next_contact']];
+const WB_FILL_SRV_FIELDS=[['serviceManager','service_manager'],['payTerms','payment_terms'],['shipping','shipping']];
+function wbFillBlanksPayload(existing,incoming){
+  const out={};
+  for(const [ck,dk] of WB_FILL_TEXT_FIELDS){ if((existing[ck]==null||existing[ck]==='') && incoming[ck]) out[dk]=incoming[ck]; }
+  if(HAS_SRV_COLS!==false) for(const [ck,dk] of WB_FILL_SRV_FIELDS){ if((existing[ck]==null||existing[ck]==='') && incoming[ck]) out[dk]=incoming[ck]; }
+  if(!existing.potential && incoming.potential) out.potential=incoming.potential;
+  if((existing.status==null||existing.status==='unknown') && incoming.status && incoming.status!=='unknown') out.status=incoming.status;
+  if(!existing.revisitCadence && incoming.revisitCadence) out.revisit_cadence=incoming.revisitCadence;
+  if(existing.paymentDelayDays==null && incoming.paymentDelayDays!=null) out.payment_delay_days=incoming.paymentDelayDays;
+  if(existing.creditLimit==null && incoming.creditLimit!=null) out.credit_limit=incoming.creditLimit;
+  if(!(existing.tags||[]).length && (incoming.tags||[]).length) out.tags=incoming.tags;
+  if(!(existing.channels||[]).length && (incoming.channels||[]).length) out.channels=incoming.channels;
+  if(!(existing.formats||[]).length && (incoming.formats||[]).length) out.formats=incoming.formats;
+  if(!(existing.notWorkingReasons||[]).length && (incoming.notWorkingReasons||[]).length) out.not_working_reasons=incoming.notWorkingReasons;
+  if(!(existing.contacts||[]).length && (incoming.contacts||[]).length) out.contacts=incoming.contacts;
+  if(!(existing.websites||[]).length && (incoming.websites||[]).length) out.websites=incoming.websites;
+  return out;
+}
 async function wbPersistImportedClients(clients,ctx){
-  const result={saved:0,skipped:0,error:null,stopped:false};
+  const result={saved:0,updated:0,skipped:0,error:null,stopped:false};
   const known=S.clients.filter(c=>c.owner_id===ctx.userId).slice();
   for(const c of clients){
     if(!wbSameSession(ctx)){result.error='Аккаунт изменился. Импорт остановлен';result.stopped=true;break;}
-    if(known.some(x=>(c.inn && x.inn)?c.inn===x.inn:(wbImportText(c.company).toLowerCase()===wbImportText(x.company).toLowerCase() && (!!c.company || wbImportText(c.name).toLowerCase()===wbImportText(x.name).toLowerCase())))){result.skipped++;continue;}
+    const existing=known.find(x=>(c.inn && x.inn)?c.inn===x.inn:(wbImportText(c.company).toLowerCase()===wbImportText(x.company).toLowerCase() && (!!c.company || wbImportText(c.name).toLowerCase()===wbImportText(x.name).toLowerCase())));
+    if(existing){
+      // Клиент уже есть — ничего не перезаписываем, только дозаполняем то, что в базе пусто.
+      const payload=wbFillBlanksPayload(existing,c);
+      if(!Object.keys(payload).length){result.skipped++;continue;}
+      let res;try{res=await sb.from('clients').update(payload).eq('id',existing.id).select().single();}catch(e){res={error:e};}
+      if(!wbSameSession(ctx)){result.error='Аккаунт изменился. Проверьте уже сохранённые строки после входа';result.stopped=true;break;}
+      if(res.error || !res.data || res.data.id==null){result.error=(res.error&&res.error.message)||'Сервер не подтвердил обновление';result.stopped=true;break;}
+      const saved=dbToClient(res.data,existing.history||[]);const at=S.clients.findIndex(x=>x.id===saved.id);
+      if(at>=0)S.clients[at]=saved;
+      const ki=known.findIndex(x=>x.id===existing.id);if(ki>=0)known[ki]=saved;
+      result.updated++;save();
+      continue;
+    }
     const p=c.name.split(/\s+/).filter(Boolean);
     const values={...clientToDbFields(c),owner_id:ctx.userId,avatar:((p[0]?.[0]||'')+(p[1]?.[0]||'')).toUpperCase()||'—',color:COLS[ci%COLS.length]};
     // Прямое подтверждение сервера: импорт не объявляется успешным только по локальному save().
@@ -8773,7 +8836,7 @@ async function wbPersistImportedClients(clients,ctx){
     if(res.error || !res.data || res.data.id==null){result.error=(res.error&&res.error.message)||'Сервер не подтвердил запись';result.stopped=true;break;}
     const saved=dbToClient(res.data,[]);const at=S.clients.findIndex(x=>x.id===saved.id);
     if(at<0)S.clients.push(saved);else S.clients[at]=saved;
-    known.push(c);result.saved++;ci++;
+    known.push(saved);result.saved++;ci++;
     save();
   }
   return result;
@@ -8787,7 +8850,7 @@ async function wbImportWorkbook(wb){
   if(!currentUser || !(isAdmin()||isHeadRole()||isManagerRole()))throw new Error('Сначала войдите в CRM с назначенной ролью');
   if(!isOnline())throw new Error('Для импорта подключитесь к интернету');
   const ctx=wbSessionContext();
-  const r={saved:0,skipped:0,tasksSaved:0,error:null,stopped:false};
+  const r={saved:0,updated:0,skipped:0,tasksSaved:0,error:null,stopped:false};
   if(!wb.SheetNames.includes('Клиенты') && !wb.SheetNames.includes('Задачи'))throw new Error('Не найден лист «Клиенты» или «Задачи»');
   let tasks=[];
   if(wb.SheetNames.includes('Задачи')){tasks=XLSX.utils.sheet_to_json(wb.Sheets['Задачи'],{header:1}).slice(1);if(tasks.length>WB_IMPORT_MAX_ROWS)throw new Error('Слишком много задач в файле');}
@@ -8829,8 +8892,8 @@ async function importExcel(input){
     const wb=XLSX.read(data,{type:'array'});const r=await wbImportWorkbook(wb);
     if(!wbSameSession(ctx))return;
     showPage(currentPageId());
-    if(r.error){toast(`Сохранено клиентов: ${r.saved}, задач: ${r.tasksSaved}. Импорт остановлен: ${r.error}. Обновите данные перед повтором`);}
-    else toast(`Сохранено в CRM: клиентов ${r.saved}, задач ${r.tasksSaved}. Дубликатов пропущено: ${r.skipped}`);
+    if(r.error){toast(`Новых клиентов: ${r.saved}, дозаполнено: ${r.updated}, задач: ${r.tasksSaved}. Импорт остановлен: ${r.error}. Обновите данные перед повтором`);}
+    else toast(`Клиенты — новых: ${r.saved}, дозаполнено полей: ${r.updated}, без изменений: ${r.skipped}. Задач сохранено: ${r.tasksSaved}`);
   }catch(e){if(wbSameSession(ctx))toast('Ошибка импорта: '+e.message);}
   finally{wbImportBusy=false;input.value='';}
 }
