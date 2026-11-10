@@ -19,7 +19,8 @@
 // заново наполнит кеш свежим содержимым, а activate() корректно удалит старый.
 // ВАЖНО: при каждом бампе APP_BUILD в index.html меняйте и эту строку тоже —
 // они не связаны программно (Service Worker не видит JS-переменные страницы).
-const CACHE_NAME = 'wisebase-shell-ver2930';
+// APP_BUILD с версии 30 находится в app.js.
+const CACHE_NAME = 'wisebase-shell-ver3000';
 
 // «Оболочка» — то, без чего приложение не откроется вообще. Кешируем при установке,
 // чтобы это точно было готово ДО первого открытия в офлайне (а не только после
@@ -27,9 +28,12 @@ const CACHE_NAME = 'wisebase-shell-ver2930';
 const SHELL_URLS = [
   './',
   './index.html',
+  // С версии 30 весь код приложения лежит в отдельном файле app.js (в index.html скриптов
+  // больше нет — этого требует политика безопасности страницы). Без него офлайн не запустится.
+  './app.js',
   'https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js',
-  'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js',
-  'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:wght@500&display=swap',
+  'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.0/dist/umd/supabase.js',
+  'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@400;500;600;700;800&display=swap',
 ];
 // Сам CSS с fonts.googleapis.com выше кешируется, но ОН ССЫЛАЕТСЯ на файлы шрифтов
 // (.woff2), которые лежат на ДРУГОМ домене — fonts.gstatic.com — и раньше не
@@ -41,15 +45,16 @@ const FONT_FILES_HOST = 'fonts.gstatic.com';
 self.addEventListener('install', e => {
   e.waitUntil(
     caches.open(CACHE_NAME).then(cache =>
-      // fetch()+put(), а не cache.add() — у add() есть особенность: он отклоняет
-      // «непрозрачные» (opaque) кросс-доменные ответы, даже если запрос по факту
-      // успешен. Для внешних CDN (Supabase JS, XLSX, шрифты) ответ всегда opaque —
-      // с add() они молча не закешировались бы вообще.
+      // Внешние ресурсы запрашиваем в режиме CORS (все три CDN его поддерживают), а НЕ no-cors.
+      // Причина: страница подключает библиотеки с crossorigin="anonymous" и проверкой
+      // целостности (integrity). Такому запросу нельзя отдать «непрозрачный» (opaque) ответ,
+      // который получается при no-cors, — браузер считает это ошибкой сети, и библиотека
+      // из кеша просто не загрузилась бы. Обычный CORS-ответ подходит и скриптам, и шрифтам.
       // allSettled, а не all — если один ресурс не закешировался (например, из-за
       // временной недоступности CDN), это не должно сорвать установку остальных.
       Promise.allSettled(SHELL_URLS.map(url => {
-        const req = new Request(url, { mode: url.startsWith('http') ? 'no-cors' : 'same-origin' });
-        return fetch(req).then(res => cache.put(req, res));
+        const req = new Request(url, { mode: url.startsWith('http') ? 'cors' : 'same-origin', credentials: url.startsWith('http') ? 'omit' : 'same-origin', cache: 'reload' });
+        return fetch(req).then(res => { if (!res.ok) throw new Error('HTTP ' + res.status); return cache.put(req, res); });
       }))
     ).then(() => self.skipWaiting())
   );
@@ -87,7 +92,9 @@ self.addEventListener('fetch', e => {
       // (opaque) ответов заголовки недоступны — в некоторых браузерах из-за этого
       // совпадение по Request не срабатывает, а по чистому URL срабатывает.
       caches.match(req).then(c => c || caches.match(req.url))
-        .then(cached => cached || fetch(req).then(res => {
+        // Непрозрачный ответ из старого кеша годится только для no-cors-запросов (например,
+        // <link> со шрифтами). Скрипту с crossorigin он не подойдёт — тогда берём из сети.
+        .then(cached => (cached && !(cached.type === 'opaque' && req.mode === 'cors')) ? cached : fetch(req).then(res => {
         if (res && (res.ok || res.type === 'opaque')) {
           const copy = res.clone();
           caches.open(CACHE_NAME).then(cache => cache.put(req, copy)).catch(() => {});
@@ -152,10 +159,17 @@ self.addEventListener('notificationclick', e => {
   const url = (e.notification.data && e.notification.data.url) || './';
   e.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
-      for (const c of list) {
-        if ('focus' in c) return c.focus();
+      // Раньше фокус получало первое попавшееся окно, а адрес из уведомления терялся.
+      // Теперь ищем окно именно нашего приложения и сообщаем ему, что открыть
+      // (см. wbOpenFromNotification в app.js); если окна нет — открываем новое по адресу.
+      const scope = self.registration.scope;
+      const target = new URL(url, scope).href;
+      const own = list.find(c => c.url.startsWith(scope) && 'focus' in c);
+      if (own) {
+        own.postMessage({ type: 'WB_NOTIFICATION_CLICK', url: target, tag: e.notification.tag || '' });
+        return own.focus();
       }
-      if (clients.openWindow) return clients.openWindow(url);
+      if (clients.openWindow) return clients.openWindow(target.startsWith(scope) ? target : scope);
     })
   );
 });
