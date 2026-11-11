@@ -6640,6 +6640,15 @@ async function wbPersistImportedClients(clients,ctx){
   }
   return result;
 }
+// Колонки шаблона сопоставляются по заголовкам, а не по номеру. Иначе файл, скачанный до
+// версии 29.3 (в нём нет «Вывески» и ещё 10 колонок), читался бы со сдвигом: имя контакта
+// попадало бы в «Вывеску», регион — в ИНН и т.д., а дозаполнение пустых полей записало бы
+// это в базу. Неизвестные колонки пропускаются, отсутствующие считаются пустыми.
+function wbAlignTemplateRows(head,rows){
+  const idx=CLIENT_TPL_HEADERS.map(h=>head.indexOf(h));
+  if(idx.every((j,i)=>j===i))return rows;
+  return rows.map(r=>idx.map(j=>j<0?'':(r||[])[j]));
+}
 async function importClientsTemplateRows(rows){
   if(!currentUser || !(isAdmin()||isHeadRole()||isManagerRole()))throw new Error('Сначала войдите в CRM с назначенной ролью');
   if(!isOnline())throw new Error('Для импорта подключитесь к интернету');
@@ -6655,8 +6664,10 @@ async function wbImportWorkbook(wb){
   if(wb.SheetNames.includes('Задачи')){tasks=XLSX.utils.sheet_to_json(wb.Sheets['Задачи'],{header:1}).slice(1);if(tasks.length>WB_IMPORT_MAX_ROWS)throw new Error('Слишком много задач в файле');}
   if(wb.SheetNames.includes('Клиенты')){
     const rows=XLSX.utils.sheet_to_json(wb.Sheets['Клиенты'],{header:1});
-    const template=wbImportText((rows[0]||[])[0])==='Компания *';
-    Object.assign(r,await wbPersistImportedClients(wbParseClientRows(rows.slice(1),template),ctx));
+    const head=(rows[0]||[]).map(wbImportText);
+    const template=head[0]==='Компания *';
+    const body=template?wbAlignTemplateRows(head,rows.slice(1)):rows.slice(1);
+    Object.assign(r,await wbPersistImportedClients(wbParseClientRows(body,template),ctx));
   }
   if(r.stopped)return r;
   const tRev=Object.fromEntries(Object.entries(TYPE_L).map(([k,v])=>[v,k]));
@@ -9889,7 +9900,9 @@ async function wbOpenClientFile(id,name){
   a.href=url;
   // В новой вкладке открываем только картинки и PDF; всё остальное (в т.ч. SVG и HTML,
   // которые могли бы выполнить скрипт на нашем адресе) — только скачиванием.
-  if(/^(image\/(jpeg|png|webp|gif)|application\/pdf)$/.test(data.type)){ a.target='_blank'; a.rel='noopener'; }
+  // В ПК-версии новое окно для blob-адреса не откроется (оболочка выпускает наружу только
+  // http/mailto/tel) — там файл всегда сохраняется через стандартный диалог.
+  if(!window.wisebaseDesktop && /^(image\/(jpeg|png|webp|gif)|application\/pdf)$/.test(data.type)){ a.target='_blank'; a.rel='noopener'; }
   else a.download=wbFileDisplayName(name);
   document.body.appendChild(a); a.click(); a.remove();
   setTimeout(()=>URL.revokeObjectURL(url),60000);
