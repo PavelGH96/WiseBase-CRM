@@ -806,6 +806,10 @@ h356:function(event){wbDeleteClientFile(wbL(this,"h356-0"),(wbS(this,"h356-1")))
 },
 h357:function(event){wbUploadClientFiles(wbL(this,"h357-0"),this)
 },
+pr_nav:function(event){showPage('prospects')
+},
+pr_mobnav:function(event){closeMobMore();showPage('prospects')
+},
 };
 wbBind(document);
 
@@ -1062,7 +1066,7 @@ let TODAY=today(); // обновляется без перезагрузки п�
 // новой присланной версии). Показывается в Профиле, чтобы можно было сверить «то, что
 // открыто на телефоне» с «тем, что прислали только что» — без гадания, обновился
 // ли сайт после деплоя на хостинг.
-const APP_BUILD='ver 30.0 · безопасность (CSP без inline-скриптов, 2FA, автовыход), файлы клиента, шаблоны сообщений, журнал ошибок';
+const APP_BUILD='ver 31.0 · База региона: общий пул точек, перевод в работу, нерабочие с напоминанием, импорт из Excel';
 // Преобразует Date обратно в строку 'YYYY-MM-DD' по ЛОКАЛЬНЫМ компонентам (не UTC) — пара к today().
 function dateToLocalStr(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 // Парсит строку 'YYYY-MM-DD' как ЛОКАЛЬНУЮ дату (полночь по местному времени), а не UTC.
@@ -1933,7 +1937,7 @@ function gotoClient(id){
 // Возвращает id текущей активной страницы (без префикса 'page-')
 function currentPageId(){ const el=document.querySelector('.page.active'); return el?el.id.replace('page-',''):'dashboard'; }
 // Порядок вкладок — единый источник для навигации мышью и стрелками ←/→.
-const NAV_ORDER=['dashboard','clients','tasks','offers','trips','calendar','analytics','stats','links'];
+const NAV_ORDER=['dashboard','clients','tasks','offers','trips','calendar','analytics','stats','links','prospects'];
 
 /* ============ НАВИГАЦИЯ С КЛАВИАТУРЫ ============
    Два принципа, из-за нарушения которых была прошлая версия:
@@ -2358,11 +2362,11 @@ function showPage(p){
   document.querySelectorAll('.mob-nav-btn').forEach(b=>{b.classList.remove('active');b.removeAttribute('aria-current');});
   document.querySelectorAll('.mob-more-item').forEach(b=>{b.classList.remove('active');b.removeAttribute('aria-current');});
   const _mpt=document.getElementById('mob-page-title-text');
-  if(_mpt)_mpt.textContent=({dashboard:'Главная',clients:'Клиенты',tasks:'Задачи',offers:'Сделки',trips:'Карта поездок',calendar:'Календарь',analytics:'Аналитика',stats:'Статистика',links:'Ссылки и контакты'})[p]||'WiseBase';
+  if(_mpt)_mpt.textContent=({dashboard:'Главная',clients:'Клиенты',tasks:'Задачи',offers:'Сделки',trips:'Карта поездок',calendar:'Календарь',analytics:'Аналитика',stats:'Статистика',links:'Ссылки и контакты',prospects:'База региона'})[p]||'WiseBase';
   const mb=document.getElementById('mob-btn-'+p);
   if(mb){mb.classList.add('active');mb.setAttribute('aria-current','page');}
   const mMore=document.getElementById('mob-btn-more');
-  if(mMore)mMore.classList.toggle('active',['trips','analytics','stats','links'].includes(p));
+  if(mMore)mMore.classList.toggle('active',['trips','analytics','stats','links','prospects'].includes(p));
   // Боковой рельс
   document.querySelectorAll('.rail-item').forEach(b=>{b.classList.remove('active');b.removeAttribute('aria-current');});
   const rb=document.getElementById('rail-btn-'+p);
@@ -2379,6 +2383,7 @@ function showPage(p){
   else if(p==='analytics'){ renderAnalytics(); if(window.switchAnTab) switchAnTab(window.anCurrentTab||'reports'); }
   else if(p==='stats')renderStats();
   else if(p==='links')renderLinksPage();
+  else if(p==='prospects'){ prRender(); prLoad(); }
   // FAB — только на Дашборде и в Задачах
   (function(){const fab=document.querySelector('.fab');if(fab)fab.style.display=(matchMedia('(max-width:600px)').matches||p==='dashboard'||p==='tasks')?'flex':'none';if(typeof closeFabMenu==='function')closeFabMenu();})();
   // Каскад списков при входе убран по просьбе — раздел появляется как раньше (fadeIn всей страницы).
@@ -3754,7 +3759,7 @@ function emailSelectedClients(){
 }
 
 // === CRUD CLIENTS ===
-function openAddClient(){ editClientId=null; ['c-company','c-sign','c-city','c-address','c-note','c-inn','c-nextcontact','c-servicemgr','c-payterms','c-paydelay','c-creditlimit','c-shipping'].forEach(id=>document.getElementById(id).value=''); renderRegionOptions(); setRegionValue(''); document.getElementById('c-potential').value=''; document.getElementById('c-status').value='unknown'; renderNotWorkingOptions(); renderObjectCategoryOptions(); setNotWorkingReasons([]); onClientStatusChange(); document.getElementById('c-category').value=''; document.getElementById('c-revisit').value=''; setChannelBtns([]); setFormatBtns([]); resetGeoGroups(null,null); updGeoWarn(); resetWebsiteRows(null); document.querySelectorAll('#tag-selector input').forEach(cb=>cb.checked=false); applyAllFormSectionStates(); document.querySelector('#m-client h3').textContent='Новый клиент'; document.querySelector('#m-client .btn-primary').textContent='Добавить'; resetContacts(null); document.getElementById('c-owner-wrap').style.display='none'; document.getElementById('m-client').classList.add('open'); }
+function openAddClient(){ _prConvert=null; editClientId=null; ['c-company','c-sign','c-city','c-address','c-note','c-inn','c-nextcontact','c-servicemgr','c-payterms','c-paydelay','c-creditlimit','c-shipping'].forEach(id=>document.getElementById(id).value=''); renderRegionOptions(); setRegionValue(''); document.getElementById('c-potential').value=''; document.getElementById('c-status').value='unknown'; renderNotWorkingOptions(); renderObjectCategoryOptions(); setNotWorkingReasons([]); onClientStatusChange(); document.getElementById('c-category').value=''; document.getElementById('c-revisit').value=''; setChannelBtns([]); setFormatBtns([]); resetGeoGroups(null,null); updGeoWarn(); resetWebsiteRows(null); document.querySelectorAll('#tag-selector input').forEach(cb=>cb.checked=false); applyAllFormSectionStates(); document.querySelector('#m-client h3').textContent='Новый клиент'; document.querySelector('#m-client .btn-primary').textContent='Добавить'; resetContacts(null); document.getElementById('c-owner-wrap').style.display='none'; document.getElementById('m-client').classList.add('open'); }
 // УЛУЧШЕНИЕ: Enter в модалке клиента работает так же, как клик по кнопке
 // «Сохранить»/«Добавить» — в полях компании, ИНН, региона, полях контактного
 // лица (имя/телефон/email) и т.д. В заметке (textarea) Enter, как обычно,
@@ -8504,6 +8509,7 @@ function initRealtime() {
     .on('postgres_changes', { event: '*', schema: 'public', table: 'clients' }, onRtChange('clients'))
     .on('postgres_changes', { event: '*', schema: 'public', table: 'tasks' }, onRtChange('tasks'))
     .on('postgres_changes', { event: '*', schema: 'public', table: 'offers' }, onRtChange('offers'))
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'prospects' }, () => prRemoteChange())
     .on('postgres_changes', { event: '*', schema: 'public', table: 'links' }, async () => {
       // Не перетираем то, что человек сейчас печатает: ждём, пока правки уйдут в базу.
       if (lkPending.size) return;
@@ -8706,7 +8712,9 @@ async function saveClientToDb() {
     if(r.queued) toast('Клиент сохранён локально — отправлю, когда появится сеть');
   } else {
     // Новый клиент — ответственный всегда сам создатель, автоматически, без ручного выбора.
-    dbData.owner_id=currentUser.id;
+    // Перевод точки из «Базы региона»: клиента получает выбранный менеджер (см. prStartConvert).
+    const _conv=_prConvert; _prConvert=null;
+    dbData.owner_id=(_conv&&_conv.ownerId)||currentUser.id;
     const p=displayName.trim().split(/\s+/).filter(Boolean);
     dbData.avatar=((p[0]?.[0]||'')+(p[1]?.[0]||'')).toUpperCase()||'—';
     dbData.color=COLS[ci++%COLS.length]; dbData.pinned=false;
@@ -8724,6 +8732,7 @@ async function saveClientToDb() {
     // Точка входа в воронку — фиксируем в фоне, иначе у клиента не будет начала отсчёта.
     logStatusChange(newId, null, dbData.status||'unknown');
     if(!r.queued) logAction('insert','client',newId,{name:displayName});
+    if(_conv) prAfterConvert(_conv,newId,r.queued);
     return;
   }
   }finally{ _savingClient=false; }
@@ -9918,6 +9927,412 @@ if('serviceWorker' in navigator){
   });
 }
 
+
+
+// ============================================================
+// ver 31 — БАЗА РЕГИОНА: общий пул потенциальных точек до перевода в клиенты.
+// Таблицы prospects / prospect_history. Точка — это город + адрес + комментарий;
+// после контакта её либо переводят в работу (становится клиентом выбранного менеджера,
+// история переезжает в карточку клиента), либо помечают нерабочей с причиной и,
+// при желании, датой возврата (создаётся обычная задача-напоминание).
+// Раздел работает только при наличии сети: точки общие для всей команды, и офлайн-правки
+// двух человек по одной точке было бы не развести.
+// Обработчики здесь — через data-pa и один общий слушатель (inline-скрипты запрещены CSP).
+// ============================================================
+const PR={items:[],hist:new Map(),loaded:false,loading:false,error:null,filter:'new',city:'',q:'',open:new Set(),cur:null,stale:false};
+let _prConvert=null;   // {prospectId, ownerId} — пока заполняется карточка клиента при переводе в работу
+const PR_STATUS_L={new:'Новая',not_working:'Нерабочая',converted:'В работе'};
+function prKey(city,address){ return String(city||'').trim().toLowerCase()+'|'+String(address||'').trim().replace(/\s+/g,' ').toLowerCase(); }
+function prGet(id){ return PR.items.find(x=>x.id===id); }
+function prUserName(id){
+  if(!id)return '';
+  if(currentUser && id===currentUser.id)return (currentProfile&&currentProfile.full_name)||currentUser.email||'Вы';
+  const p=allProfiles.find(x=>x.id===id);
+  return p?(p.full_name||p.email||'Сотрудник'):'Сотрудник';
+}
+function prIsDue(p){ return p.status==='not_working' && p.revisit_date && p.revisit_date<=TODAY; }
+
+async function prLoad(force){
+  if(PR.loading)return;
+  if(PR.loaded && !force && !PR.stale)return;
+  if(!isOnline()){ PR.error=PR.loaded?null:'База региона доступна при подключении к сети.'; prRender(); return; }
+  PR.loading=true; PR.error=null; if(!PR.loaded)prRender();
+  try{
+    if(!allProfiles.length){ try{ await loadAllProfiles(); }catch(_){} }
+    const all=[];
+    // PostgREST отдаёт не больше 1000 строк за запрос — читаем страницами.
+    for(let from=0;;from+=1000){
+      const {data,error}=await sb.from('prospects').select('*').order('city').order('address').range(from,from+999);
+      if(error)throw error;
+      all.push(...(data||[]));
+      if(!data||data.length<1000)break;
+    }
+    PR.items=all; PR.loaded=true; PR.stale=false;
+  }catch(e){
+    PR.error='Не удалось загрузить базу региона: '+((e&&e.message)||e);
+  }
+  PR.loading=false;
+  prRender();
+}
+let _prRemoteTimer=null;
+function prRemoteChange(){
+  // Коллега изменил точку: перечитываем, если раздел открыт, иначе — при следующем заходе.
+  PR.stale=true;
+  clearTimeout(_prRemoteTimer);
+  _prRemoteTimer=setTimeout(()=>{ if(currentPageId()==='prospects' && !document.querySelector('#m-prospect.open,#m-prospect-nw.open,#m-prospect-conv.open'))prLoad(true); },1200);
+}
+
+function prFiltered(){
+  const q=PR.q.trim().toLowerCase();
+  return PR.items.filter(p=>{
+    if(PR.filter==='due'){ if(!prIsDue(p))return false; }
+    else if(PR.filter!=='all' && p.status!==PR.filter)return false;
+    if(PR.city && p.city!==PR.city)return false;
+    if(q && !((p.city+' '+p.address+' '+p.name+' '+p.comment).toLowerCase().includes(q)))return false;
+    return true;
+  });
+}
+function prBadges(p){
+  let h='';
+  if(p.status==='new')h+='<span class="pr-b pr-b-new">Новая</span>';
+  else if(p.status==='not_working')h+='<span class="pr-b pr-b-nw">Нерабочая'+((p.not_working_reasons||[]).length?': '+esc(p.not_working_reasons.join(', ')):'')+'</span>';
+  else h+='<span class="pr-b pr-b-conv">В работе</span>';
+  if(p.status==='new' && p.claimed_by)h+='<span class="pr-b pr-b-claim">Взял: '+esc(prUserName(p.claimed_by))+'</span>';
+  if(p.status==='not_working' && p.revisit_date)h+='<span class="pr-b '+(prIsDue(p)?'pr-b-due':'pr-b-wait')+'">Вернуться '+FD(p.revisit_date)+'</span>';
+  return h;
+}
+function prRender(){
+  const list=document.getElementById('pr-list'); if(!list)return;
+  // фильтры-чипы со счётчиками
+  const cnt={new:0,not_working:0,converted:0,due:0};
+  PR.items.forEach(p=>{ cnt[p.status]=(cnt[p.status]||0)+1; if(prIsDue(p))cnt.due++; });
+  const chips=[['new','Новые',cnt.new],['due','Пора вернуться',cnt.due],['not_working','Нерабочие',cnt.not_working],['converted','В работе',cnt.converted],['all','Все',PR.items.length]];
+  document.getElementById('pr-chips').innerHTML=chips.map(([k,l,n])=>`<button type="button" class="seg-chip${PR.filter===k?' active':''}" data-pa="filter" data-key="${k}" aria-pressed="${PR.filter===k}">${l} <span class="seg-n">${n}</span></button>`).join('');
+  // список городов для фильтра и подсказок
+  const cities=[...new Set(PR.items.map(p=>p.city))].sort((a,b)=>a.localeCompare(b,'ru'));
+  const sel=document.getElementById('pr-city');
+  sel.innerHTML='<option value="">Все города</option>'+cities.map(c=>`<option value="${esc(c)}"${c===PR.city?' selected':''}>${esc(c)}</option>`).join('');
+  document.getElementById('pr-city-list').innerHTML=cities.map(c=>`<option value="${esc(c)}"></option>`).join('');
+
+  if(PR.error && !PR.items.length){ list.innerHTML=`<div class="empty-state"><div class="es-ic">📡</div><div class="es-t">${esc(PR.error)}</div><button type="button" class="btn btn-ghost btn-sm" data-pa="reload">Повторить</button></div>`; return; }
+  if(!PR.loaded){ list.innerHTML='<div class="empty-state"><div class="es-s">Загрузка…</div></div>'; return; }
+  if(!PR.items.length){ list.innerHTML='<div class="empty-state"><div class="es-ic">🗺️</div><div class="es-t">База региона пока пуста</div><div class="es-s">Загрузите список точек из Excel (город, адрес, комментарий) или добавьте первую точку вручную.</div><button type="button" class="btn btn-primary" data-pa="import">Импорт из Excel</button></div>'; return; }
+  const rows=prFiltered();
+  if(!rows.length){ list.innerHTML='<div class="empty-state"><div class="es-t">Ничего не найдено</div><div class="es-s">Измените фильтр или строку поиска.</div></div>'; return; }
+  const byCity=new Map();
+  rows.forEach(p=>{ if(!byCity.has(p.city))byCity.set(p.city,[]); byCity.get(p.city).push(p); });
+  const names=[...byCity.keys()].sort((a,b)=>a.localeCompare(b,'ru'));
+  // При поиске и когда городов мало — раскрываем всё сразу; иначе рисуем только раскрытые
+  // города (точек могут быть тысячи).
+  const openAll=!!PR.q.trim() || names.length<=2;
+  let shown=0;
+  list.innerHTML=names.map(city=>{
+    const arr=byCity.get(city);
+    const open=openAll || PR.open.has(city);
+    let body='';
+    if(open){
+      const lim=Math.max(0,Math.min(arr.length,400-shown)); shown+=lim;
+      body=arr.slice(0,lim).map(p=>`<button type="button" class="pr-row" data-pa="open" data-id="${p.id}"><span class="pr-main"><span class="pr-addr">${esc(p.address)}</span>${p.name?`<span class="pr-name">${esc(p.name)}</span>`:''}</span><span class="pr-comment">${esc(p.comment)}</span><span class="pr-badges">${prBadges(p)}</span></button>`).join('')
+        +(lim<arr.length?`<div class="pr-more">Показаны первые ${lim} из ${arr.length}. Уточните поиск, чтобы увидеть остальные.</div>`:'');
+    }
+    return `<div class="pr-city${open?' open':''}"><button type="button" class="pr-city-head" data-pa="city" data-key="${esc(city)}" aria-expanded="${open}"><span class="pr-arrow" aria-hidden="true">▸</span><span>${esc(city)}</span><span class="pr-n">${arr.length}</span></button>${body}</div>`;
+  }).join('');
+}
+
+// ---------- карточка точки ----------
+function prOpenModal(id){ document.getElementById(id).classList.add('open'); }
+function prOpenDetail(id){
+  const p=id?prGet(id):null;
+  PR.cur=p?p.id:null;
+  document.getElementById('m-prospect-title').textContent=p?'Точка':'Новая точка';
+  document.getElementById('pr-f-city').value=p?p.city:(PR.city||'');
+  document.getElementById('pr-f-address').value=p?p.address:'';
+  document.getElementById('pr-f-name').value=p?p.name:'';
+  document.getElementById('pr-f-comment').value=p?p.comment:'';
+  document.getElementById('pr-del').style.display=(p&&isAdmin())?'':'none';
+  prRenderDetailExtra();
+  prOpenModal('m-prospect');
+  if(p)prLoadHistory(p.id);
+  setTimeout(()=>{ const f=document.getElementById(p?'pr-hist-input':'pr-f-city'); if(f&&!p)f.focus(); },60);
+}
+function prRenderDetailExtra(){
+  const el=document.getElementById('pr-detail-extra');
+  const p=PR.cur?prGet(PR.cur):null;
+  if(!p){ el.innerHTML=''; return; }
+  const map='https://yandex.ru/maps/?text='+encodeURIComponent(p.city+', '+p.address);
+  let actions='';
+  if(p.status==='new'){
+    const mine=p.claimed_by && currentUser && p.claimed_by===currentUser.id;
+    actions+=p.claimed_by
+      ? (mine?'<button type="button" class="btn btn-ghost btn-sm" data-pa="unclaim">Снять отметку «взял»</button>':'')
+      : '<button type="button" class="btn btn-ghost btn-sm" data-pa="claim">Взял</button>';
+    actions+='<button type="button" class="btn btn-primary btn-sm" data-pa="convert">В работу</button><button type="button" class="btn btn-danger btn-sm" data-pa="nw">Нерабочая</button>';
+  }else if(p.status==='not_working'){
+    actions+='<button type="button" class="btn btn-primary btn-sm" data-pa="convert">В работу</button><button type="button" class="btn btn-ghost btn-sm" data-pa="reopen">Вернуть в новые</button><button type="button" class="btn btn-ghost btn-sm" data-pa="nw">Изменить причину</button>';
+  }else{
+    const c=p.converted_client_id?S.clients.find(x=>x.id===p.converted_client_id):null;
+    actions+=c?`<button type="button" class="btn btn-ghost btn-sm" data-pa="goto-client">Открыть клиента: ${esc(c.company||c.name)}</button>`:'<span class="field-hint">Клиент в базе другого менеджера или удалён.</span>';
+  }
+  const h=PR.hist.get(p.id);
+  const hist=!h?'<div class="pr-hist-empty">Загрузка…</div>'
+    :(h.length?h.map(x=>`<div class="pr-hist-item"><div class="pr-hist-meta">${FD(String(x.created_at).slice(0,10))} · ${esc(prUserName(x.author_id))}</div><div>${esc(x.text)}</div></div>`).join(''):'<div class="pr-hist-empty">Записей пока нет</div>');
+  el.innerHTML=`<div class="pr-statusline">${prBadges(p)}<a class="pr-maplink" href="${esc(map)}" target="_blank" rel="noopener">Открыть в Яндекс Картах ↗</a></div>
+    <div class="pr-actions">${actions}</div>
+    <div class="form-sec-lbl">История общения</div>
+    <div class="pr-hist" id="pr-hist">${hist}</div>
+    <div class="pr-hist-add"><input type="text" id="pr-hist-input" placeholder="Что обсудили, о чём договорились…" maxlength="1000" aria-label="Новая запись в историю"><button type="button" class="btn btn-ghost btn-sm" data-pa="hist-add">Добавить</button></div>`;
+  const box=document.getElementById('pr-hist'); if(box)box.scrollTop=box.scrollHeight;
+}
+async function prLoadHistory(id){
+  const {data,error}=await sb.from('prospect_history').select('*').eq('prospect_id',id).order('created_at');
+  if(error){ toast('Не удалось загрузить историю: '+error.message); PR.hist.set(id,PR.hist.get(id)||[]); }
+  else PR.hist.set(id,data||[]);
+  if(PR.cur===id)prRenderDetailExtra();
+}
+async function prAddHistory(id,text,kind){
+  const {data,error}=await sb.from('prospect_history').insert({prospect_id:id,text,kind:kind||'comment',author_id:currentUser.id}).select().single();
+  if(error){ toast('Не удалось записать в историю: '+error.message); return false; }
+  const arr=PR.hist.get(id)||[]; arr.push(data); PR.hist.set(id,arr);
+  return true;
+}
+async function prUpdate(id,values){
+  const {data,error}=await sb.from('prospects').update(values).eq('id',id).select().single();
+  if(error){
+    toast(error.code==='23505'?'Точка с таким городом и адресом уже есть в базе':'Не удалось сохранить: '+error.message);
+    return null;
+  }
+  const i=PR.items.findIndex(x=>x.id===id); if(i>=0)PR.items[i]=data;
+  return data;
+}
+function prNeedOnline(){ if(isOnline())return true; toast('Нет сети — база региона доступна только онлайн'); return false; }
+
+async function prSave(){
+  if(!prNeedOnline())return;
+  const v={city:document.getElementById('pr-f-city').value.trim(),address:document.getElementById('pr-f-address').value.trim(),
+    name:document.getElementById('pr-f-name').value.trim(),comment:document.getElementById('pr-f-comment').value.trim()};
+  if(!v.city||!v.address){ toast('Укажите город и адрес'); return; }
+  if(PR.cur){
+    const p=prGet(PR.cur);
+    if(p && p.city===v.city && p.address===v.address && p.name===v.name && p.comment===v.comment){ closeModal('m-prospect'); return; }
+    if(await prUpdate(PR.cur,v)){ toast('Точка сохранена'); closeModal('m-prospect'); prRender(); }
+    return;
+  }
+  const insert=async()=>{
+    const {data,error}=await sb.from('prospects').insert(v).select().single();
+    if(error){ toast(error.code==='23505'?'Точка с таким городом и адресом уже есть в базе':'Не удалось добавить: '+error.message); return; }
+    PR.items.push(data); PR.open.add(data.city);
+    toast('Точка добавлена'); closeModal('m-prospect'); prRender();
+  };
+  const dup=S.clients.find(c=>c.city&&c.address&&prKey(c.city,c.address)===prKey(v.city,v.address));
+  if(dup)confirm2('Такой адрес уже есть среди клиентов','По этому адресу уже заведён клиент «'+(dup.company||dup.name)+'». Всё равно добавить точку в базу региона?',insert,'Добавить');
+  else await insert();
+}
+async function prClaim(on){
+  if(!prNeedOnline()||!PR.cur)return;
+  const p=await prUpdate(PR.cur,{claimed_by:on?currentUser.id:null,claimed_at:on?new Date().toISOString():null});
+  if(!p)return;
+  await prAddHistory(p.id,on?'Взял точку в проработку':'Снял отметку «взял»','claim');
+  prRenderDetailExtra(); prRender();
+}
+async function prHistAddFromInput(){
+  if(!prNeedOnline()||!PR.cur)return;
+  const inp=document.getElementById('pr-hist-input'); const text=inp.value.trim();
+  if(!text)return;
+  inp.disabled=true;
+  const ok=await prAddHistory(PR.cur,text,'comment');
+  if(ok)prRenderDetailExtra(); else inp.disabled=false;
+  const ni=document.getElementById('pr-hist-input'); if(ni)ni.focus();
+}
+function prDelete(){
+  const p=PR.cur?prGet(PR.cur):null; if(!p)return;
+  confirm2('Удалить точку','Удалить «'+p.city+', '+p.address+'» вместе с историей общения? Восстановить не получится.',async()=>{
+    const {error}=await sb.from('prospects').delete().eq('id',p.id);
+    if(error){ toast('Не удалось удалить: '+error.message); return; }
+    PR.items=PR.items.filter(x=>x.id!==p.id); PR.hist.delete(p.id);
+    closeModal('m-prospect'); prRender(); toast('Точка удалена');
+  },'Удалить');
+}
+
+// ---------- нерабочая ----------
+function prOpenNw(){
+  const p=PR.cur?prGet(PR.cur):null; if(!p)return;
+  const cur=new Set(p.status==='not_working'?(p.not_working_reasons||[]):[]);
+  document.getElementById('pr-nw-reasons').innerHTML=NOT_WORKING_REASONS.map(r=>`<label><input type="checkbox" value="${esc(r)}"${cur.has(r)?' checked':''}> ${esc(r)}</label>`).join('');
+  document.getElementById('pr-nw-comment').value='';
+  document.getElementById('pr-nw-date').value=(p.status==='not_working'&&p.revisit_date)||'';
+  document.getElementById('pr-nw-date').min=TODAY;
+  prOpenModal('m-prospect-nw');
+}
+async function prSaveNw(){
+  if(!prNeedOnline()||!PR.cur)return;
+  const before=prGet(PR.cur);
+  const reasons=[...document.querySelectorAll('#pr-nw-reasons input:checked')].map(x=>x.value);
+  const comment=document.getElementById('pr-nw-comment').value.trim();
+  const date=document.getElementById('pr-nw-date').value||null;
+  if(!reasons.length && !comment){ toast('Укажите причину или комментарий'); return; }
+  const prevDate=before&&before.status==='not_working'?before.revisit_date:null;
+  const p=await prUpdate(PR.cur,{status:'not_working',not_working_reasons:reasons,revisit_date:date,claimed_by:null,claimed_at:null});
+  if(!p)return;
+  await prAddHistory(p.id,'Нерабочая'+(reasons.length?': '+reasons.join(', '):'')+(comment?'. '+comment:'')+(date?'. Вернуться '+FD(date):''),'status');
+  // напоминание — обычная задача у того, кто поставил отметку
+  if(date && date!==prevDate){
+    const values={type:'call',text:'Вернуться к точке: '+p.city+', '+p.address+(p.name?' ('+p.name+')':''),client_id:null,date,time:'',done:false,
+      note:'База региона. '+(reasons.length?'Причина отказа: '+reasons.join(', ')+'. ':'')+comment,prio:'mid',repeat:'',owner_id:currentUser.id};
+    const tmpId=tmpIdSeq--;
+    const r=await dbWrite({table:'tasks',op:'insert',values},{returning:true,tmpId});
+    if(r.error)toast('Точка сохранена, но напоминание создать не удалось: '+r.error.message);
+    else{ S.tasks.push(dbToTask({id:(r.data&&r.data.id!=null)?r.data.id:tmpId,...values})); save(); updateTaskBadge(); }
+  }
+  closeModal('m-prospect-nw');
+  toast(date?'Отмечена нерабочей, напоминание на '+FD(date)+' создано':'Отмечена нерабочей');
+  prRenderDetailExtra(); prRender();
+}
+async function prReopen(){
+  if(!prNeedOnline()||!PR.cur)return;
+  const p=await prUpdate(PR.cur,{status:'new',not_working_reasons:[],revisit_date:null});
+  if(!p)return;
+  await prAddHistory(p.id,'Возвращена в новые','status');
+  prRenderDetailExtra(); prRender();
+}
+
+// ---------- перевод в работу ----------
+function prOpenConvert(){
+  if(!prNeedOnline()||!PR.cur)return;
+  const sel=document.getElementById('pr-conv-owner');
+  const me=currentUser.id;
+  const people=allProfiles.filter(p=>p.id!==me).sort((a,b)=>(a.full_name||a.email||'').localeCompare(b.full_name||b.email||'','ru'));
+  sel.innerHTML=`<option value="${esc(me)}">${esc(prUserName(me))} (я)</option>`+people.map(p=>`<option value="${esc(p.id)}">${esc(p.full_name||p.email||'Сотрудник')}</option>`).join('');
+  prOpenModal('m-prospect-conv');
+}
+function prStartConvert(){
+  const p=PR.cur?prGet(PR.cur):null; if(!p)return;
+  const ownerId=document.getElementById('pr-conv-owner').value||currentUser.id;
+  document.getElementById('m-prospect-conv').classList.remove('open','closing');
+  document.getElementById('m-prospect').classList.remove('open','closing');
+  showPage('clients');
+  openAddClient();                 // сбрасывает _prConvert — поэтому выставляем его ПОСЛЕ
+  _prConvert={prospectId:p.id,ownerId};
+  document.getElementById('c-city').value=p.city;
+  document.getElementById('c-address').value=p.address;
+  if(p.name)document.getElementById('c-company').value=p.name;
+  if(p.comment)document.getElementById('c-note').value=p.comment;
+  toast('Заполните карточку клиента и нажмите «Добавить» — точка перейдёт в работу');
+}
+// Вызывается из saveClientToDb после успешного создания клиента из точки.
+async function prAfterConvert(conv,clientId,queued){
+  if(queued || !(clientId>0)){ toast('Клиент сохранён без сети — точка осталась в базе региона, отметьте её позже'); return; }
+  try{
+    const p=await prUpdate(conv.prospectId,{status:'converted',converted_client_id:clientId,converted_by:currentUser.id,converted_at:new Date().toISOString(),claimed_by:null,claimed_at:null,revisit_date:null});
+    if(!p)return;
+    await prAddHistory(p.id,'Переведена в работу. Ответственный: '+prUserName(conv.ownerId),'status');
+    // история общения переезжает в карточку клиента
+    const {data}=await sb.from('prospect_history').select('*').eq('prospect_id',p.id).order('created_at');
+    const rows=(data||[]).map(x=>({client_id:clientId,date:String(x.created_at).slice(0,10),text:'[База региона] '+prUserName(x.author_id)+': '+x.text}));
+    if(rows.length){
+      const {error}=await sb.from('client_history').insert(rows);
+      if(error)toast('Клиент создан, но историю перенести не удалось: '+error.message);
+      else{ const c=S.clients.find(x=>x.id===clientId); if(c){ (c.history||=[]).push(...rows.map(r=>({date:r.date,text:r.text}))); save(); if(currentPageId()==='clients')renderClients(); } }
+    }
+    prRender();
+  }catch(e){ toast('Клиент создан, но точку отметить не удалось: '+((e&&e.message)||e)); }
+}
+
+// ---------- импорт из Excel ----------
+function prTemplate(){
+  if(typeof XLSX==='undefined'){ toast('Библиотека Excel не загрузилась — проверьте сеть'); return; }
+  const ws=XLSX.utils.aoa_to_sheet([['Город','Адрес','Название','Комментарий'],['Екатеринбург','ул. Малышева, 5','Мебельный салон «Пример»','Работают с 10 до 20']]);
+  ws['!cols']=[{wch:22},{wch:36},{wch:30},{wch:40}];
+  const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'База региона');
+  XLSX.writeFile(wb,'База_региона_шаблон.xlsx');
+}
+async function prImportFile(file){
+  if(!file)return;
+  if(!prNeedOnline())return;
+  if(typeof XLSX==='undefined'){ toast('Библиотека Excel не загрузилась — проверьте сеть'); return; }
+  let grid;
+  try{
+    const wb=XLSX.read(await file.arrayBuffer(),{type:'array'});
+    grid=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,defval:'',raw:false});
+  }catch(e){ toast('Не удалось прочитать файл: '+((e&&e.message)||e)); return; }
+  const norm=s=>String(s==null?'':s).trim();
+  // ищем строку заголовков в первых 10 строках; если её нет — считаем колонки A, B, C, D
+  let col={city:0,address:1,name:-1,comment:2}, start=0;
+  for(let i=0;i<Math.min(10,grid.length);i++){
+    const low=grid[i].map(x=>norm(x).toLowerCase());
+    const ci=low.findIndex(x=>x==='город'||x==='населённый пункт'||x==='населенный пункт'), ai=low.findIndex(x=>x.startsWith('адрес'));
+    if(ci>=0&&ai>=0){ col={city:ci,address:ai,name:low.findIndex(x=>x.startsWith('назван')||x==='вывеска'||x==='компания'),comment:low.findIndex(x=>x.startsWith('коммент')||x.startsWith('примеч'))}; start=i+1; break; }
+  }
+  const have=new Set(PR.items.map(p=>prKey(p.city,p.address)));
+  const clientKeys=new Set(S.clients.filter(c=>c.city&&c.address).map(c=>prKey(c.city,c.address)));
+  const rows=[]; let empty=0, dupBase=0, dupFile=0, dupClient=0;
+  for(let i=start;i<grid.length;i++){
+    const r=grid[i]; const city=norm(r[col.city]), address=norm(r[col.address]);
+    if(!city&&!address){ continue; }
+    if(!city||!address){ empty++; continue; }
+    const k=prKey(city,address);
+    if(have.has(k)){ dupBase++; continue; }
+    if(clientKeys.has(k)){ dupClient++; continue; }
+    if(rows.some(x=>x._k===k)){ dupFile++; continue; }
+    rows.push({_k:k,city,address,name:col.name>=0?norm(r[col.name]).slice(0,200):'',comment:col.comment>=0?norm(r[col.comment]).slice(0,2000):''});
+  }
+  const skipped=[dupBase&&('уже в базе — '+dupBase),dupClient&&('уже среди клиентов — '+dupClient),dupFile&&('повторы в файле — '+dupFile),empty&&('без города или адреса — '+empty)].filter(Boolean).join(', ');
+  if(!rows.length){ toast('Новых точек в файле нет'+(skipped?' ('+skipped+')':'')); return; }
+  confirm2('Импорт в базу региона','Будет добавлено точек: '+rows.length+'.'+(skipped?' Пропущено: '+skipped+'.':''),async()=>{
+    let added=0;
+    toast('Загружаем точки…');
+    for(let i=0;i<rows.length;i+=500){
+      const chunk=rows.slice(i,i+500).map(({_k,...x})=>x);
+      const {data,error}=await sb.from('prospects').upsert(chunk,{onConflict:'org_id,dedup_key',ignoreDuplicates:true}).select('id');
+      if(error){ toast('Импорт прерван: '+error.message+'. Добавлено: '+added); break; }
+      added+=(data||[]).length;
+    }
+    logAction('import','prospects',null,{count:added});
+    toast('Добавлено точек: '+added);
+    PR.filter='new';
+    await prLoad(true);
+  },'Добавить');
+}
+
+// ---------- события раздела ----------
+document.addEventListener('click',e=>{
+  const el=e.target.closest('[data-pa]'); if(!el)return;
+  const a=el.dataset.pa;
+  if(a==='filter'){ PR.filter=el.dataset.key; prRender(); }
+  else if(a==='city'){ const c=el.dataset.key; if(PR.open.has(c))PR.open.delete(c); else PR.open.add(c); prRender(); }
+  else if(a==='open')prOpenDetail(Number(el.dataset.id));
+  else if(a==='add'){ if(prNeedOnline())prOpenDetail(null); }
+  else if(a==='import')document.getElementById('pr-file').click();
+  else if(a==='template')prTemplate();
+  else if(a==='reload')prLoad(true);
+  else if(a==='save')prSave();
+  else if(a==='close-detail')closeModal('m-prospect');
+  else if(a==='delete')prDelete();
+  else if(a==='claim')prClaim(true);
+  else if(a==='unclaim')prClaim(false);
+  else if(a==='hist-add')prHistAddFromInput();
+  else if(a==='nw')prOpenNw();
+  else if(a==='nw-save')prSaveNw();
+  else if(a==='nw-cancel')closeModal('m-prospect-nw');
+  else if(a==='reopen')prReopen();
+  else if(a==='convert')prOpenConvert();
+  else if(a==='conv-go')prStartConvert();
+  else if(a==='conv-cancel')closeModal('m-prospect-conv');
+  else if(a==='goto-client'){ const p=PR.cur?prGet(PR.cur):null; if(p&&p.converted_client_id){ closeModal('m-prospect'); showPage('clients'); selectClient(p.converted_client_id); } }
+});
+(function(){
+  let t=null;
+  const s=document.getElementById('pr-search');
+  if(s)s.addEventListener('input',()=>{ clearTimeout(t); t=setTimeout(()=>{ PR.q=s.value; prRender(); },180); });
+  const c=document.getElementById('pr-city');
+  if(c)c.addEventListener('change',()=>{ PR.city=c.value; if(c.value)PR.open.add(c.value); prRender(); });
+  const f=document.getElementById('pr-file');
+  if(f)f.addEventListener('change',()=>{ const file=f.files&&f.files[0]; f.value=''; prImportFile(file); });
+  document.addEventListener('keydown',e=>{
+    if(e.key!=='Enter')return;
+    if(e.target&&e.target.id==='pr-hist-input'){ e.preventDefault(); prHistAddFromInput(); }
+    else if(e.target&&['pr-f-city','pr-f-address','pr-f-name'].includes(e.target.id)){ e.preventDefault(); prSave(); }
+  });
+})();
 
 wbIdleNotice();
 
